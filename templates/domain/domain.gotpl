@@ -1,0 +1,12 @@
+package {{ parseToLower .ModelName }}
+
+type UseCase interface {
+	GetTx() (model.Transaction, error)
+
+	Create(m *model.{{ .ModelName }}) error
+	Update(m *model.{{ .ModelName }}) error
+	Delete(ID uint) error
+
+	GetWhere(fields model.Fields, sort model.SortFields) (model.{{ .ModelName }}, error)
+	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.{{ parseToUpperCamelCase .TableName }}, error)
+}

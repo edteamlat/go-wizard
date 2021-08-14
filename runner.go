@@ -1,26 +1,44 @@
 package main
 
-type Runner struct {
-	layers UseCaseLayers
+type action string
+
+const (
+	override = "override"
+	newField = "new-field"
+)
+
+type runner struct {
+	layers useCaseLayers
 }
 
-// NewRunner returns a new Runner
-func NewRunner() *Runner {
-	return &Runner{}
+// newRunner returns a new runner
+func newRunner() *runner {
+	return &runner{}
 }
 
-// AppendLayer adds a new UseCaseLayer to Runner.layers field
-func (r *Runner) AppendLayer(layer ...UseCaseLayer) {
+// appendLayer adds a new useCaseLayer to runner.layers field
+func (r *runner) appendLayer(layer ...useCaseLayer) {
 	r.layers = append(r.layers, layer...)
 }
 
-// Run runs the generation of every layer
-func (r Runner) Run(m Layer) error {
-	for _, layer := range r.layers {
-		if err := layer.Generate(m); err != nil {
+// run the generation of every layer
+func (r runner) run(a action, m layer) error {
+	for _, layerUseCase := range r.layers {
+		if err := r.exec(a, m, layerUseCase); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (r runner) exec(a action, m layer, layerUseCase useCaseLayer) error {
+	switch a {
+	case override:
+		return layerUseCase.override(m)
+	case newField:
+		return layerUseCase.addField(m)
+	default:
+		return layerUseCase.create(m)
+	}
 }

@@ -23,18 +23,18 @@ func main() {
 	}
 
 	layerData := newLayer(conf)
-	layerData.SetFields(fields)
+	layerData.setFields(fields)
 
-	fileSystemUseCase := NewFileSystem()
+	fileSystemUseCase := newFileSystem()
 
-	tpl := template.Must(template.New("").ParseFS(templates))
-	templateUseCase := NewTemplate(tpl)
+	tpl := template.Must(template.New("").Funcs(getTemplateFunctions()).ParseFS(templates))
+	templateUseCase := newTemplate(tpl)
 
 	layerUseCases, err := getUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
 
-	runner := NewRunner()
-	runner.AppendLayer(layerUseCases...)
-	if err := runner.Run(*layerData); err != nil {
+	runner := newRunner()
+	runner.appendLayer(layerUseCases...)
+	if err := runner.run("", *layerData); err != nil {
 		log.Fatal(err)
 	}
 }

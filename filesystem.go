@@ -6,18 +6,18 @@ import (
 	"io/ioutil"
 )
 
-type Storage interface {
-	Save(path string, data bytes.Buffer) error
+type storage interface {
+	save(path string, data bytes.Buffer) error
 }
 
-type FileSystem struct {
+type fileSystem struct {
 }
 
-func NewFileSystem() *FileSystem {
-	return &FileSystem{}
+func newFileSystem() *fileSystem {
+	return &fileSystem{}
 }
 
-func (f FileSystem) Save(path string, data bytes.Buffer) error {
+func (f fileSystem) save(path string, data bytes.Buffer) error {
 	ioutil.WriteFile(path, data.Bytes(), fs.ModePerm)
 
 	return nil

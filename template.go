@@ -6,19 +6,19 @@ import (
 	"text/template"
 )
 
-type UseCaseTemplate interface {
-	Create(wr io.Writer, templateName string, data interface{}) error
+type useCaseTemplate interface {
+	create(wr io.Writer, templateName string, data layer) error
 }
 
-type Template struct {
+type textTemplate struct {
 	tpl *template.Template
 }
 
-func NewTemplate(tpl *template.Template) *Template {
-	return &Template{tpl: tpl}
+func newTemplate(tpl *template.Template) *textTemplate {
+	return &textTemplate{tpl: tpl}
 }
 
-func (t Template) Create(wr io.Writer, templateName string, data interface{}) error {
+func (t textTemplate) create(wr io.Writer, templateName string, data layer) error {
 	if err := t.tpl.ExecuteTemplate(wr, templateName, data); err != nil {
 		return fmt.Errorf("template: %w", err)
 	}

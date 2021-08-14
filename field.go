@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var ErrInvalidField = errors.New("invalid len of field")
+var errInvalidField = errors.New("invalid len of field")
 
 const fieldSeparator = ":"
 
@@ -14,15 +14,15 @@ const (
 	typeFieldIndex = 1
 )
 
-// Field model for every field of a struct and table that want to be generated
-type Field struct {
+// field model for every field of a struct and table that want to be generated
+type field struct {
 	Name    string
 	Type    string
 	NotNull string
 }
 
-// Fields slice of Field
-type Fields []Field
+// Fields slice of field
+type Fields []field
 
 // newFieldsFromSliceString builds a new Fields from fields in string format
 func newFieldsFromSliceString(fieldsStr []string) (Fields, error) {
@@ -31,10 +31,10 @@ func newFieldsFromSliceString(fieldsStr []string) (Fields, error) {
 	for _, fieldStr := range fieldsStr {
 		splitField := strings.Split(fieldStr, fieldSeparator)
 		if !isValidLen(splitField) {
-			return fields, ErrInvalidField
+			return fields, errInvalidField
 		}
 
-		field := Field{
+		field := field{
 			Name: splitField[nameFieldIndex],
 			Type: splitField[typeFieldIndex],
 		}

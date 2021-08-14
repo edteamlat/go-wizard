@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 const (
@@ -10,49 +12,65 @@ const (
 	useCaseTemplateName = "usecase.gotpl"
 )
 
-type DomainLayer struct {
-	template UseCaseTemplate
-	storage  Storage
+const (
+	domainPath = "domain/%s/%s.go"
+)
+
+type domainLayer struct {
+	template useCaseTemplate
+	storage  storage
 }
 
-func newDomainLayer(template UseCaseTemplate, storage Storage) *DomainLayer {
-	return &DomainLayer{template: template, storage: storage}
+func newDomainLayer(template useCaseTemplate, storage storage) *domainLayer {
+	return &domainLayer{template: template, storage: storage}
 }
 
-func (d DomainLayer) Generate(data Layer) error {
-	if err := d.generateDomainFile(data); err != nil {
+func (d domainLayer) create(data layer) error {
+	if err := d.createDomainFile(data); err != nil {
 		return fmt.Errorf("domainlayer: %w", err)
 	}
 
-	if err := d.generateUseCaseFile(data); err != nil {
+	if err := d.createUseCaseFile(data); err != nil {
 		return fmt.Errorf("domainlayer: %w", err)
 	}
 
 	return nil
 }
 
-func (d DomainLayer) generateDomainFile(data interface{}) error {
+func (d domainLayer) createDomainFile(data layer) error {
 	domainFileBuf := bytes.Buffer{}
-	if err := d.template.Create(&domainFileBuf, domainTemplateName, &data); err != nil {
+	if err := d.template.create(&domainFileBuf, domainTemplateName, data); err != nil {
 		return err
 	}
 
-	if err := d.storage.Save("", domainFileBuf); err != nil {
+	packageName := strings.ToLower(data.ModelName)
+	domainFilePath := fmt.Sprintf(domainPath, packageName, packageName)
+	if err := d.storage.save(filepath.Join(data.ProjectPath, domainFilePath), domainFileBuf); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (d DomainLayer) generateUseCaseFile(data interface{}) error {
+func (d domainLayer) createUseCaseFile(data layer) error {
 	useCaseFileBuf := bytes.Buffer{}
-	if err := d.template.Create(&useCaseFileBuf, useCaseTemplateName, &data); err != nil {
+	if err := d.template.create(&useCaseFileBuf, useCaseTemplateName, data); err != nil {
 		return err
 	}
 
-	if err := d.storage.Save("", useCaseFileBuf); err != nil {
+	packageName := strings.ToLower(data.ModelName)
+	domainUseCaseFilePath := fmt.Sprintf(domainPath, packageName, "usecase")
+	if err := d.storage.save(filepath.Join(data.ProjectPath, domainUseCaseFilePath), useCaseFileBuf); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (d domainLayer) override(m layer) error {
+	panic("implement me")
+}
+
+func (d domainLayer) addField(m layer) error {
+	panic("implement me")
 }
