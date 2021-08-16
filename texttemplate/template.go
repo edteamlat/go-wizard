@@ -1,24 +1,22 @@
-package main
+package texttemplate
 
 import (
 	"fmt"
 	"io"
 	"text/template"
-)
 
-type useCaseTemplate interface {
-	create(wr io.Writer, templateName string, data layer) error
-}
+	"github.com/edteamlat/go-wizard/model"
+)
 
 type textTemplate struct {
 	tpl *template.Template
 }
 
-func newTemplate(tpl *template.Template) *textTemplate {
+func NewTemplate(tpl *template.Template) *textTemplate {
 	return &textTemplate{tpl: tpl}
 }
 
-func (t textTemplate) create(wr io.Writer, templateName string, data layer) error {
+func (t textTemplate) Create(wr io.Writer, templateName string, data model.Layer) error {
 	if err := t.tpl.ExecuteTemplate(wr, templateName, data); err != nil {
 		return fmt.Errorf("template: %w", err)
 	}

@@ -1,14 +1,15 @@
-package main
+package domain
 
 import (
 	"fmt"
 	"strings"
 	"text/template"
 
+	"github.com/edteamlat/go-wizard/model"
 	"github.com/stoewer/go-strcase"
 )
 
-func getTemplateFunctions() template.FuncMap {
+func GetTemplateFunctions() template.FuncMap {
 	return template.FuncMap{
 		"parseToUpperCamelCase": parseToUpperCamelCase,
 		"parseToUpper":          parseToUpper,
@@ -68,7 +69,7 @@ func parseToSqlType(v string) string {
 	}
 }
 
-func handleNull(f field) string {
+func handleNull(f model.Field) string {
 	field := strcase.UpperCamelCase(f.Name)
 
 	if strings.TrimSpace(strings.ToUpper(f.NotNull)) == "NOT NULL" {
@@ -89,7 +90,7 @@ func handleNull(f field) string {
 	}
 }
 
-func handleNullOnScan(f field) string {
+func handleNullOnScan(f model.Field) string {
 	if strings.TrimSpace(strings.ToUpper(f.NotNull)) == "NOT NULL" {
 		return ""
 	}
@@ -110,7 +111,7 @@ func handleNullOnScan(f field) string {
 	}
 }
 
-func parseNullFieldsOnScan(f field) string {
+func parseNullFieldsOnScan(f model.Field) string {
 	field := strcase.UpperCamelCase(f.Name)
 	if f.NotNull == "NOT NULL" {
 		return ""

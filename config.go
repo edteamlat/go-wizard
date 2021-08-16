@@ -4,29 +4,22 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/edteamlat/go-wizard/model"
+
 	"gopkg.in/yaml.v3"
 
 	"github.com/labstack/gommon/log"
 )
 
-// config model to map configuration from a yaml file
-type config struct {
-	ProjectPath string   `yaml:"project_path"`
-	ModuleName  string   `yaml:"module_name"`
-	TableName   string   `yaml:"table_name"`
-	Fields      []string `yaml:"fields"`
-	Layers      []string `yaml:"layers"`
-}
-
-func readConfig(filename string) (config, error) {
+func readConfig(filename string) (model.Config, error) {
 	log.Infof("Loading configuration file from %s...", filename)
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return config{}, fmt.Errorf("config: %w", err)
+		return model.Config{}, fmt.Errorf("config: %w", err)
 	}
 
-	conf := config{}
+	conf := model.Config{}
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
 		return conf, fmt.Errorf("config: %w", err)
 	}

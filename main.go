@@ -4,6 +4,11 @@ import (
 	"embed"
 	"text/template"
 
+	"github.com/edteamlat/go-wizard/domain"
+	"github.com/edteamlat/go-wizard/filesystem"
+	"github.com/edteamlat/go-wizard/model"
+	"github.com/edteamlat/go-wizard/texttemplate"
+
 	"github.com/labstack/gommon/log"
 )
 
@@ -17,24 +22,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fields, err := newFieldsFromSliceString(conf.Fields)
+	fields, err := model.NewFieldsFromSliceString(conf.Fields)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	layerData := newLayer(conf)
-	layerData.setFields(fields)
+	layerData := model.NewLayer(conf)
+	layerData.SetFields(fields)
 
-	fileSystemUseCase := newFileSystem()
+	fileSystemUseCase := filesystem.NewFileSystem()
 
-	tpl := template.Must(template.New("").Funcs(getTemplateFunctions()).ParseFS(templates))
-	templateUseCase := newTemplate(tpl)
+	tpl := template.Must(template.New("").Funcs(domain.GetTemplateFunctions()).ParseFS(templates))
+	templateUseCase := texttemplate.NewTemplate(tpl)
 
-	layerUseCases, err := getUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+	layerUseCases, err := domain.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
 
-	runner := newRunner()
-	runner.appendLayer(layerUseCases...)
-	if err := runner.run("", *layerData); err != nil {
+	runner := domain.NewRunner()
+	runner.AppendLayer(layerUseCases...)
+	if err := runner.Run("", *layerData); err != nil {
 		log.Fatal(err)
 	}
 }

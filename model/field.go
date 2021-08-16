@@ -1,11 +1,11 @@
-package main
+package model
 
 import (
 	"errors"
 	"strings"
 )
 
-var errInvalidField = errors.New("invalid len of field")
+var errInvalidField = errors.New("invalid len of Field")
 
 const fieldSeparator = ":"
 
@@ -14,18 +14,18 @@ const (
 	typeFieldIndex = 1
 )
 
-// field model for every field of a struct and table that want to be generated
-type field struct {
+// Field model for every Field of a struct and table that want to be generated
+type Field struct {
 	Name    string
 	Type    string
 	NotNull string
 }
 
-// Fields slice of field
-type Fields []field
+// Fields slice of Field
+type Fields []Field
 
-// newFieldsFromSliceString builds a new Fields from fields in string format
-func newFieldsFromSliceString(fieldsStr []string) (Fields, error) {
+// NewFieldsFromSliceString builds a new Fields from fields in string format
+func NewFieldsFromSliceString(fieldsStr []string) (Fields, error) {
 	fields := Fields{}
 
 	for _, fieldStr := range fieldsStr {
@@ -34,7 +34,7 @@ func newFieldsFromSliceString(fieldsStr []string) (Fields, error) {
 			return fields, errInvalidField
 		}
 
-		field := field{
+		field := Field{
 			Name: splitField[nameFieldIndex],
 			Type: splitField[typeFieldIndex],
 		}

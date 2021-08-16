@@ -1,9 +1,12 @@
-package main
+package texttemplate
 
 import (
 	"bytes"
 	"testing"
 	"text/template"
+
+	"github.com/edteamlat/go-wizard/domain"
+	"github.com/edteamlat/go-wizard/model"
 )
 
 type fields struct {
@@ -11,7 +14,7 @@ type fields struct {
 }
 type args struct {
 	templateName string
-	data         layer
+	data         model.Layer
 }
 
 type testTable struct {
@@ -34,7 +37,7 @@ func TestTemplate_Create(t1 *testing.T) {
 				tpl: tt.fields.tpl,
 			}
 			wr := &bytes.Buffer{}
-			err := t.create(wr, tt.args.templateName, tt.args.data)
+			err := t.Create(wr, tt.args.templateName, tt.args.data)
 			if (err != nil) != tt.wantErr {
 				t1.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -47,7 +50,7 @@ func TestTemplate_Create(t1 *testing.T) {
 }
 
 func getDomainLayerTests() testTables {
-	tpl := template.Must(template.New("domain.gotpl").Funcs(getTemplateFunctions()).ParseFiles("templates/domain/domain.gotpl"))
+	tpl := template.Must(template.New("domain.gotpl").Funcs(domain.GetTemplateFunctions()).ParseFiles("../templates/domain/domain.gotpl"))
 
 	return testTables{
 		{
@@ -57,9 +60,9 @@ func getDomainLayerTests() testTables {
 			},
 			args: args{
 				templateName: "domain.gotpl",
-				data: layer{
-					ModelName:   "User",
-					TableName:   "users",
+				data: model.Layer{
+					Model:       "User",
+					Table:       "users",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -86,9 +89,9 @@ type UseCase interface {
 			},
 			args: args{
 				templateName: "domain.gotpl",
-				data: layer{
-					ModelName:   "UserLogin",
-					TableName:   "user_logins",
+				data: model.Layer{
+					Model:       "UserLogin",
+					Table:       "user_logins",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -115,9 +118,9 @@ type UseCase interface {
 			},
 			args: args{
 				templateName: "domain.gotpl",
-				data: layer{
-					ModelName:   "UserLogin",
-					TableName:   "user_logins",
+				data: model.Layer{
+					Model:       "UserLogin",
+					Table:       "user_logins",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -144,9 +147,9 @@ type UseCase interface {
 			},
 			args: args{
 				templateName: "domain.gotpl",
-				data: layer{
-					ModelName:   "Role",
-					TableName:   "roles",
+				data: model.Layer{
+					Model:       "Role",
+					Table:       "roles",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -170,7 +173,7 @@ type UseCase interface {
 }
 
 func getDomainUseCaseLayerTests() testTables {
-	tpl := template.Must(template.New("usecase.gotpl").Funcs(getTemplateFunctions()).ParseFiles("templates/domain/usecase.gotpl"))
+	tpl := template.Must(template.New("domain.gotpl").Funcs(domain.GetTemplateFunctions()).ParseFiles("templates/domain/domain.gotpl"))
 
 	return testTables{
 		{
@@ -179,10 +182,10 @@ func getDomainUseCaseLayerTests() testTables {
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "usecase.gotpl",
-				data: layer{
-					ModelName:   "User",
-					TableName:   "users",
+				templateName: "domain.gotpl",
+				data: model.Layer{
+					Model:       "User",
+					Table:       "users",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -208,10 +211,10 @@ type UseCase interface {
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "usecase.gotpl",
-				data: layer{
-					ModelName:   "UserLogin",
-					TableName:   "user_logins",
+				templateName: "domain.gotpl",
+				data: model.Layer{
+					Model:       "UserLogin",
+					Table:       "user_logins",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -237,10 +240,10 @@ type UseCase interface {
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "usecase.gotpl",
-				data: layer{
-					ModelName:   "UserLogin",
-					TableName:   "user_logins",
+				templateName: "domain.gotpl",
+				data: model.Layer{
+					Model:       "UserLogin",
+					Table:       "user_logins",
 					Fields:      nil,
 					ProjectPath: "",
 				},
@@ -266,10 +269,10 @@ type UseCase interface {
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "usecase.gotpl",
-				data: layer{
-					ModelName:   "Role",
-					TableName:   "roles",
+				templateName: "domain.gotpl",
+				data: model.Layer{
+					Model:       "Role",
+					Table:       "roles",
 					Fields:      nil,
 					ProjectPath: "",
 				},

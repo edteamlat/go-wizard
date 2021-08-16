@@ -1,10 +1,10 @@
 # Use for the name of the structs of the different layers
-model_name: UserRole
+model: UserRole
 
 # Will be use for the table name and constraints
 # also, it'll be converted to camel case to be use
 # for the Slice model
-table_name: user_roles
+table: user_roles
 # a list of fields with the format:
 # field_name:go-type:not null
 fields:
@@ -18,7 +18,7 @@ fields:
 # if you don't want to use one, just remove it
 layers:
   - domain
-  - handler # we only support the echo framework for now
+  - handler:echo # we only support the echo framework for now
   - postres # we don't support other db system for now
   - model
-  - database # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+  - database:postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
