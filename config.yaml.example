@@ -1,3 +1,5 @@
+project_path: $GOPATH/src/
+
 # Use for the name of the structs of the different layers
 model: UserRole
 
@@ -5,20 +7,25 @@ model: UserRole
 # also, it'll be converted to camel case to be use
 # for the Slice model
 table: user_roles
-# a list of fields with the format:
-# field_name:go-type:not null
+
+# a list of fields with the format of map:
+# field_name: go-type:not null
 fields:
-  - "user_id:uint"
-  - "role_id:int"
-  - "is_active:true"
-  - "description:string:not null"
-  - "created_at:time" # if we don't specify the third value, by default will be NULL
+  user_id: uint
+  role_id: int
+  is_active: true
+  description: string:not null # with the : separator you can specify whether you want to allow null or not
+  created_at: time.Time # if we don't specify the third value, by default will be NULL
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it
+# format = layer-name: "path/to-save-layer#
+# the path of the layer will be appended to the project_path
+# by default we set the recommended path for each layer
 layers:
-  - domain
-  - handler:echo # we only support the echo framework for now
-  - postres # we don't support other db system for now
-  - model
-  - database:postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+  domain: domain
+  handler_echo: infrastructure/handler # we only support the echo framework for now
+  storage_postgres: infrastructure/postgres # we don't support other db system for now
+  model: model
+  sqlmigration_postgres: sqlmigration # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+

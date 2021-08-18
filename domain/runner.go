@@ -7,9 +7,13 @@ import (
 type action string
 
 const (
-	override = "override"
-	newField = "new-field"
+	override action = "override"
+	newField action = "new-field"
 )
+
+type UseCaseRunner interface {
+	GenerateLayers(a action, m model.Layer) error
+}
 
 type runner struct {
 	layers UseCaseLayers
@@ -25,8 +29,8 @@ func (r *runner) AppendLayer(layer ...UseCaseLayer) {
 	r.layers = append(r.layers, layer...)
 }
 
-// Run the generation of every layer
-func (r runner) Run(a action, m model.Layer) error {
+// GenerateLayers runs the generation of every layer
+func (r runner) GenerateLayers(a action, m model.Layer) error {
 	for _, layerUseCase := range r.layers {
 		if err := r.exec(a, m, layerUseCase); err != nil {
 			return err

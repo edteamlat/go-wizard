@@ -9,10 +9,9 @@ var errInvalidField = errors.New("invalid len of Field")
 
 const fieldSeparator = ":"
 
-const (
-	nameFieldIndex = 0
-	typeFieldIndex = 1
-)
+const typeFieldIndex = 0
+
+const notNull = "NOT NULL"
 
 // Field model for every Field of a struct and table that want to be generated
 type Field struct {
@@ -24,23 +23,23 @@ type Field struct {
 // Fields slice of Field
 type Fields []Field
 
-// NewFieldsFromSliceString builds a new Fields from fields in string format
-func NewFieldsFromSliceString(fieldsStr []string) (Fields, error) {
+// NewFieldsFromMap builds a new Fields from fields in string format
+func NewFieldsFromMap(fieldsMap map[string]string) (Fields, error) {
 	fields := Fields{}
 
-	for _, fieldStr := range fieldsStr {
-		splitField := strings.Split(fieldStr, fieldSeparator)
+	for fieldName, fieldType := range fieldsMap {
+		splitField := strings.Split(fieldType, fieldSeparator)
 		if !isValidLen(splitField) {
 			return fields, errInvalidField
 		}
 
 		field := Field{
-			Name: splitField[nameFieldIndex],
+			Name: fieldName,
 			Type: splitField[typeFieldIndex],
 		}
 
 		if isNameTypeAndNotNull(splitField) {
-			field.NotNull = "NOT NULL"
+			field.NotNull = notNull
 		}
 
 		fields = append(fields, field)
@@ -51,7 +50,7 @@ func NewFieldsFromSliceString(fieldsStr []string) (Fields, error) {
 
 func isValidLen(splitField []string) bool {
 	fieldsLen := len(splitField)
-	return fieldsLen >= 2 && fieldsLen <= 3
+	return fieldsLen >= 1 && fieldsLen <= 2
 }
 
 func isNameTypeAndNotNull(splitField []string) bool {

@@ -10,9 +10,8 @@ import (
 
 // available layers that can be generated
 const (
-	domainLayerOption      = "domain"
-	postgresLayerOption    = "postgres"
-	handlerEchoLayerOption = "handler:echo"
+	postgresLayerOption    = "storage_postgres"
+	handlerEchoLayerOption = "handler_echo"
 )
 
 // UseCaseLayer use case to generate a layer
@@ -37,7 +36,7 @@ type Storage interface {
 func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, storage Storage) (UseCaseLayers, error) {
 	layers := UseCaseLayers{}
 
-	for _, layerName := range conf.Layers {
+	for layerName, _ := range conf.Layers {
 		layer, err := getLayer(layerName, template, storage)
 		if err != nil {
 			return layers, err
@@ -52,7 +51,7 @@ func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, stora
 // getLayer factory that obtains a new useCaseLayer
 func getLayer(name string, template UseCaseTemplate, storage Storage) (UseCaseLayer, error) {
 	switch name {
-	case domainLayerOption:
+	case domainLayerName:
 		return newDomainLayer(template, storage), nil
 	case postgresLayerOption:
 		return nil, nil

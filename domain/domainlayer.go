@@ -3,7 +3,6 @@ package domain
 import (
 	"bytes"
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -14,9 +13,7 @@ const (
 	useCaseTemplateName = "domain.gotpl"
 )
 
-const (
-	domainPath = "domain/%s/%s.go"
-)
+const domainLayerName = "domain"
 
 type domainLayer struct {
 	template UseCaseTemplate
@@ -45,9 +42,7 @@ func (d domainLayer) createDomainFile(data model.Layer) error {
 		return err
 	}
 
-	packageName := strings.ToLower(data.Model)
-	domainFilePath := fmt.Sprintf(domainPath, packageName, packageName)
-	if err := d.storage.Save(filepath.Join(data.ProjectPath, domainFilePath), domainFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(domainLayerName, strings.ToLower(data.Model)), domainFileBuf); err != nil {
 		return err
 	}
 
@@ -60,9 +55,7 @@ func (d domainLayer) createUseCaseFile(data model.Layer) error {
 		return err
 	}
 
-	packageName := strings.ToLower(data.Model)
-	domainUseCaseFilePath := fmt.Sprintf(domainPath, packageName, "domain")
-	if err := d.storage.Save(filepath.Join(data.ProjectPath, domainUseCaseFilePath), useCaseFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(domainLayerName, "usecase"), useCaseFileBuf); err != nil {
 		return err
 	}
 

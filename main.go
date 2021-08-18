@@ -13,7 +13,7 @@ import (
 )
 
 //go:embed templates
-var templates embed.FS
+var templatesFS embed.FS
 
 func main() {
 	// TODO: read path from flag
@@ -22,24 +22,48 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fields, err := model.NewFieldsFromSliceString(conf.Fields)
+	layerData, err := buildLayerModel(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	layerData := model.NewLayer(conf)
-	layerData.SetFields(fields)
+	runner, err := buildUseCaseRunner(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	fileSystemUseCase := filesystem.NewFileSystem()
+	if err := runner.GenerateLayers("", layerData); err != nil {
+		log.Fatal(err)
+	}
+}
 
-	tpl := template.Must(template.New("").Funcs(domain.GetTemplateFunctions()).ParseFS(templates))
-	templateUseCase := texttemplate.NewTemplate(tpl)
-
-	layerUseCases, err := domain.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+func buildUseCaseRunner(conf model.Config) (domain.UseCaseRunner, error) {
+	layerUseCases, err := buildUseCaseLayers(conf)
+	if err != nil {
+		return nil, err
+	}
 
 	runner := domain.NewRunner()
 	runner.AppendLayer(layerUseCases...)
-	if err := runner.Run("", *layerData); err != nil {
-		log.Fatal(err)
+	return runner, nil
+}
+
+func buildUseCaseLayers(conf model.Config) (domain.UseCaseLayers, error) {
+	fileSystemUseCase := filesystem.NewFileSystem()
+
+	tpl := template.Must(template.New("").Funcs(domain.GetTemplateFunctions()).ParseFS(templatesFS))
+	templateUseCase := texttemplate.NewTemplate(tpl)
+
+	return domain.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+}
+
+func buildLayerModel(conf model.Config) (model.Layer, error) {
+	fields, err := model.NewFieldsFromMap(conf.Fields)
+	if err != nil {
+		return model.Layer{}, err
 	}
+	layerData := model.NewLayer(conf)
+	layerData.SetFields(fields)
+
+	return *layerData, nil
 }
