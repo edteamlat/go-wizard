@@ -2,12 +2,15 @@ package texttemplate
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"text/template"
 
-	"github.com/edteamlat/go-wizard/domain"
+	"github.com/edteamlat/go-wizard/domain/edhex"
 	"github.com/edteamlat/go-wizard/model"
 )
+
+const edhexTemplatesPath = "../../templates/edhex"
 
 type fields struct {
 	tpl *template.Template
@@ -50,130 +53,8 @@ func TestTemplate_Create(t1 *testing.T) {
 }
 
 func getDomainLayerTests() testTables {
-	tpl := template.Must(template.New("domain.gotpl").Funcs(domain.GetTemplateFunctions()).ParseFiles("../templates/domain/domain.gotpl"))
-
-	return testTables{
-		{
-			name: "",
-			fields: fields{
-				tpl: tpl,
-			},
-			args: args{
-				templateName: "domain.gotpl",
-				data: model.Layer{
-					Model:       "User",
-					Table:       "users",
-					Fields:      nil,
-					ProjectPath: "",
-				},
-			},
-			wantWr: `package user
-
-type UseCase interface {
-	GetTx() (model.Transaction, error)
-
-	Create(m *model.User) error
-	Update(m *model.User) error
-	Delete(ID uint) error
-
-	GetWhere(fields model.Fields, sort model.SortFields) (model.User, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.Users, error)
-}
-`,
-			wantErr: false,
-		},
-		{
-			name: "",
-			fields: fields{
-				tpl: tpl,
-			},
-			args: args{
-				templateName: "domain.gotpl",
-				data: model.Layer{
-					Model:       "UserLogin",
-					Table:       "user_logins",
-					Fields:      nil,
-					ProjectPath: "",
-				},
-			},
-			wantWr: `package userlogin
-
-type UseCase interface {
-	GetTx() (model.Transaction, error)
-
-	Create(m *model.UserLogin) error
-	Update(m *model.UserLogin) error
-	Delete(ID uint) error
-
-	GetWhere(fields model.Fields, sort model.SortFields) (model.UserLogin, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.UserLogins, error)
-}
-`,
-			wantErr: false,
-		},
-		{
-			name: "",
-			fields: fields{
-				tpl: tpl,
-			},
-			args: args{
-				templateName: "domain.gotpl",
-				data: model.Layer{
-					Model:       "UserLogin",
-					Table:       "user_logins",
-					Fields:      nil,
-					ProjectPath: "",
-				},
-			},
-			wantWr: `package userlogin
-
-type UseCase interface {
-	GetTx() (model.Transaction, error)
-
-	Create(m *model.UserLogin) error
-	Update(m *model.UserLogin) error
-	Delete(ID uint) error
-
-	GetWhere(fields model.Fields, sort model.SortFields) (model.UserLogin, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.UserLogins, error)
-}
-`,
-			wantErr: false,
-		},
-		{
-			name: "",
-			fields: fields{
-				tpl: tpl,
-			},
-			args: args{
-				templateName: "domain.gotpl",
-				data: model.Layer{
-					Model:       "Role",
-					Table:       "roles",
-					Fields:      nil,
-					ProjectPath: "",
-				},
-			},
-			wantWr: `package role
-
-type UseCase interface {
-	GetTx() (model.Transaction, error)
-
-	Create(m *model.Role) error
-	Update(m *model.Role) error
-	Delete(ID uint) error
-
-	GetWhere(fields model.Fields, sort model.SortFields) (model.Role, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.Roles, error)
-}
-`,
-			wantErr: false,
-		},
-	}
-}
-
-func getDomainUseCaseLayerTests() testTables {
-	tpl := template.Must(template.New("domain.gotpl").Funcs(domain.GetTemplateFunctions()).ParseFiles("templates/domain/domain.gotpl"))
+	path := fmt.Sprintf("%s/domain/domain.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("domain.gotpl").Funcs(edhex.GetTemplateFunctions()).ParseFiles(path))
 
 	return testTables{
 		{

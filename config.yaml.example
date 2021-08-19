@@ -23,9 +23,9 @@ fields:
 # the path of the layer will be appended to the project_path
 # by default we set the recommended path for each layer
 layers:
-  domain: domain
-  handler_echo: infrastructure/handler # we only support the echo framework for now
-  storage_postgres: infrastructure/postgres # we don't support other db system for now
-  model: model
-  sqlmigration_postgres: sqlmigration # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+  domain
+  handler_echo # we only support the echo framework for now
+  storage_postgres # we don't support other db system for now
+  model
+  sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
 

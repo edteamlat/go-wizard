@@ -1,4 +1,4 @@
-package domain
+package edhex
 
 import (
 	"bytes"
@@ -13,14 +13,16 @@ const (
 	useCaseTemplateName = "domain.gotpl"
 )
 
-const domainLayerName = "domain"
+const domainPath = ""
+
+const DomainLayerName = "domain"
 
 type domainLayer struct {
 	template UseCaseTemplate
 	storage  Storage
 }
 
-func newDomainLayer(template UseCaseTemplate, storage Storage) *domainLayer {
+func NewDomainLayer(template UseCaseTemplate, storage Storage) *domainLayer {
 	return &domainLayer{template: template, storage: storage}
 }
 
@@ -42,7 +44,7 @@ func (d domainLayer) createDomainFile(data model.Layer) error {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath(domainLayerName, strings.ToLower(data.Model)), domainFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(DomainLayerName, strings.ToLower(data.Model)), domainFileBuf); err != nil {
 		return err
 	}
 
@@ -55,7 +57,7 @@ func (d domainLayer) createUseCaseFile(data model.Layer) error {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath(domainLayerName, "usecase"), useCaseFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(DomainLayerName, "usecase"), useCaseFileBuf); err != nil {
 		return err
 	}
 

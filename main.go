@@ -4,11 +4,12 @@ import (
 	"embed"
 	"text/template"
 
-	"github.com/edteamlat/go-wizard/domain"
-	"github.com/edteamlat/go-wizard/filesystem"
+	"github.com/edteamlat/go-wizard/domain/edhex"
+	"github.com/edteamlat/go-wizard/domain/layer"
+	"github.com/edteamlat/go-wizard/domain/runner"
+	"github.com/edteamlat/go-wizard/infrastructure/filesystem"
+	"github.com/edteamlat/go-wizard/infrastructure/texttemplate"
 	"github.com/edteamlat/go-wizard/model"
-	"github.com/edteamlat/go-wizard/texttemplate"
-
 	"github.com/labstack/gommon/log"
 )
 
@@ -21,40 +22,39 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	layerData, err := buildLayerModel(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	runner, err := buildUseCaseRunner(conf)
+	runnerUseCase, err := buildUseCaseRunner(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := runner.GenerateLayers("", layerData); err != nil {
+	if err := runnerUseCase.GenerateLayers("", layerData); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func buildUseCaseRunner(conf model.Config) (domain.UseCaseRunner, error) {
+func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {
 	layerUseCases, err := buildUseCaseLayers(conf)
 	if err != nil {
 		return nil, err
 	}
 
-	runner := domain.NewRunner()
-	runner.AppendLayer(layerUseCases...)
-	return runner, nil
+	runnerUseCase := runner.NewRunner()
+	runnerUseCase.AppendLayer(layerUseCases...)
+	return runnerUseCase, nil
 }
 
-func buildUseCaseLayers(conf model.Config) (domain.UseCaseLayers, error) {
+func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	fileSystemUseCase := filesystem.NewFileSystem()
 
-	tpl := template.Must(template.New("").Funcs(domain.GetTemplateFunctions()).ParseFS(templatesFS))
+	tpl := template.Must(template.New("").Funcs(edhex.GetTemplateFunctions()).ParseFS(templatesFS))
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
-	return domain.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
 }
 
 func buildLayerModel(conf model.Config) (model.Layer, error) {

@@ -7,10 +7,9 @@ import (
 )
 
 type Layer struct {
-	Model      string
-	Table      string
-	Fields     Fields
-	LayersPath map[string]string
+	Model  string
+	Table  string
+	Fields Fields
 
 	// ProjectPath indicates the root location of the project
 	ProjectPath string
@@ -22,7 +21,6 @@ func NewLayer(conf Config) *Layer {
 		ProjectPath: conf.ProjectPath,
 		Model:       conf.Model,
 		Table:       conf.Table,
-		LayersPath:  conf.Layers,
 	}
 }
 

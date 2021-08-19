@@ -1,22 +1,12 @@
-package domain
+package runner
 
 import (
+	"github.com/edteamlat/go-wizard/domain/layer"
 	"github.com/edteamlat/go-wizard/model"
 )
 
-type action string
-
-const (
-	override action = "override"
-	newField action = "new-field"
-)
-
-type UseCaseRunner interface {
-	GenerateLayers(a action, m model.Layer) error
-}
-
 type runner struct {
-	layers UseCaseLayers
+	layers layer.UseCaseLayers
 }
 
 // NewRunner returns a new runner
@@ -25,7 +15,7 @@ func NewRunner() *runner {
 }
 
 // AppendLayer adds a new useCaseLayer to runner.layers field
-func (r *runner) AppendLayer(layer ...UseCaseLayer) {
+func (r *runner) AppendLayer(layer ...layer.UseCase) {
 	r.layers = append(r.layers, layer...)
 }
 
@@ -40,7 +30,7 @@ func (r runner) GenerateLayers(a action, m model.Layer) error {
 	return nil
 }
 
-func (r runner) exec(a action, m model.Layer, layerUseCase UseCaseLayer) error {
+func (r runner) exec(a action, m model.Layer, layerUseCase layer.UseCase) error {
 	switch a {
 	case override:
 		return layerUseCase.Override(m)

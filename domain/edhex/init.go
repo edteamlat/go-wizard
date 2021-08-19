@@ -1,4 +1,4 @@
-package domain
+package edhex
 
 type Init struct {
 	template UseCaseTemplate
