@@ -1,4 +1,4 @@
-package edhex
+package stringparser
 
 import (
 	"fmt"

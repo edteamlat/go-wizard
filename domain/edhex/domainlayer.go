@@ -10,10 +10,8 @@ import (
 
 const (
 	domainTemplateName  = "domain.gotpl"
-	useCaseTemplateName = "domain.gotpl"
+	useCaseTemplateName = "usecase.gotpl"
 )
-
-const domainPath = ""
 
 const DomainLayerName = "domain"
 
@@ -28,11 +26,11 @@ func NewDomainLayer(template UseCaseTemplate, storage Storage) *domainLayer {
 
 func (d domainLayer) Create(data model.Layer) error {
 	if err := d.createDomainFile(data); err != nil {
-		return fmt.Errorf("domainlayer: %w", err)
+		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
 	if err := d.createUseCaseFile(data); err != nil {
-		return fmt.Errorf("domainlayer: %w", err)
+		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
 	return nil

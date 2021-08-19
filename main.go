@@ -4,9 +4,9 @@ import (
 	"embed"
 	"text/template"
 
-	"github.com/edteamlat/go-wizard/domain/edhex"
 	"github.com/edteamlat/go-wizard/domain/layer"
 	"github.com/edteamlat/go-wizard/domain/runner"
+	"github.com/edteamlat/go-wizard/domain/stringparser"
 	"github.com/edteamlat/go-wizard/infrastructure/filesystem"
 	"github.com/edteamlat/go-wizard/infrastructure/texttemplate"
 	"github.com/edteamlat/go-wizard/model"
@@ -51,7 +51,7 @@ func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {
 func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	fileSystemUseCase := filesystem.NewFileSystem()
 
-	tpl := template.Must(template.New("").Funcs(edhex.GetTemplateFunctions()).ParseFS(templatesFS))
+	tpl := template.Must(template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(templatesFS))
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
 	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)

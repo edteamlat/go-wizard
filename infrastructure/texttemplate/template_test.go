@@ -6,7 +6,7 @@ import (
 	"testing"
 	"text/template"
 
-	"github.com/edteamlat/go-wizard/domain/edhex"
+	"github.com/edteamlat/go-wizard/domain/stringparser"
 	"github.com/edteamlat/go-wizard/model"
 )
 
@@ -54,7 +54,7 @@ func TestTemplate_Create(t1 *testing.T) {
 
 func getDomainLayerTests() testTables {
 	path := fmt.Sprintf("%s/domain/domain.gotpl", edhexTemplatesPath)
-	tpl := template.Must(template.New("domain.gotpl").Funcs(edhex.GetTemplateFunctions()).ParseFiles(path))
+	tpl := template.Must(template.New("domain.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
 
 	return testTables{
 		{

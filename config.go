@@ -16,12 +16,12 @@ func readConfig(filename string) (model.Config, error) {
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return model.Config{}, fmt.Errorf("config: %w", err)
+		return model.Config{}, fmt.Errorf("config: could not read file %s, %w", filename, err)
 	}
 
 	conf := model.Config{}
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
-		return conf, fmt.Errorf("config: %w", err)
+		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
 	}
 
 	log.Info("Configuration file has been loaded.")
