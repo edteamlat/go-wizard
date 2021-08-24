@@ -7,6 +7,6 @@ type Storage interface {
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification Specification) (model.{{ .Model }}, error)
-	GetAllWhere(specification Specification) (model.{{ parseToUpperCamelCase .Table }}, error)
+	GetWhere(specification model.Specification) (model.{{ .Model }}, error)
+	GetAllWhere(specification model.Specification) (model.{{ parseToUpperCamelCase .Table }}, error)
 }

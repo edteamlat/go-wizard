@@ -80,8 +80,8 @@ type Storage interface {
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification Specification) (model.User, error)
-	GetAllWhere(specification Specification) (model.Users, error)
+	GetWhere(specification model.Specification) (model.User, error)
+	GetAllWhere(specification model.Specification) (model.Users, error)
 }
 `,
 			wantErr: false,
@@ -109,8 +109,8 @@ type Storage interface {
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification Specification) (model.UserLogin, error)
-	GetAllWhere(specification Specification) (model.UserLogins, error)
+	GetWhere(specification model.Specification) (model.UserLogin, error)
+	GetAllWhere(specification model.Specification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -138,8 +138,8 @@ type Storage interface {
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification Specification) (model.UserLogin, error)
-	GetAllWhere(specification Specification) (model.UserLogins, error)
+	GetWhere(specification model.Specification) (model.UserLogin, error)
+	GetAllWhere(specification model.Specification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -167,8 +167,8 @@ type Storage interface {
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification Specification) (model.Role, error)
-	GetAllWhere(specification Specification) (model.Roles, error)
+	GetWhere(specification model.Specification) (model.Role, error)
+	GetAllWhere(specification model.Specification) (model.Roles, error)
 }
 `,
 			wantErr: false,
