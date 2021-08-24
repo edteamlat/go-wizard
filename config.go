@@ -3,16 +3,14 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 
 	"github.com/edteamlat/go-wizard/model"
-
 	"gopkg.in/yaml.v3"
-
-	"github.com/labstack/gommon/log"
 )
 
 func readConfig(filename string) (model.Config, error) {
-	log.Infof("Loading configuration file from %s...", filename)
+	log.Printf("Loading configuration file from %s...", filename)
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -24,7 +22,7 @@ func readConfig(filename string) (model.Config, error) {
 		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
 	}
 
-	log.Info("Configuration file has been loaded.")
+	log.Println("Configuration file has been loaded.")
 
 	return conf, nil
 }

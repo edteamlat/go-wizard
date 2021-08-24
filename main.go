@@ -22,10 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	layerData, err := buildLayerModel(conf)
-	if err != nil {
-		log.Fatal(err)
-	}
+
+	layerData := model.NewLayer(conf)
 
 	runnerUseCase, err := buildUseCaseRunner(conf)
 	if err != nil {
@@ -55,15 +53,4 @@ func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
 	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
-}
-
-func buildLayerModel(conf model.Config) (model.Layer, error) {
-	fields, err := model.NewFieldsFromMap(conf.Fields)
-	if err != nil {
-		return model.Layer{}, err
-	}
-	layerData := model.NewLayer(conf)
-	layerData.SetFields(fields)
-
-	return *layerData, nil
 }

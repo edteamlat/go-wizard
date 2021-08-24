@@ -1,7 +1,9 @@
 package layer
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 
 	"github.com/edteamlat/go-wizard/domain/edhex"
 	"github.com/edteamlat/go-wizard/model"
@@ -17,14 +19,22 @@ type UseCase interface {
 // UseCaseLayers slice of useCaseLayers
 type UseCaseLayers []UseCase
 
+type UseCaseTemplate interface {
+	Create(wr io.Writer, templateName string, data model.Layer) error
+}
+
+type Storage interface {
+	Save(path string, data bytes.Buffer) error
+}
+
 // GetUseCaseLayersFromConf obtains all useCaseLayers that were specified on the Config file
-func GetUseCaseLayersFromConf(conf model.Config, template edhex.UseCaseTemplate, storage edhex.Storage) (UseCaseLayers, error) {
+func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, storage Storage) (UseCaseLayers, error) {
 	layers := UseCaseLayers{}
 
 	for _, layerName := range conf.Layers {
 		layer, err := getLayer(layerName, template, storage)
 		if err != nil {
-			return layers, err
+			return nil, err
 		}
 
 		layers = append(layers, layer)
@@ -34,7 +44,7 @@ func GetUseCaseLayersFromConf(conf model.Config, template edhex.UseCaseTemplate,
 }
 
 // getLayer factory that obtains a new useCaseLayer
-func getLayer(name string, template edhex.UseCaseTemplate, storage edhex.Storage) (UseCase, error) {
+func getLayer(name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
 	switch name {
 	case edhex.DomainLayerName:
 		return edhex.NewDomainLayer(template, storage), nil

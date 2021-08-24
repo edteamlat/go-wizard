@@ -1,12 +1,12 @@
 package {{ parseToLower .Model }}
 
-type UseCase interface {
+type Storage interface {
 	GetTx() (model.Transaction, error)
 
 	Create(m *model.{{ .Model }}) error
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(fields model.Fields, sort model.SortFields) (model.{{ .Model }}, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.{{ parseToUpperCamelCase .Table }}, error)
+	GetWhere(specification Specification) (model.{{ .Model }}, error)
+	GetAllWhere(specification Specification) (model.{{ parseToUpperCamelCase .Table }}, error)
 }

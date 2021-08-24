@@ -20,8 +20,8 @@ type domainLayer struct {
 	storage  Storage
 }
 
-func NewDomainLayer(template UseCaseTemplate, storage Storage) *domainLayer {
-	return &domainLayer{template: template, storage: storage}
+func NewDomainLayer(template UseCaseTemplate, storage Storage) domainLayer {
+	return domainLayer{template: template, storage: storage}
 }
 
 func (d domainLayer) Create(data model.Layer) error {

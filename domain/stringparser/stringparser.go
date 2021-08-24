@@ -9,8 +9,6 @@ import (
 	"github.com/stoewer/go-strcase"
 )
 
-const notNull = "NOT NULL"
-
 func GetTemplateFunctions() template.FuncMap {
 	return template.FuncMap{
 		"parseToUpperCamelCase": parseToUpperCamelCase,
@@ -74,7 +72,7 @@ func parseToSqlType(v string) string {
 func handleNull(f model.Field) string {
 	field := strcase.UpperCamelCase(f.Name)
 
-	if strings.TrimSpace(strings.ToUpper(f.NotNull)) == notNull {
+	if !f.IsNull {
 		return fmt.Sprintf("m.%s", field)
 	}
 
@@ -93,7 +91,7 @@ func handleNull(f model.Field) string {
 }
 
 func handleNullOnScan(f model.Field) string {
-	if strings.TrimSpace(strings.ToUpper(f.NotNull)) == notNull {
+	if !f.IsNull {
 		return ""
 	}
 
@@ -115,7 +113,7 @@ func handleNullOnScan(f model.Field) string {
 
 func parseNullFieldsOnScan(f model.Field) string {
 	field := strcase.UpperCamelCase(f.Name)
-	if f.NotNull == notNull {
+	if !f.IsNull {
 		return ""
 	}
 

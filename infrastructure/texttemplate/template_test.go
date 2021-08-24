@@ -73,15 +73,15 @@ func getDomainLayerTests() testTables {
 			},
 			wantWr: `package user
 
-type UseCase interface {
+type Storage interface {
 	GetTx() (model.Transaction, error)
 
 	Create(m *model.User) error
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(fields model.Fields, sort model.SortFields) (model.User, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.Users, error)
+	GetWhere(specification Specification) (model.User, error)
+	GetAllWhere(specification Specification) (model.Users, error)
 }
 `,
 			wantErr: false,
@@ -102,15 +102,15 @@ type UseCase interface {
 			},
 			wantWr: `package userlogin
 
-type UseCase interface {
+type Storage interface {
 	GetTx() (model.Transaction, error)
 
 	Create(m *model.UserLogin) error
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(fields model.Fields, sort model.SortFields) (model.UserLogin, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.UserLogins, error)
+	GetWhere(specification Specification) (model.UserLogin, error)
+	GetAllWhere(specification Specification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -131,15 +131,15 @@ type UseCase interface {
 			},
 			wantWr: `package userlogin
 
-type UseCase interface {
+type Storage interface {
 	GetTx() (model.Transaction, error)
 
 	Create(m *model.UserLogin) error
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(fields model.Fields, sort model.SortFields) (model.UserLogin, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.UserLogins, error)
+	GetWhere(specification Specification) (model.UserLogin, error)
+	GetAllWhere(specification Specification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -160,15 +160,15 @@ type UseCase interface {
 			},
 			wantWr: `package role
 
-type UseCase interface {
+type Storage interface {
 	GetTx() (model.Transaction, error)
 
 	Create(m *model.Role) error
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(fields model.Fields, sort model.SortFields) (model.Role, error)
-	GetAllWhere(fields model.Fields, sort model.SortFields, pag model.Pagination) (model.Roles, error)
+	GetWhere(specification Specification) (model.Role, error)
+	GetAllWhere(specification Specification) (model.Roles, error)
 }
 `,
 			wantErr: false,

@@ -16,17 +16,13 @@ type Layer struct {
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
-func NewLayer(conf Config) *Layer {
-	return &Layer{
+func NewLayer(conf Config) Layer {
+	return Layer{
 		ProjectPath: conf.ProjectPath,
 		Model:       conf.Model,
 		Table:       conf.Table,
+		Fields:      conf.Fields,
 	}
-}
-
-// SetFields sets the fields that will be used to generate de Struct fields and table columns
-func (l *Layer) SetFields(fields Fields) {
-	l.Fields = fields
 }
 
 func (l *Layer) GetPath(layerName, filename string) string {

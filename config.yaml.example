@@ -8,24 +8,24 @@ model: UserRole
 # for the Slice model
 table: user_roles
 
-# a list of fields with the format of map:
-# field_name: go-type:not null
+# a list of objects where you specify the name, type and if it allows nulls
 fields:
-  user_id: uint
-  role_id: int
-  is_active: true
-  description: string:not null # with the : separator you can specify whether you want to allow null or not
-  created_at: time.Time # if we don't specify the third value, by default will be NULL
+  - name: user_id
+    type: uint
+    is_null: false
+  - name: description
+    type: string
+    is_null: true
+  - name: created_at
+    type: time.Time
+    is_null: false
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it
-# format = layer-name: "path/to-save-layer#
-# the path of the layer will be appended to the project_path
-# by default we set the recommended path for each layer
 layers:
-  domain
-  handler_echo # we only support the echo framework for now
-  storage_postgres # we don't support other db system for now
-  model
-  sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+  - domain
+  - handler_echo # we only support the echo framework for now
+  - storage_postgres # we don't support other db system for now
+  - model
+  - sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
 
