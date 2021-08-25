@@ -1,0 +1,31 @@
+project_path: $GOPATH/src/
+
+# Use for the name of the structs of the different layers
+model: UserRole
+
+# Will be use for the table name and constraints
+# also, it'll be converted to camel case to be use
+# for the Slice model
+table: user_roles
+
+# a list of objects where you specify the name, type and if it allows nulls
+fields:
+  - name: user_id
+    type: uint
+    is_null: false
+  - name: description
+    type: string
+    is_null: true
+  - name: created_at
+    type: time.Time
+    is_null: false
+
+# The available layers that we can generate
+# if you don't want to use one, just remove it
+layers:
+  - domain
+  - handler_echo # we only support the echo framework for now
+  - storage_postgres # we don't support other db system for now
+  - model
+  - sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
+
