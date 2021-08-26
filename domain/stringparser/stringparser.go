@@ -27,7 +27,7 @@ func GetTemplateFunctions() template.FuncMap {
 }
 
 func parseToUpperCamelCase(v string) string {
-	return strcase.UpperCamelCase(v)
+	return parseIdToID(strcase.UpperCamelCase(v))
 }
 
 func parseToUpper(v string) string {
@@ -43,7 +43,7 @@ func parseToKebabCase(v string) string {
 }
 
 func parseToLowerCamelCase(v string) string {
-	return strcase.LowerCamelCase(v)
+	return parseIdToID(strcase.LowerCamelCase(v))
 }
 
 func getFirstLetter(v string) string {
@@ -56,6 +56,10 @@ func increment(v int) int {
 
 func decrement(v int) int {
 	return v - 1
+}
+
+func parseIdToID(v string) string {
+	return strings.ReplaceAll(v, "Id", "ID")
 }
 
 func parseToSqlType(v string) string {
@@ -71,7 +75,7 @@ func parseToSqlType(v string) string {
 	case "time.Time":
 		return "TIMESTAMP"
 	default:
-		return "CHANGE-THIS-TYPE"
+		return "UNKNOWN-TYPE"
 	}
 }
 

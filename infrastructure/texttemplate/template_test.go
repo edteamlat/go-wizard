@@ -35,7 +35,7 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
-	tests = append(tests, getDomainUseCaseLayerTests()...)
+	tests = append(tests, getModelLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -61,7 +61,7 @@ func getDomainLayerTests() testTables {
 
 	return testTables{
 		{
-			name: "",
+			name: "domain one word package name",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -103,7 +103,7 @@ type Storage interface {
 			wantErr: false,
 		},
 		{
-			name: "",
+			name: "domain two words package name",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -145,7 +145,7 @@ type Storage interface {
 			wantErr: false,
 		},
 		{
-			name: "",
+			name: "domain two words package name",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -187,7 +187,7 @@ type Storage interface {
 			wantErr: false,
 		},
 		{
-			name: "",
+			name: "domain one word package name",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -377,6 +377,136 @@ func handleStorageErr(err error) error {
 	}
 }
 `,
+			wantErr: false,
+		},
+	}
+}
+
+func getModelLayerTests() testTables {
+	path := fmt.Sprintf("%s/model/model.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("model.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: "model one word package name",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "model.gotpl",
+				data: model.Layer{
+					Model: "User",
+					Table: "users",
+					Fields: model.Fields{
+						{
+							Name: "id",
+							Type: "uint",
+						},
+						{
+							Name: "first_name",
+							Type: "string",
+						},
+						{
+							Name: "email",
+							Type: "string",
+						},
+						{
+							Name: "is_active",
+							Type: "bool",
+						},
+						{
+							Name: "created_at",
+							Type: "time.Time",
+						},
+					},
+				},
+			},
+			wantWr:  fmt.Sprintf(`package model
+
+import "time"
+
+// User model of table users
+type User struct {
+	ID uint %[1]sjson:"id"%[1]s
+	FirstName string %[1]sjson:"first_name"%[1]s
+	Email string %[1]sjson:"email"%[1]s
+	IsActive bool %[1]sjson:"is_active"%[1]s
+	CreatedAt time.Time %[1]sjson:"created_at"%[1]s
+	}
+
+func (u User) HasID() bool { return u.ID > 0 }
+
+func (u User) Validate() error {
+	// implement validation of fields for creation and update
+	return nil
+}
+
+// Users slice of User
+type Users []User
+
+func (u Users) IsEmpty() bool { return len(Users) == 0 }
+`, "`"),
+			wantErr: false,
+		},
+		{
+			name: "model two words package name",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "model.gotpl",
+				data: model.Layer{
+					Model: "UserRole",
+					Table: "user_roles",
+					Fields: model.Fields{
+						{
+							Name: "id",
+							Type: "uint",
+						},
+						{
+							Name: "role_id",
+							Type: "uint16",
+						},
+						{
+							Name: "user_id",
+							Type: "int",
+						},
+						{
+							Name: "is_active",
+							Type: "bool",
+						},
+						{
+							Name: "created_at",
+							Type: "time.Time",
+						},
+					},
+				},
+			},
+			wantWr:  fmt.Sprintf(`package model
+
+import "time"
+
+// UserRole model of table user_roles
+type UserRole struct {
+	ID uint %[1]sjson:"id"%[1]s
+	RoleID uint16 %[1]sjson:"role_id"%[1]s
+	UserID int %[1]sjson:"user_id"%[1]s
+	IsActive bool %[1]sjson:"is_active"%[1]s
+	CreatedAt time.Time %[1]sjson:"created_at"%[1]s
+	}
+
+func (u UserRole) HasID() bool { return u.ID > 0 }
+
+func (u UserRole) Validate() error {
+	// implement validation of fields for creation and update
+	return nil
+}
+
+// UserRoles slice of UserRole
+type UserRoles []UserRole
+
+func (u UserRoles) IsEmpty() bool { return len(UserRoles) == 0 }
+`, "`"),
 			wantErr: false,
 		},
 	}
