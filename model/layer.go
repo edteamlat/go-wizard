@@ -13,6 +13,9 @@ type Layer struct {
 
 	// ProjectPath indicates the root location of the project
 	ProjectPath string
+
+	// ModuleName is used to build the imports
+	ModuleName string `json:"module_name"`
 }
 
 // NewLayer returns a new Layer with module and table Field initialized

@@ -12,9 +12,12 @@ import (
 
 const edhexTemplatesPath = "../../templates/edhex"
 
+const moduleName = "github.com/edteamlat/go-wizard"
+
 type fields struct {
 	tpl *template.Template
 }
+
 type args struct {
 	templateName string
 	data         model.Layer
@@ -65,13 +68,26 @@ func getDomainLayerTests() testTables {
 			args: args{
 				templateName: "domain.gotpl",
 				data: model.Layer{
-					Model:       "User",
-					Table:       "users",
-					Fields:      nil,
-					ProjectPath: "",
+					Model:      "User",
+					Table:      "users",
+					Fields:     nil,
+					ModuleName: moduleName,
 				},
 			},
 			wantWr: `package user
+
+import (
+	"github.com/edteamlat/go-wizard/model"
+)
+
+type UseCase interface {
+	Create(m *model.User) error
+	Update(m *model.User) error
+	Delete(ID uint) error
+
+	GetWhere(specification model.FiltersSpecification) (model.User, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
+}
 
 type Storage interface {
 	GetTx() (model.Transaction, error)
@@ -80,8 +96,8 @@ type Storage interface {
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.Specification) (model.User, error)
-	GetAllWhere(specification model.Specification) (model.Users, error)
+	GetWhere(specification model.FiltersSpecification) (model.User, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
 }
 `,
 			wantErr: false,
@@ -94,13 +110,26 @@ type Storage interface {
 			args: args{
 				templateName: "domain.gotpl",
 				data: model.Layer{
-					Model:       "UserLogin",
-					Table:       "user_logins",
-					Fields:      nil,
-					ProjectPath: "",
+					Model:      "UserLogin",
+					Table:      "user_logins",
+					Fields:     nil,
+					ModuleName: moduleName,
 				},
 			},
 			wantWr: `package userlogin
+
+import (
+	"github.com/edteamlat/go-wizard/model"
+)
+
+type UseCase interface {
+	Create(m *model.UserLogin) error
+	Update(m *model.UserLogin) error
+	Delete(ID uint) error
+
+	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
+}
 
 type Storage interface {
 	GetTx() (model.Transaction, error)
@@ -109,8 +138,8 @@ type Storage interface {
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.Specification) (model.UserLogin, error)
-	GetAllWhere(specification model.Specification) (model.UserLogins, error)
+	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -123,23 +152,36 @@ type Storage interface {
 			args: args{
 				templateName: "domain.gotpl",
 				data: model.Layer{
-					Model:       "UserLogin",
-					Table:       "user_logins",
-					Fields:      nil,
-					ProjectPath: "",
+					Model:      "UserRole",
+					Table:      "user_roles",
+					Fields:     nil,
+					ModuleName: moduleName,
 				},
 			},
-			wantWr: `package userlogin
+			wantWr: `package userrole
+
+import (
+	"github.com/edteamlat/go-wizard/model"
+)
+
+type UseCase interface {
+	Create(m *model.UserRole) error
+	Update(m *model.UserRole) error
+	Delete(ID uint) error
+
+	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
+}
 
 type Storage interface {
 	GetTx() (model.Transaction, error)
 
-	Create(m *model.UserLogin) error
-	Update(m *model.UserLogin) error
+	Create(m *model.UserRole) error
+	Update(m *model.UserRole) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.Specification) (model.UserLogin, error)
-	GetAllWhere(specification model.Specification) (model.UserLogins, error)
+	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
 }
 `,
 			wantErr: false,
@@ -152,13 +194,26 @@ type Storage interface {
 			args: args{
 				templateName: "domain.gotpl",
 				data: model.Layer{
-					Model:       "Role",
-					Table:       "roles",
-					Fields:      nil,
-					ProjectPath: "",
+					Model:      "Role",
+					Table:      "roles",
+					Fields:     nil,
+					ModuleName: moduleName,
 				},
 			},
 			wantWr: `package role
+
+import (
+	"github.com/edteamlat/go-wizard/model"
+)
+
+type UseCase interface {
+	Create(m *model.Role) error
+	Update(m *model.Role) error
+	Delete(ID uint) error
+
+	GetWhere(specification model.FiltersSpecification) (model.Role, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
+}
 
 type Storage interface {
 	GetTx() (model.Transaction, error)
@@ -167,8 +222,8 @@ type Storage interface {
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.Specification) (model.Role, error)
-	GetAllWhere(specification model.Specification) (model.Roles, error)
+	GetWhere(specification model.FiltersSpecification) (model.Role, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
 }
 `,
 			wantErr: false,

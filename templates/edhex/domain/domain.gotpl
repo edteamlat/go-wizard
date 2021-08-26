@@ -1,5 +1,18 @@
 package {{ parseToLower .Model }}
 
+import (
+	"{{ .ModuleName }}/model"
+)
+
+type UseCase interface {
+	Create(m *model.{{ .Model }}) error
+	Update(m *model.{{ .Model }}) error
+	Delete(ID uint) error
+
+	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error)
+}
+
 type Storage interface {
 	GetTx() (model.Transaction, error)
 
@@ -7,6 +20,6 @@ type Storage interface {
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.Specification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.Specification) (model.{{ parseToUpperCamelCase .Table }}, error)
+	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error)
 }
