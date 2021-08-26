@@ -16,6 +16,8 @@ func GetTemplateFunctions() template.FuncMap {
 		"parseToLower":          parseToLower,
 		"parseToKebabCase":      parseToKebabCase,
 		"parseToLowerCamelCase": parseToLowerCamelCase,
+		"parseToSnakeCase":      parseToSnakeCase,
+		"parseToUpperSnakeCase": parseToUpperSnakeCase,
 		"getFirstLetter":        getFirstLetter,
 		"increment":             increment,
 		"decrement":             decrement,
@@ -46,6 +48,14 @@ func parseToLowerCamelCase(v string) string {
 	return parseIdToID(strcase.LowerCamelCase(v))
 }
 
+func parseToSnakeCase(v string) string {
+	return strcase.SnakeCase(v)
+}
+
+func parseToUpperSnakeCase(v string) string {
+	return strings.ToUpper(strcase.SnakeCase(v))
+}
+
 func getFirstLetter(v string) string {
 	return strings.ToLower(string(v[0]))
 }
@@ -74,6 +84,8 @@ func parseToSqlType(v string) string {
 		return "BOOLEAN"
 	case "time.Time":
 		return "TIMESTAMP"
+	case "json.RawMessage":
+		return "JSON"
 	default:
 		return "UNKNOWN-TYPE"
 	}

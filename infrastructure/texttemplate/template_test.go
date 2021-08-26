@@ -35,7 +35,7 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
-	tests = append(tests, getModelLayerTests()...)
+	tests = append(tests, getSQLMigrationLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -421,7 +421,7 @@ func getModelLayerTests() testTables {
 					},
 				},
 			},
-			wantWr:  fmt.Sprintf(`package model
+			wantWr: fmt.Sprintf(`package model
 
 import "time"
 
@@ -482,7 +482,7 @@ func (u Users) IsEmpty() bool { return len(Users) == 0 }
 					},
 				},
 			},
-			wantWr:  fmt.Sprintf(`package model
+			wantWr: fmt.Sprintf(`package model
 
 import "time"
 
@@ -507,6 +507,144 @@ type UserRoles []UserRole
 
 func (u UserRoles) IsEmpty() bool { return len(UserRoles) == 0 }
 `, "`"),
+			wantErr: false,
+		},
+	}
+}
+
+func getSQLMigrationLayerTests() testTables {
+	path := fmt.Sprintf("%s/sqlmigration/sqlmigration.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("sqlmigration.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: "",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "sqlmigration.gotpl",
+				data: model.Layer{
+					Model: "Course",
+					Table: "courses",
+					Fields: model.Fields{
+						{
+							Name:   "id",
+							Type:   "uint",
+							IsNull: false,
+						},
+						{
+							Name:   "title",
+							Type:   "string",
+							IsNull: false,
+						},
+						{
+							Name:   "is_premium",
+							Type:   "bool",
+							IsNull: false,
+						},
+						{
+							Name:   "infographics",
+							Type:   "json.RawMessage",
+							IsNull: true,
+						},
+						{
+							Name:   "created_at",
+							Type:   "time.Time",
+							IsNull: false,
+						},
+						{
+							Name:   "updated_at",
+							Type:   "time.Time",
+							IsNull: true,
+						},
+					},
+				},
+			},
+			wantWr: `CREATE TABLE courses (
+	id SERIAL NOT NULL,
+	title VARCHAR(SIZE) NOT NULL,
+	is_premium BOOLEAN NOT NULL,
+	infographics JSON,
+	created_at TIMESTAMP NOT NULL DEFAULT now(),
+	updated_at TIMESTAMP,
+	CONSTRAINT courses_id_pk PRIMARY KEY (id)
+);
+
+COMMENT ON TABLE courses IS 'Write your comment';
+
+-- Register the permission module for the routes
+INSERT INTO modules (name) VALUES ('COURSE');
+`,
+			wantErr: false,
+		},
+		{
+			name: "",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "sqlmigration.gotpl",
+				data: model.Layer{
+					Model: "CoursePrice",
+					Table: "course_prices",
+					Fields: model.Fields{
+						{
+							Name:   "id",
+							Type:   "uint",
+							IsNull: false,
+						},
+						{
+							Name:   "course_id",
+							Type:   "uint64",
+							IsNull: false,
+						},
+						{
+							Name:   "price",
+							Type:   "float32",
+							IsNull: false,
+						},
+						{
+							Name:   "base_price",
+							Type:   "float64",
+							IsNull: true,
+						},
+						{
+							Name:   "is_active",
+							Type:   "bool",
+							IsNull: false,
+						},
+						{
+							Name:   "begins_at",
+							Type:   "time.Time",
+							IsNull: false,
+						},
+						{
+							Name:   "ends_at",
+							Type:   "time.Time",
+							IsNull: true,
+						},
+					},
+				},
+			},
+			wantWr: `CREATE TABLE course_prices (
+	id SERIAL NOT NULL,
+	course_id INTEGER NOT NULL,
+	price NUMERIC(SIZE) NOT NULL,
+	base_price NUMERIC(SIZE),
+	is_active BOOLEAN NOT NULL,
+	begins_at TIMESTAMP NOT NULL,
+	ends_at TIMESTAMP,
+	created_at TIMESTAMP NOT NULL DEFAULT now(),
+	updated_at TIMESTAMP,
+	CONSTRAINT course_prices_id_pk PRIMARY KEY (id)
+);
+
+COMMENT ON TABLE course_prices IS 'Write your comment';
+
+-- Register the permission module for the routes
+INSERT INTO modules (name) VALUES ('COURSE_PRICE');
+`,
 			wantErr: false,
 		},
 	}

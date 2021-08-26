@@ -1,0 +1,16 @@
+CREATE TABLE {{.Table}} (
+	id SERIAL NOT NULL,
+	{{- range $i, $field := .Fields -}}
+		{{ if and (ne $field.Name "id") (ne $field.Name "created_at") (ne $field.Name "updated_at") }}
+	{{ $field.Name }} {{ parseToSqlType $field.Type}}{{ if .IsNull }},{{ else }} NOT NULL,{{ end }}
+		{{- end }}
+	{{- end }}
+	created_at TIMESTAMP NOT NULL DEFAULT now(),
+	updated_at TIMESTAMP,
+	CONSTRAINT {{ .Table }}_id_pk PRIMARY KEY (id)
+);
+
+COMMENT ON TABLE {{ .Table }} IS 'Write your comment';
+
+-- Register the permission module for the routes
+INSERT INTO modules (name) VALUES ('{{ parseToUpperSnakeCase .Model }}');
