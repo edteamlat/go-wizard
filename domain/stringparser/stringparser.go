@@ -16,6 +16,7 @@ func GetTemplateFunctions() template.FuncMap {
 		"parseToLower":          parseToLower,
 		"parseToKebabCase":      parseToKebabCase,
 		"parseToLowerCamelCase": parseToLowerCamelCase,
+		"getFirstLetter":        getFirstLetter,
 		"increment":             increment,
 		"decrement":             decrement,
 		"parseToSqlType":        parseToSqlType,
@@ -44,6 +45,11 @@ func parseToKebabCase(v string) string {
 func parseToLowerCamelCase(v string) string {
 	return strcase.LowerCamelCase(v)
 }
+
+func getFirstLetter(v string) string {
+	return strings.ToLower(string(v[0]))
+}
+
 func increment(v int) int {
 	return v + 1
 }

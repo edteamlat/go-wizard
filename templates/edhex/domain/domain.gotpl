@@ -1,3 +1,5 @@
+{{ $modelSlice := parseToUpperCamelCase .Table -}}
+
 package {{ parseToLower .Model }}
 
 import (
@@ -10,7 +12,7 @@ type UseCase interface {
 	Delete(ID uint) error
 
 	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
 }
 
 type Storage interface {
@@ -21,5 +23,5 @@ type Storage interface {
 	Delete(ID uint) error
 
 	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error)
+	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
 }

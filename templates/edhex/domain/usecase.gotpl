@@ -1,0 +1,125 @@
+{{ $packageName := parseToLower .Model -}}
+{{ $reciverType := .Model -}}
+{{ $reciverName := getFirstLetter .Model -}}
+
+package {{ $packageName }}
+
+import (
+	"errors"
+	"fmt"
+
+	"{{ .ModuleName }}/model"
+)
+
+var allowedFieldsForQuery = []string{
+	{{ range $i, $field := .Fields -}}
+		"{{ $field.Name }}",
+	{{- end }}
+}
+
+// {{ $reciverType }} implements UseCase
+type {{ $reciverType }} struct {
+	storage Storage
+}
+
+// New returns a new {{ $reciverType }}
+func New(s Storage) {{ $reciverType }} {
+	return {{ $reciverType }}{storage: s}
+}
+
+// Create creates a model.{{ .Model }}
+func ({{ $reciverName }} {{ $reciverType }}) Create(m *model.{{ .Model }}) error {
+	if err := model.ValidateStructNil(m); err != nil {
+		return fmt.Errorf("{{ $packageName }}: %w", model.ErrNilPointer)
+	}
+
+	if err := m.Validate(); err != nil {
+		return fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	err := {{ $reciverName }}.storage.Create(m)
+	if err != nil {
+		return handleStorageErr(err)
+	}
+
+	return nil
+}
+
+// Update updates a model.{{ .Model }} by id
+func ({{ $reciverName }} {{ $reciverType }}) Update(m *model.{{ .Model }}) error {
+	if err := model.ValidateStructNil(m); err != nil {
+		return fmt.Errorf("{{ $packageName }}: %w", model.ErrNilPointer)
+	}
+
+	if !m.HasID() {
+		return fmt.Errorf("{{ $packageName }}: %w", model.ErrInvalidID)
+	}
+
+	if err := m.Validate(); err != nil {
+		return fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	err := {{ $reciverName }}.storage.Update(m)
+	if err != nil {
+		return handleStorageErr(err)
+	}
+
+	return nil
+}
+
+// Delete deletes a model.{{ .Model }} by id
+func ({{ $reciverName }} {{ $reciverType }}) Delete(ID uint) error {
+	err := {{ $reciverName }}.storage.Delete(ID)
+	if err != nil {
+		return handleStorageErr(err)
+	}
+
+	return nil
+}
+
+// GetWhere returns a model.{{ .Model }} according to filters and sorts
+func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error) {
+	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+		return model.{{ .Model }}{}, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	if err := specification.Sorts.ValidateNames(allowedFieldsForQuery); err != nil {
+		return model.{{ .Model }}{}, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	{{ parseToLowerCamelCase .Model }}, err := {{ $reciverName }}.storage.GetWhere(specification)
+	if err != nil {
+		return model.{{ .Model }}{}, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	return {{ parseToLowerCamelCase .Model }}, nil
+}
+
+// GetAllWhere returns a model.{{ parseToUpperCamelCase .Table }} according to filters and sorts
+func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error) {
+	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+		return nil, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	if err := specification.Sorts.ValidateNames(allowedFieldsForQuery); err != nil {
+		return nil, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	{{ parseToLowerCamelCase .Table }}, err := {{ $reciverName }}.storage.GetAllWhere(specification)
+	if err != nil {
+		return nil, fmt.Errorf("{{ $packageName }}: %w", err)
+	}
+
+	return {{ parseToLowerCamelCase .Table }}, nil
+}
+
+// handleStorageErr handles errors from storage layer
+func handleStorageErr(err error) error {
+	e := model.NewError()
+	e.SetError(err)
+
+	switch err {
+	default:
+		return err
+	}
+}
