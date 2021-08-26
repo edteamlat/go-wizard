@@ -1,4 +1,5 @@
 project_path: $GOPATH/src/
+module_name: github.com/edteamlat/go-wizzard
 
 # Use for the name of the structs of the different layers
 model: UserRole
@@ -22,7 +23,7 @@ fields:
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it
-layers:
+layers: # by default the fields id, created_at and updated_at will be created
   - domain
   - handler_echo # we only support the echo framework for now
   - storage_postgres # we don't support other db system for now

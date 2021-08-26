@@ -5,7 +5,6 @@
 package {{ $packageName }}
 
 import (
-	"errors"
 	"fmt"
 
 	"{{ .ModuleName }}/model"
@@ -18,7 +17,7 @@ var allowedFieldsForQuery = []string{
 }
 
 // {{ $reciverType }} implements UseCase
-type {{ $reciverType }} struct {
+		type {{ $reciverType }} struct {
 	storage Storage
 }
 

@@ -15,13 +15,14 @@ type Layer struct {
 	ProjectPath string
 
 	// ModuleName is used to build the imports
-	ModuleName string `json:"module_name"`
+	ModuleName string
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
 func NewLayer(conf Config) Layer {
 	return Layer{
 		ProjectPath: conf.ProjectPath,
+		ModuleName:  conf.ModuleName,
 		Model:       conf.Model,
 		Table:       conf.Table,
 		Fields:      conf.Fields,
@@ -29,5 +30,5 @@ func NewLayer(conf Config) Layer {
 }
 
 func (l *Layer) GetPath(layerName, filename string) string {
-	return fmt.Sprintf("%s.go", filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename))
+	return fmt.Sprintf("%s", filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename))
 }

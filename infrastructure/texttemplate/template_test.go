@@ -35,6 +35,9 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
+	tests = append(tests, getDomainLayerTests()...)
+	tests = append(tests, getDomainUseCaseLayerTests()...)
+	tests = append(tests, getModelLayerTests()...)
 	tests = append(tests, getSQLMigrationLayerTests()...)
 
 	for _, tt := range tests {
@@ -260,7 +263,6 @@ func getDomainUseCaseLayerTests() testTables {
 			wantWr: `package user
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/edteamlat/go-wizard/model"
