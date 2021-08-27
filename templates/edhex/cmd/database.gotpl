@@ -1,1 +1,11 @@
-package cmd
+package main
+
+import (
+	"sql"
+
+	"{{ .ModuleName }}/model"
+)
+
+func newDBConnection(dbConf model.Database) *sql.DB {
+	// implement me
+}
