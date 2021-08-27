@@ -2,14 +2,20 @@ package model
 
 // Configuration model to read a config file to init our app
 type Configuration struct {
-	LogFolder      string   `json:"log_folder"`
-	LogPretty      bool     `json:"log_pretty"`
-	AllowedOrigins []string `json:"allowed_origins"`
-	AllowedMethods []string `json:"allowed_methods"`
-	Database       Database `json:"database"`
+	PortHTTP        uint16   `json:"port_http"`
+	PortHTTPS       uint16   `json:"port_https"`
+	LogFolder       string   `json:"log_folder"`
+	LogPretty       bool     `json:"log_pretty"`
+	CertPem         string   `json:"cert_pem"`
+	KeyPem          string   `json:"key_pem"`
+	PublicFileSign  string   `json:"public_file_sign"`
+	PrivateFileSign string   `json:"private_file_sign"`
+	AllowedOrigins  []string `json:"allowed_origins"`
+	AllowedMethods  []string `json:"allowed_methods"`
+	Database        Database `json:"database"`
 }
 
-// Database model to connet to a database
+// Database model to connect to a database
 type Database struct {
 	Engine   string `json:"engine"`
 	User     string `json:"user"`
