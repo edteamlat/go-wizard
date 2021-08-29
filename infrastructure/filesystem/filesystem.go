@@ -37,7 +37,7 @@ func createDir(dir string) error {
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	// if dir already exists we dont have to create it
+	// if dir already exists we don't have to create it
 	if d != nil && d.IsDir() {
 		return nil
 	}
