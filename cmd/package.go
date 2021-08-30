@@ -7,7 +7,7 @@ import (
 // packageCmd represents the package command
 var packageCmd = &cobra.Command{
 	Use:   "package",
-	Short: "A brief description of your command",
+	Short: "Adds a package to the project.",
 	Run: func(cmd *cobra.Command, args []string) {
 		configPath := cmd.Flag(configPathFlag)
 		architecture := cmd.Flag(architectureFlag)

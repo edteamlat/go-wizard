@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/edteamlat/go-wizard/domain/runner"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,10 @@ It generates the layers:
 By default will use edhex if no arquitecture is specified.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called", cmd.Flag("architecture").Value)
+		configPath := cmd.Flag(configPathFlag)
+		architecture := cmd.Flag(architectureFlag)
+
+		run(configPath.Value.String(), architecture.Value.String(), runner.Init)
 	},
 }
 

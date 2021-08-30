@@ -17,8 +17,7 @@ import (
 var templatesFS embed.FS
 
 func run(configPath, arquitecture string, action runner.Action) {
-	// TODO: read path from flag
-	conf, err := readConfig("config.yaml")
+	conf, err := readConfig(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
