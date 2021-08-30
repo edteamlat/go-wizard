@@ -20,7 +20,7 @@ func (r *runner) AppendLayer(layer ...layer.UseCase) {
 }
 
 // GenerateLayers runs the generation of every layer
-func (r runner) GenerateLayers(a action, m model.Layer) error {
+func (r runner) GenerateLayers(a Action, m model.Layer) error {
 	for _, layerUseCase := range r.layers {
 		if err := r.exec(a, m, layerUseCase); err != nil {
 			return err
@@ -30,11 +30,11 @@ func (r runner) GenerateLayers(a action, m model.Layer) error {
 	return nil
 }
 
-func (r runner) exec(a action, m model.Layer, layerUseCase layer.UseCase) error {
+func (r runner) exec(a Action, m model.Layer, layerUseCase layer.UseCase) error {
 	switch a {
-	case override:
+	case Override:
 		return layerUseCase.Override(m)
-	case newField:
+	case NewField:
 		return layerUseCase.AddField(m)
 	default:
 		return layerUseCase.Create(m)
