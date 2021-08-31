@@ -9,10 +9,7 @@ var packageCmd = &cobra.Command{
 	Use:   "package",
 	Short: "Adds a package to the project.",
 	Run: func(cmd *cobra.Command, args []string) {
-		configPath := cmd.Flag(configPathFlag)
-		architecture := cmd.Flag(architectureFlag)
-
-		run(configPath.Value.String(), architecture.Value.String(), "")
+		run(cmd, args, "")
 	},
 }
 

@@ -11,17 +11,21 @@ import (
 	"github.com/edteamlat/go-wizard/infrastructure/texttemplate"
 	"github.com/edteamlat/go-wizard/model"
 	"github.com/labstack/gommon/log"
+	"github.com/spf13/cobra"
 )
 
 // go:embed ../templates
 var templatesFS embed.FS
 
-func run(configPath, arquitecture string, action runner.Action) {
-	conf, err := readConfig(configPath)
+func run(cmd *cobra.Command, args []string, action runner.Action) {
+	configPath := cmd.Flag(configPathFlag)
+	architecture := cmd.Flag(architectureFlag)
+
+	conf, err := readConfig(configPath.Value.String())
 	if err != nil {
 		log.Fatal(err)
 	}
-	conf.Architecture = arquitecture
+	conf.Architecture = architecture.Value.String()
 
 	layerData := model.NewLayer(conf)
 

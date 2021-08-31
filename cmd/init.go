@@ -22,10 +22,7 @@ It generates the layers:
 By default will use edhex if no arquitecture is specified.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		configPath := cmd.Flag(configPathFlag)
-		architecture := cmd.Flag(architectureFlag)
-
-		run(configPath.Value.String(), architecture.Value.String(), runner.Init)
+		run(cmd, args, runner.Init)
 	},
 }
 
