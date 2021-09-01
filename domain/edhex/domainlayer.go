@@ -42,7 +42,8 @@ func (d domainLayer) createDomainFile(data model.Layer) error {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath(DomainLayerName, strings.ToLower(data.Model)), domainFileBuf); err != nil {
+	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
+	if err := d.storage.Save(data.GetPath(DomainLayerName, filename), domainFileBuf); err != nil {
 		return err
 	}
 
@@ -55,7 +56,7 @@ func (d domainLayer) createUseCaseFile(data model.Layer) error {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath(DomainLayerName, "usecase"), useCaseFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(DomainLayerName, "usecase.go"), useCaseFileBuf); err != nil {
 		return err
 	}
 
@@ -63,9 +64,9 @@ func (d domainLayer) createUseCaseFile(data model.Layer) error {
 }
 
 func (d domainLayer) Override(m model.Layer) error {
-	panic("implement me")
+	return nil
 }
 
 func (d domainLayer) AddField(m model.Layer) error {
-	panic("implement me")
+	return nil
 }

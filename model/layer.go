@@ -7,24 +7,30 @@ import (
 )
 
 type Layer struct {
-	Model  string
-	Table  string
-	Fields Fields
+	Model        string
+	Table        string
+	TableComment string
+	Fields       Fields
 
 	// ProjectPath indicates the root location of the project
 	ProjectPath string
+
+	// ModuleName is used to build the imports
+	ModuleName string
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
 func NewLayer(conf Config) Layer {
 	return Layer{
-		ProjectPath: conf.ProjectPath,
-		Model:       conf.Model,
-		Table:       conf.Table,
-		Fields:      conf.Fields,
+		ProjectPath:  conf.ProjectPath,
+		ModuleName:   conf.ModuleName,
+		Model:        conf.Model,
+		Table:        conf.Table,
+		TableComment: conf.TableComment,
+		Fields:       conf.Fields,
 	}
 }
 
 func (l *Layer) GetPath(layerName, filename string) string {
-	return fmt.Sprintf("%s.go", filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename))
+	return fmt.Sprintf("%s", filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename))
 }
