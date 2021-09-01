@@ -4,115 +4,29 @@ import (
 	"net/http"
 
 	"{{ .ModuleName }}/model"
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+
+	"github.com/labstack/echo"
 )
 
+// HTTPErrorHandler handler the error response of echo
 func HTTPErrorHandler(err error, c echo.Context) {
-	// handler *echo.HTTPError
-	if he, ok := err.(*echo.HTTPError); ok {
-		var msgErr string
-		msgErr, ok := he.Message.(string)
-		if !ok {
-			msgErr = "¡Upps! algo inesperado ocurrió"
-
-		}
-
-		registryLogError(c, he.Code, err)
-		err = c.JSON(he.Code, Response{Message: msgErr})
-
-		return
-	}
-
-	// handler if NOT is a *model.Error
+	// custom error
 	e, ok := err.(*model.Error)
-	if !ok {
-		registryLogError(c, http.StatusInternalServerError, err)
-		err = c.JSON(http.StatusInternalServerError, MessageResponse{
-			Errors: []*Response{{Code: UnexpectedError, Message: "¡Upps! algo inesperado ocurrió"}},
-		})
-
+	if ok {
+		err = c.JSON(getResponseError(e))
 		return
 	}
 
-	// handler a *model.Error
-	status, resp := getResponseError(e)
-	registryLogError(c, status, err)
-
-	err = c.JSON(status, resp)
-}
-
-// RegistryLogInfo registry for logs in elastic
-func RegistryLogInfo(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		if c.Request().Method == http.MethodGet {
-			return next(c)
-		}
-
-		fields := logrus.Fields{
-			"uri":         c.Path(),
-			"query_param": c.QueryParams(),
-			"remote_ip":   c.RealIP(),
-			"method":      c.Request().Method,
-		}
-
-		if hasToken(c.Request()) {
-			fields["user"] = GetUserID(c)
-		}
-
-		logrus.WithFields(fields).Info()
-
-		return next(c)
-	}
-}
-
-func registryLogError(c echo.Context, status int, err error) {
-	fields := logrus.Fields{
-		"status":      status,
-		"uri":         c.Path(),
-		"query_param": c.QueryParams(),
-		"remote_ip":   c.RealIP(),
-		"method":      c.Request().Method,
-	}
-
-	if hasToken(c.Request()) {
-		fields["user"] = GetUserID(c)
-	}
-
-	if e, ok := err.(*model.Error); ok {
-		fields["where"] = e.Where()
-		fields["who"] = e.Who()
-	}
-
-	if status >= 500 {
-		logrus.WithFields(fields).Error(err)
-		return
-	}
-
-	if status >= 400 {
-		logrus.WithFields(fields).Warn(err)
-		return
-	}
-}
-
-func GetUserID(c echo.Context) uint {
-	userID := c.Get("userID")
-	if userID != nil {
-		return userID.(uint)
-	}
-	return 0
-}
-
-func hasToken(r *http.Request) bool {
-	ah := r.Header.Get("Authorization")
-	if ah == "" {
-		return false
-	}
-	return true
+	// if the handler not returns a "model.Error" then it returns a generic error JSON response
+	err = c.JSON(http.StatusInternalServerError, model.MessageResponse{
+		Errors: model.Responses{
+			{Code: UnexpectedError, Message: "¡Uy! metimos la pata, disculpanos lo solucionaremos"},
+		},
+	})
 }
 
 // getResponseError returns the status code and a Response
-func getResponseError(err *model.Error) (outputStatus int, outputResponse MessageResponse) {
+func getResponseError(err *model.Error) (outputStatus int, outputResponse model.MessageResponse) {
 	if !err.HasCode() {
 		err.SetCode(UnexpectedError)
 	}
@@ -125,30 +39,15 @@ func getResponseError(err *model.Error) (outputStatus int, outputResponse Messag
 		outputResponse.Data = err.Data()
 	}
 
-	// search if in the response map exists the err.Code
-	if !err.IsFailureError() {
-		if response, ok := responses[err.Code()]; ok {
-			err.SetStatus(response.Status)
-			err.SetAPIMessage(response.Message)
-		}
+	if !err.HasStatusHTTP() {
+		err.SetStatusHTTP(http.StatusInternalServerError)
 	}
 
-	// Failure is a special code for send the custom error message, and API message from the logic and not from responses map
-	if err.IsFailureError() {
-		if !err.HasStatus() {
-			err.SetStatus(http.StatusBadRequest)
-		}
-	}
-
-	if !err.HasStatus() {
-		err.SetStatus(http.StatusInternalServerError)
-	}
-
-	outputStatus = err.Status()
-	outputResponse.Errors = append(outputResponse.Errors, &Response{
+	outputStatus = err.StatusHTTP()
+	outputResponse.Errors = model.Responses{model.Response{
 		Code:    err.Code(),
 		Message: err.APIMessage(),
-	})
+	}}
 
 	return
 }

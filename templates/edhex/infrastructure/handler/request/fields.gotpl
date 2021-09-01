@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"sqlbuilder"
 
-	"github.com/labstack/echo/v4"
 	"{{ .ModuleName }}/handler/response"
+
+	"github.com/labstack/echo/v4"
 )
 
 func GetFiltersSpecification(c echo.Context) (model.FiltersSpecification, error) {

@@ -30,8 +30,8 @@ func NewError() *Error {
 // Error implements the interface error
 func (e *Error) Error() string {
 
-	return fmt.Sprintf("Status: %d:%s | Endpoint: %s%s | Where: %s | Who: %s | EmployerID: %d | UserID: %d | Err: %v",
-		e.statusHTTP, e.code, e.endpoint, e.formatQueryParams(), e.where, e.who, e.employerID, e.userID, e.err)
+	return fmt.Sprintf("Status: %d:%s | Endpoint: %s%s | Where: %s | Who: %s | UserID: %d | Err: %v",
+		e.statusHTTP, e.code, e.endpoint, e.formatQueryParams(), e.where, e.who, e.userID, e.err)
 }
 
 // SetError sets the error field

@@ -1,6 +1,7 @@
 package response
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -10,132 +11,169 @@ import (
 
 // errorTypes
 const (
-	// Failure is a special code for send the custom error message, and API message from the logic and not from responses map
-	Failure model.StatusCode = "failure"
-
-	UnexpectedError   model.StatusCode = "unexpected_error"
-	UniqueError       model.StatusCode = "unique_error"
-	ForeignKeyError   model.StatusCode = "foreign_key_error"
-	NotNullError      model.StatusCode = "not_null_error"
-	InvalidParameter  model.StatusCode = "invalid_parameter"
-	InvalidBody       model.StatusCode = "invalid_body"
-	InvalidPagination model.StatusCode = "invalid_pagination"
-	BindFailed        model.StatusCode = "bind_failed"
-	ValidationFailed  model.StatusCode = "validation_failed"
-	RecordCreated     model.StatusCode = "record_created"
-	RecordUpdated     model.StatusCode = "record_updated"
-	RecordDeleted     model.StatusCode = "record_deleted"
-	RecordNotFound    model.StatusCode = "record_not_found"
-	Ok                model.StatusCode = "ok"
-	UnableToReadImage model.StatusCode = "unable_to_read_image"
-	RecordNotExist    model.StatusCode = "record_not_exist"
+	BindFailed model.StatusCode = "bind_failed"
+	// Failure sends the custom error message and API message from the logic
+	Failure        model.StatusCode = "failure"
+	Ok             model.StatusCode = "ok"
+	RecordCreated  model.StatusCode = "record_created"
+	RecordUpdated  model.StatusCode = "record_updated"
+	RecordDeleted  model.StatusCode = "record_deleted"
+	RecordNotFound model.StatusCode = "record_not_found"
+	// UnexpectedError is a server error
+	UnexpectedError model.StatusCode = "unexpected_error"
+	// AuthError is any of authorization errors
+	AuthError model.StatusCode = "authorization_error"
 )
 
-type data struct {
-	Status  int
-	Message string
+// Responser interface that must be implemented for handler http responses of framework Echo
+type Responser interface {
+	OK(data interface{}) (int, model.MessageResponse)
+	Created(data interface{}) (int, model.MessageResponse)
+	Updated(data interface{}) (int, model.MessageResponse)
+	Deleted(data interface{}) (int, model.MessageResponse)
+	NotFound() (int, string)
+	BindFailed(c echo.Context, err error) error
+	UnexpectedError(c echo.Context, who string, err error) *model.Error
+	ErrorHandled(c echo.Context, who string, err *model.Error) *model.Error
+	AuthorizationError(c echo.Context, who string, err *model.Error, statusCode int) *model.Error
+	Error(c echo.Context, who string, err error) *model.Error
 }
 
-var responses = map[model.StatusCode]data{
-	UnexpectedError: {
-		Status:  http.StatusInternalServerError,
-		Message: "¡Upps! algo inesperado ocurrió",
-	},
-	UniqueError: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! nos enviaste un registro duplicado, revisa la documentación del paquete",
-	},
-	ForeignKeyError: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! el id de un modelo relacionado en el payload no existe o no fue enviado",
-	},
-	NotNullError: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! nos enviaste datos nulos, revisa la documentación del paquete",
-	},
-	InvalidParameter: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! el valor del parámetro que has enviado no es valido. Por favor revisa el formato y tipo",
-	},
-	InvalidBody: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! el body que has enviado no es valido. Por favor revisa el formato y tipo",
-	},
-	InvalidPagination: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! los parámetros de paginación no son validos",
-	},
-	BindFailed: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! el payload que enviaste no es valido, verifica la documentación del paquete",
-	},
-	ValidationFailed: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! la información que nos enviasté esta incompleta, verifica la documentación del paquete",
-	},
-	RecordCreated: {
-		Status:  http.StatusCreated,
-		Message: "Registro creadó",
-	},
-	RecordUpdated: {
-		Status:  http.StatusOK,
-		Message: "Registro actualizadó",
-	},
-	RecordDeleted: {
-		Status:  http.StatusOK,
-		Message: "Registro eliminadó",
-	},
-
-	RecordNotFound: {
-		Status:  http.StatusOK,
-		Message: "No se encontraron registros",
-	},
-	Ok: {
-		Status:  http.StatusOK,
-		Message: "",
-	},
-	RecordNotExist: {
-		Status:  http.StatusBadRequest,
-		Message: "¡Upps! el registro no existe",
-	},
+// API is a response API
+type API struct {
+	logger model.Logger
 }
 
-// MessageResponse contains the response message
-type MessageResponse struct {
-	Data     interface{} `json:"data,omitempty"`
-	Errors   []*Response `json:"errors,omitempty"`
-	Messages []*Response `json:"messages,omitempty"`
+// New returns a new response API
+func New(logger model.Logger) API {
+	return API{logger: logger}
 }
 
-type Response struct {
-	Code    model.StatusCode `json:"code,omitempty"`
-	Message string           `json:"message,omitempty"`
-}
-
-func Successfull(code model.StatusCode, data interface{}) (status int, resp MessageResponse) {
-	status = http.StatusOK
-	res := &Response{code, "Ok"}
-
-	if e, ok := responses[code]; ok {
-		status = e.Status
-		res.Message = e.Message
+// OK returns an sucessfull message response
+func (a API) OK(data interface{}) (int, model.MessageResponse) {
+	return http.StatusOK, model.MessageResponse{
+		Data:     data,
+		Messages: model.Responses{{Code: Ok, Message: "¡listo!"}},
 	}
-	resp.Messages = append(resp.Messages, res)
-	resp.Data = data
-
-	return
 }
 
-// Failed returns an Error
-func Failed(who string, co model.StatusCode, err error) *model.Error {
+// Created returns an created message response
+func (a API) Created(data interface{}) (int, model.MessageResponse) {
+	return http.StatusCreated, model.MessageResponse{
+		Data:     data,
+		Messages: model.Responses{{Code: RecordCreated, Message: "¡listo!"}},
+	}
+}
+
+// Updated returns an updated message response
+func (a API) Updated(data interface{}) (int, model.MessageResponse) {
+	return http.StatusOK, model.MessageResponse{
+		Data:     data,
+		Messages: model.Responses{{Code: RecordUpdated, Message: "¡listo!"}},
+	}
+}
+
+// Deleted returns an deleted message response
+func (a API) Deleted(data interface{}) (int, model.MessageResponse) {
+	return http.StatusOK, model.MessageResponse{
+		Data:     data,
+		Messages: model.Responses{{Code: RecordDeleted, Message: "¡listo!"}},
+	}
+}
+
+// NotFound returns an not found message response
+func (a API) NotFound() (int, string) {
+	return http.StatusNotFound, ""
+}
+
+// BindFailed returns a bind failed error response
+func (a API) BindFailed(c echo.Context, err error) error {
 	fun, _, line, _ := runtime.Caller(1)
 
-	errData := model.NewError()
+	e := model.NewError()
+	e.SetError(err)
+	e.SetCode(BindFailed)
+	e.SetStatusHTTP(http.StatusBadRequest)
+	e.SetEndpoint(c.Path())
+	e.SetQueryParams(c.QueryParams().Encode())
+	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
+	e.SetWho("c.Bind()")
 
-	errData.SetCode(co)
-	errData.SetError(err)
-	errData.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
-	errData.SetWho(who)
+	a.logger.Warning("%s", e.Error())
+	return e
+}
 
-	return errData
+// UnexpectedError returns an unexpected error
+func (a API) UnexpectedError(c echo.Context, who string, err error) *model.Error {
+	fun, _, line, _ := runtime.Caller(1)
+
+	e := model.NewError()
+	e.SetError(err)
+	e.SetAPIMessage("¡Uy! metimos la pata, disculpanos lo solucionaremos")
+	e.SetCode(UnexpectedError)
+	e.SetStatusHTTP(http.StatusInternalServerError)
+	e.SetEndpoint(c.Path())
+	e.SetQueryParams(c.QueryParams().Encode())
+	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
+	e.SetWho(who)
+	e.SetEmployerID(request.GetEmployerID(c))
+	e.SetUserID(request.GetUserID(c))
+
+	a.logger.Error("%s", e.Error())
+	return e
+}
+
+// ErrorHandled returns an error handled
+func (a API) ErrorHandled(c echo.Context, who string, e *model.Error) *model.Error {
+	fun, _, line, _ := runtime.Caller(1)
+
+	e.SetCode(Failure)
+	e.SetEndpoint(c.Path())
+	e.SetQueryParams(c.QueryParams().Encode())
+	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
+	e.SetWho(who)
+	e.SetUserID(request.GetUserID(c))
+
+	if !e.HasStatusHTTP() {
+		e.SetStatusHTTP(http.StatusBadRequest)
+	}
+
+	if e.StatusHTTP() < http.StatusInternalServerError {
+		a.logger.Warning("%s", e.Error())
+		return e
+	}
+
+	a.logger.Error("%s", e.Error())
+	return e
+}
+
+// AuthorizationError returns an authorization error handled
+func (a API) AuthorizationError(c echo.Context, who string, e *model.Error, httpStatusCode int) *model.Error {
+	fun, _, line, _ := runtime.Caller(1)
+
+	e.SetCode(AuthError)
+	e.SetEndpoint(c.Path())
+	e.SetQueryParams(c.QueryParams().Encode())
+	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
+	e.SetWho(who)
+	e.SetStatusHTTP(httpStatusCode)
+	e.SetEmployerID(request.GetEmployerID(c))
+	e.SetUserID(request.GetUserID(c))
+
+	if e.StatusHTTP() < http.StatusInternalServerError {
+		a.logger.Warning("%s", e.Error())
+		return e
+	}
+
+	a.logger.Error("%s", e.Error())
+	return e
+}
+
+func (a API) Error(c echo.Context, who string, err error) *model.Error {
+	e := model.NewError()
+	if errors.As(err, &e) {
+		return a.ErrorHandled(c, who, e)
+	}
+
+	return a.UnexpectedError(c, who, err)
 }
