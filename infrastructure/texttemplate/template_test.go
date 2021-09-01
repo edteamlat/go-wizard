@@ -35,12 +35,13 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
-	// tests = append(tests, getDomainLayerTests()...)
-	// tests = append(tests, getDomainUseCaseLayerTests()...)
-	// tests = append(tests, getModelLayerTests()...)
-	// tests = append(tests, getSQLMigrationLayerTests()...)
-	// tests = append(tests, getHandlerLayerTests()...)
+	tests = append(tests, getDomainLayerTests()...)
+	tests = append(tests, getDomainUseCaseLayerTests()...)
+	tests = append(tests, getModelLayerTests()...)
+	tests = append(tests, getSQLMigrationLayerTests()...)
+	tests = append(tests, getHandlerLayerTests()...)
 	tests = append(tests, getHandlerRouteLayerTests()...)
+	tests = append(tests, getHandlerLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -814,4 +815,259 @@ func publicRoutes(api *echo.Echo, h handler) {
 			wantErr: false,
 		},
 	}
+}
+
+func getHandlerLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/handler/package/handler.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("handler.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "handler.gotpl",
+				data: model.Layer{
+					Model:      "Order",
+					Table:      "orders",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"%[1]s/%[2]s"
+	"%[1]s/infrastructure/handler/request"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/model"
+)
+
+type handler struct {
+	useCase invoice.useCase
+	response response.Responser
+}
+
+func newHandler(useCase %[2]s.useCase) handler {
+	return handler{useCase: useCase}
+}
+
+// Create handles the creation of a model.%[3]s
+func (h handler) Create(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.%[3]s
+func (h handler) Update(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = uint(ID)
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.%[3]s
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(uint(ID))
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.%[3]s
+func (h handler) GetWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderData, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderData))
+}
+
+// GetAllWhere handles the search of all model.%[3]s
+func (h handler) GetAllWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orders, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orders))
+}
+`, moduleName, "order", "Order"),
+			wantErr: false,
+		},
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "handler.gotpl",
+				data: model.Layer{
+					Model:      "OrderItem",
+					Table:      "OrderItems",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"%[1]s/%[2]s"
+	"%[1]s/infrastructure/handler/request"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/model"
+)
+
+type handler struct {
+	useCase invoice.useCase
+	response response.Responser
+}
+
+func newHandler(useCase %[2]s.useCase) handler {
+	return handler{useCase: useCase}
+}
+
+// Create handles the creation of a model.%[3]s
+func (h handler) Create(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.%[3]s
+func (h handler) Update(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = uint(ID)
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.%[3]s
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(uint(ID))
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.%[3]s
+func (h handler) GetWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItemData, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItemData))
+}
+
+// GetAllWhere handles the search of all model.%[3]s
+func (h handler) GetAllWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItems, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItems))
+}
+`, moduleName, "orderitem", "OrderItem"),
+			wantErr: false,
+		},
+	}
+
 }

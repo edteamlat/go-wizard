@@ -83,12 +83,12 @@ func (h handler) GetWhere(c echo.Context) error {
 		return err
 	}
 
-	{{ parseToLowerCamelCase .Model }}, err := h.useCase.GetAllWhere(filtersSpecification)
+	{{ parseToLowerCamelCase .Model }}Data, err := h.useCase.GetAllWhere(filtersSpecification)
 	if err != nil {
 		return h.response.Error(c, "useCase.GetWhere()", err)
 	}
 
-	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}))
+	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}Data))
 }
 
 // GetAllWhere handles the search of all model.{{ .Model }}
@@ -107,4 +107,3 @@ func (h handler) GetAllWhere(c echo.Context) error {
 
 	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Table }}))
 }
-
