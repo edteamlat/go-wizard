@@ -10,7 +10,7 @@ CREATE TABLE {{.Table}} (
 	CONSTRAINT {{ .Table }}_id_pk PRIMARY KEY (id)
 );
 
-COMMENT ON TABLE {{ .Table }} IS 'Write your comment';
+COMMENT ON TABLE {{ .Table }} IS '{{ .TableComment }}';
 
 -- Register the permission module for the routes
 INSERT INTO modules (name) VALUES ('{{ parseToUpperSnakeCase .Model }}');

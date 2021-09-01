@@ -7,9 +7,10 @@ import (
 )
 
 type Layer struct {
-	Model  string
-	Table  string
-	Fields Fields
+	Model        string
+	Table        string
+	TableComment string
+	Fields       Fields
 
 	// ProjectPath indicates the root location of the project
 	ProjectPath string
@@ -21,11 +22,12 @@ type Layer struct {
 // NewLayer returns a new Layer with module and table Field initialized
 func NewLayer(conf Config) Layer {
 	return Layer{
-		ProjectPath: conf.ProjectPath,
-		ModuleName:  conf.ModuleName,
-		Model:       conf.Model,
-		Table:       conf.Table,
-		Fields:      conf.Fields,
+		ProjectPath:  conf.ProjectPath,
+		ModuleName:   conf.ModuleName,
+		Model:        conf.Model,
+		Table:        conf.Table,
+		TableComment: conf.TableComment,
+		Fields:       conf.Fields,
 	}
 }
 

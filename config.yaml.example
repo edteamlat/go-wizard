@@ -9,6 +9,8 @@ model: UserRole
 # for the Slice model
 table: user_roles
 
+table_comment: Write your comment here
+
 # a list of objects where you specify the name, type and if it allows nulls
 fields:
   - name: user_id
