@@ -9,6 +9,8 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 )
 
+const edhexArchitecture = "edhex"
+
 // UseCase use case to generate a layer
 type UseCase interface {
 	Create(m model.Layer) error
@@ -32,7 +34,7 @@ func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, stora
 	layers := UseCaseLayers{}
 
 	for _, layerName := range conf.Layers {
-		layer, err := getLayer(layerName, template, storage)
+		layer, err := getLayer(conf.Architecture, layerName, template, storage)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +46,17 @@ func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, stora
 }
 
 // getLayer factory that obtains a new useCaseLayer
-func getLayer(name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
+func getLayer(architecture, name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
+	switch name {
+	case edhexArchitecture:
+		return getEDhexLayer(name, template, storage)
+	default:
+		return nil, fmt.Errorf("layer is not implemented")
+	}
+}
+
+// getLayer factory that obtains a new useCaseLayer
+func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
 	switch name {
 	case edhex.DomainLayerName:
 		return edhex.NewDomainLayer(template, storage), nil

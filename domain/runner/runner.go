@@ -4,13 +4,14 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 )
 
-type action string
+type Action string
 
 const (
-	override action = "override"
-	newField action = "new-field"
+	Override Action = "override"
+	NewField Action = "new-field"
+	Init     Action = "init"
 )
 
 type UseCase interface {
-	GenerateLayers(a action, m model.Layer) error
+	GenerateLayers(a Action, m model.Layer) error
 }

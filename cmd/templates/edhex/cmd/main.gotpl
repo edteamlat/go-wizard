@@ -1,0 +1,33 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+
+	"{{ .ModuleName }}/handler/response"
+	"{{ .ModuleName }}/handler"
+)
+
+
+func main() {
+	config := newConfiguration("./configuration.json")
+	api := newHTTP(config, response.HTTPErrorHandler)
+	logger := newLogger(config.LogFolder, false)
+	db := newDBConnection(config)
+	remoteConfig := newRemoteConfig(conf.Database)
+
+	loadSignatures(config, logger)
+
+	handler.InitRoutes(model.RouterSpecification{
+		Config:       config,
+		Api:          api,
+		Logger:       logger,
+		DB:           db,
+		RemoteConfig: remoteConfig,
+	})
+
+	logger.Info("Starting service")
+	port := fmt.Sprintf(":%d", config.PortHTTP)
+	logger.Fatal(api.Start(port))
+}

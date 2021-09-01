@@ -1,0 +1,45 @@
+package request
+
+import (
+	"encoding/json"
+	"sqlbuilder"
+
+	"{{ .ModuleName }}/handler/response"
+
+	"github.com/labstack/echo/v4"
+)
+
+func GetFiltersSpecification(c echo.Context) (model.FiltersSpecification, error) {
+	filters := c.QueryParam("filters")
+	fields := sqlbuilder.Fields{}
+	if filters != "" {
+		err := json.Unmarshal([]byte(filters), &fields)
+		if err != nil {
+			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+		}
+	}
+
+	sorts := c.QueryParam("sorts")
+	sortsFields := sqlbuilder.SortFields{}
+	if sorts != "" {
+		err := json.Unmarshal([]byte(sorts), &sortsFields)
+		if err != nil {
+			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+		}
+	}
+
+	pagination := c.QueryParam("pagination")
+	pag := sqlbuilder.Pagination{}
+	if pagination != "" {
+		err := json.Unmarshal([]byte(pagination), &pag)
+		if err != nil {
+			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+		}
+	}
+
+	return model.FiltersSpecification{
+		Filters:    fields,
+		Sorts:      sortsFields,
+		Pagination: pag,
+	}, nil
+}

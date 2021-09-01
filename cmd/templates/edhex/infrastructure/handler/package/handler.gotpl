@@ -1,0 +1,110 @@
+{{ $package := parseToLower.Model -}}
+
+package {{ $package}}
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"{{ .ModuleName }}/{{ $package }}"
+	"{{ .ModuleName }}/infrastructure/handler/request"
+	"{{ .ModuleName }}/infrastructure/handler/response"
+	"{{ .ModuleName }}/model"
+)
+
+type handler struct {
+	useCase invoice.useCase
+	response response.Responser
+}
+
+func newHandler(useCase {{ $package }}.useCase) handler {
+	return handler{useCase: useCase}
+}
+
+// Create handles the creation of a model.{{ .Model }}
+func (h handler) Create(c echo.Context) error {
+	m := model.{{ .Model }}{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.{{ .Model }}
+func (h handler) Update(c echo.Context) error {
+	m := model.{{ .Model }}{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = uint(ID)
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.{{ .Model }}
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(uint(ID))
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.{{ .Model }}
+func (h handler) GetWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+	return err
+	}
+
+	{{ parseToLowerCamelCase .Model }}, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+	return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}))
+}
+
+// GetAllWhere handles the search of all model.{{ .Model }}
+func (h handler) GetAllWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	{{ parseToLowerCamelCase .Table }}, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Table }}))
+}
+

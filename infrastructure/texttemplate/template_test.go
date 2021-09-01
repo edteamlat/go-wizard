@@ -10,7 +10,7 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const edhexTemplatesPath = "../../templates/edhex"
+const edhexTemplatesPath = "../../cmd/templates/edhex"
 
 const moduleName = "github.com/edteamlat/go-wizard"
 

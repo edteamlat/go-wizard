@@ -9,4 +9,5 @@ type Config struct {
 	TableComment string   `yaml:"table_comment"`
 	Layers       []string `yaml:"layers"`
 	Fields       Fields   `yaml:"fields"`
+	Architecture string
 }
