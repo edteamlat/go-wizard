@@ -35,10 +35,12 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
-	tests = append(tests, getDomainLayerTests()...)
-	tests = append(tests, getDomainUseCaseLayerTests()...)
-	tests = append(tests, getModelLayerTests()...)
-	tests = append(tests, getSQLMigrationLayerTests()...)
+	// tests = append(tests, getDomainLayerTests()...)
+	// tests = append(tests, getDomainUseCaseLayerTests()...)
+	// tests = append(tests, getModelLayerTests()...)
+	// tests = append(tests, getSQLMigrationLayerTests()...)
+	// tests = append(tests, getHandlerLayerTests()...)
+	tests = append(tests, getHandlerRouteLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -649,6 +651,166 @@ COMMENT ON TABLE course_prices IS 'Write your comment';
 -- Register the permission module for the routes
 INSERT INTO modules (name) VALUES ('COURSE_PRICE');
 `,
+			wantErr: false,
+		},
+	}
+}
+
+func getHandlerRouteLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/handler/package/route.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("route.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "route.gotpl",
+				data: model.Layer{
+					Model:      "Invoice",
+					Table:      "invoices",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package invoice
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/domain/%[2]s"
+	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+)
+
+// NewRouter returns a router to handle model.Invoice requests
+func NewRouter(specification model.RouterSpecification) {
+	handler := buildHandler(specification)
+
+	// build middlewares to validate permissions on the routes
+
+	adminRoutes(specification, handler)
+	privateRoutes(specification, handler)
+	publicRoutes(specification, handler)
+}
+
+func buildHandler(specification model.RouterSpecification) handler {
+	responser := response.New(specification.Logger)
+
+	useCase := %[2]s.New(%[2]sStorage.New(specification.DB))
+	return newHandler(useCase, responser)
+}
+
+// adminRoutes handle the routes that requires a token and permissions to certain users
+func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("api/v1/admin/invoices", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// privateRoutes handle the routes that requires a token
+func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("/api/v1/private/invoices", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// publicRoutes handle the routes that not requires a validation of any kind to be use
+func publicRoutes(api *echo.Echo, h handler) {
+	route := api.Group("/api/v1/invoices")
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+`, moduleName, "invoice"),
+			wantErr: false,
+		},
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "route.gotpl",
+				data: model.Layer{
+					Model:      "InvoiceItem",
+					Table:      "invoice_items",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package invoiceitem
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/domain/%[2]s"
+	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+)
+
+// NewRouter returns a router to handle model.InvoiceItem requests
+func NewRouter(specification model.RouterSpecification) {
+	handler := buildHandler(specification)
+
+	// build middlewares to validate permissions on the routes
+
+	adminRoutes(specification, handler)
+	privateRoutes(specification, handler)
+	publicRoutes(specification, handler)
+}
+
+func buildHandler(specification model.RouterSpecification) handler {
+	responser := response.New(specification.Logger)
+
+	useCase := %[2]s.New(%[2]sStorage.New(specification.DB))
+	return newHandler(useCase, responser)
+}
+
+// adminRoutes handle the routes that requires a token and permissions to certain users
+func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("api/v1/admin/invoice-items", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// privateRoutes handle the routes that requires a token
+func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("/api/v1/private/invoice-items", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// publicRoutes handle the routes that not requires a validation of any kind to be use
+func publicRoutes(api *echo.Echo, h handler) {
+	route := api.Group("/api/v1/invoice-items")
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+`, moduleName, "invoiceitem"),
 			wantErr: false,
 		},
 	}

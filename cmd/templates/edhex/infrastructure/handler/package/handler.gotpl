@@ -1,4 +1,4 @@
-{{ $package := parseToLower.Model -}}
+{{ $package := parseToLower .Model -}}
 
 package {{ $package}}
 
@@ -80,12 +80,12 @@ func (h handler) GetWhere(c echo.Context) error {
 
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
-	return err
+		return err
 	}
 
 	{{ parseToLowerCamelCase .Model }}, err := h.useCase.GetAllWhere(filtersSpecification)
 	if err != nil {
-	return h.response.Error(c, "useCase.GetWhere()", err)
+		return h.response.Error(c, "useCase.GetWhere()", err)
 	}
 
 	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}))
