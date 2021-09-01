@@ -51,7 +51,7 @@ func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {
 }
 
 func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
-	fileSystemUseCase := filesystem.NewFileSystem()
+	fileSystemUseCase := filesystem.New()
 
 	tpl := template.Must(template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(templatesFS))
 	templateUseCase := texttemplate.NewTemplate(tpl)

@@ -1,0 +1,25 @@
+{{ $slice := parseToUpperCamelCase .Table -}}
+{{ $reciverName := getFirstLetter .Model -}}
+
+package model
+
+import "time"
+
+// {{ .Model }} model of table {{ .Table }}
+type {{ .Model }} struct {
+	{{ range $i, $field := .Fields -}}
+		{{ parseToUpperCamelCase $field.Name }} {{ $field.Type }} `json:"{{ $field.Name }}"`
+	{{ end -}}
+}
+
+func ({{ $reciverName }} {{ .Model }}) HasID() bool { return {{ $reciverName }}.ID > 0 }
+
+func ({{ $reciverName }} {{ .Model }}) Validate() error {
+	// implement validation of fields for creation and update
+	return nil
+}
+
+// {{ $slice }} slice of {{ .Model }}
+type {{ $slice }} []{{ .Model }}
+
+func ({{ $reciverName }} {{ $slice }}) IsEmpty() bool { return len({{ $slice }}) == 0 }
