@@ -17,7 +17,7 @@ var allowedFieldsForQuery = []string{
 }
 
 // {{ $reciverType }} implements UseCase
-		type {{ $reciverType }} struct {
+type {{ $reciverType }} struct {
 	storage Storage
 }
 

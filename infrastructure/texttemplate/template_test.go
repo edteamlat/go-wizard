@@ -59,7 +59,7 @@ func TestTemplate_Create(t1 *testing.T) {
 }
 
 func getDomainLayerTests() testTables {
-	path := fmt.Sprintf("%s/domain/domain.gotpl", edhexTemplatesPath)
+	path := fmt.Sprintf("%s/domain/package/domain.gotpl", edhexTemplatesPath)
 	tpl := template.Must(template.New("domain.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
 
 	return testTables{
@@ -235,7 +235,7 @@ type Storage interface {
 }
 
 func getDomainUseCaseLayerTests() testTables {
-	path := fmt.Sprintf("%s/domain/usecase.gotpl", edhexTemplatesPath)
+	path := fmt.Sprintf("%s/domain/package/usecase.gotpl", edhexTemplatesPath)
 	tpl := template.Must(template.New("usecase.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
 
 	return testTables{
@@ -385,8 +385,8 @@ func handleStorageErr(err error) error {
 }
 
 func getModelLayerTests() testTables {
-	path := fmt.Sprintf("%s/model/model.gotpl", edhexTemplatesPath)
-	tpl := template.Must(template.New("model.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+	path := fmt.Sprintf("%s/model/newmodel.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("newmodel.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
 
 	return testTables{
 		{
@@ -395,7 +395,7 @@ func getModelLayerTests() testTables {
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "model.gotpl",
+				templateName: "newmodel.gotpl",
 				data: model.Layer{
 					Model: "User",
 					Table: "users",
@@ -456,7 +456,7 @@ func (u Users) IsEmpty() bool { return len(Users) == 0 }
 				tpl: tpl,
 			},
 			args: args{
-				templateName: "model.gotpl",
+				templateName: "newmodel.gotpl",
 				data: model.Layer{
 					Model: "UserRole",
 					Table: "user_roles",
@@ -527,8 +527,9 @@ func getSQLMigrationLayerTests() testTables {
 			args: args{
 				templateName: "sqlmigration.gotpl",
 				data: model.Layer{
-					Model: "Course",
-					Table: "courses",
+					Model:        "Course",
+					Table:        "courses",
+					TableComment: "Write your comment",
 					Fields: model.Fields{
 						{
 							Name:   "id",
@@ -588,8 +589,9 @@ INSERT INTO modules (name) VALUES ('COURSE');
 			args: args{
 				templateName: "sqlmigration.gotpl",
 				data: model.Layer{
-					Model: "CoursePrice",
-					Table: "course_prices",
+					Model:        "CoursePrice",
+					Table:        "course_prices",
+					TableComment: "Write your comment",
 					Fields: model.Fields{
 						{
 							Name:   "id",

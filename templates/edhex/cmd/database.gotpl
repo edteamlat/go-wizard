@@ -1,1 +1,25 @@
-package cmd
+package main
+
+import (
+	"sql"
+
+	"{{ .ModuleName }}/model"
+)
+
+func newDBConnection(dbConf model.Database) (*sql.DB, err) {
+	if config.SSLMode == "" {
+		config.SSLMode = "disable"
+	}
+
+	dns := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		dbConf.User,
+		dbConf.Password,
+		dbConf.Server,
+		dbConf.Port,
+		dbConf.Name,
+		dbConf.SSLMode,
+	)
+
+	return sql.Open("postgres", dns)
+}

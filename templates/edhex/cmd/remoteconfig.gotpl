@@ -1,1 +1,7 @@
-package cmd
+package main
+
+import "{{ .ModuleName }}/model"
+
+func newRemoteConfig(dbConf model.Database) model.RemoteConfig {
+	// implement me
+}
