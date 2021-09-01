@@ -12,15 +12,19 @@ const (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "go-wizard",
-	Short: "Generador de paquetes con Arquitectura Hexagonal.",
-	Long: `Generador de paquetes con Arquitectura Hexagonal.
+	Short: "Generator of packages with hexagonal architecture.",
+	Long: `Generator of packages with hexagonal architecture.
 
-Las capas que genera son:
+Layers that can be generated:
 1. domain
 2. handler
 3. storage
 4. model
-5. sqlmigration`,
+5. sqlmigration
+
+Hexagonal Architecture variation that can be used:
+1. edhex
+`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
