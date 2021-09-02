@@ -11,3 +11,7 @@ type Config struct {
 	Fields       Fields   `yaml:"fields"`
 	Architecture string
 }
+
+func (c *Config) AddDefaultInitLayers() {
+	c.Layers = append(c.Layers, "root", "cmd")
+}

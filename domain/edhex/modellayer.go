@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	modelTemplateName  = "newmodel.gotpl"
+	modelTemplateName = "newmodel.gotpl"
 )
 
 const ModelLayerName = "model"
@@ -21,6 +21,10 @@ type modelLayer struct {
 
 func NewModelLayer(template UseCaseTemplate, storage Storage) modelLayer {
 	return modelLayer{template: template, storage: storage}
+}
+
+func (d modelLayer) Init(m model.Layer) error {
+	return nil
 }
 
 func (d modelLayer) Create(data model.Layer) error {

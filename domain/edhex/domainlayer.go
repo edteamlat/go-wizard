@@ -24,6 +24,10 @@ func NewDomainLayer(template UseCaseTemplate, storage Storage) domainLayer {
 	return domainLayer{template: template, storage: storage}
 }
 
+func (d domainLayer) Init(m model.Layer) error {
+	return nil
+}
+
 func (d domainLayer) Create(data model.Layer) error {
 	if err := d.createDomainFile(data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)

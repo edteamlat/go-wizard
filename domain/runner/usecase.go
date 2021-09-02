@@ -36,6 +36,8 @@ func (r runner) exec(a Action, m model.Layer, layerUseCase layer.UseCase) error 
 		return layerUseCase.Override(m)
 	case NewField:
 		return layerUseCase.AddField(m)
+	case Init:
+		return layerUseCase.Init(m)
 	default:
 		return layerUseCase.Create(m)
 	}

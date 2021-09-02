@@ -25,6 +25,10 @@ func NewHandlerLayer(template UseCaseTemplate, storage Storage) handlerLayer {
 	return handlerLayer{template: template, storage: storage}
 }
 
+func (d handlerLayer) Init(m model.Layer) error {
+	return nil
+}
+
 func (d handlerLayer) Create(data model.Layer) error {
 	if err := d.createHandler(data); err != nil {
 		return fmt.Errorf("edhex-handlerlayer: %w", err)

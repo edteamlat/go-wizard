@@ -25,6 +25,10 @@ func NewSQLMigrationLayer(template UseCaseTemplate, storage Storage) sqlMigratio
 	return sqlMigrationLayer{template: template, storage: storage}
 }
 
+func (d sqlMigrationLayer) Init(m model.Layer) error {
+	return nil
+}
+
 func (d sqlMigrationLayer) Create(data model.Layer) error {
 	if err := d.createSQLMigration(data); err != nil {
 		return fmt.Errorf("edhex-sqlmigration: %w", err)

@@ -13,6 +13,7 @@ const edhexArchitecture = "edhex"
 
 // UseCase use case to generate a layer
 type UseCase interface {
+	Init(m model.Layer) error
 	Create(m model.Layer) error
 	Override(m model.Layer) error
 	AddField(m model.Layer) error
@@ -68,6 +69,10 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 		return edhex.NewPostgresLayer(template, storage), nil
 	case edhex.HandlerLayerName:
 		return edhex.NewHandlerLayer(template, storage), nil
+	case edhex.RootLayerName:
+		return edhex.NewRootLayer(template, storage), nil
+	case "cmd":
+		return edhex.NewDomainLayer(template, storage), nil
 	default:
 		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}

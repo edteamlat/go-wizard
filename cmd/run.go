@@ -27,6 +27,10 @@ func run(cmd *cobra.Command, args []string, action runner.Action) {
 	}
 	conf.Architecture = architecture.Value.String()
 
+	if action == runner.Init {
+		conf.AddDefaultInitLayers()
+	}
+
 	layerData := model.NewLayer(conf)
 
 	runnerUseCase, err := buildUseCaseRunner(conf)
@@ -55,6 +59,7 @@ func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 
 	tpl, err := template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(
 		templatesFS,
+		"**/**/*.gotpl",
 		"**/**/**/*.gotpl",
 		"**/**/**/**/*.gotpl",
 		"**/**/**/**/**/*.gotpl",

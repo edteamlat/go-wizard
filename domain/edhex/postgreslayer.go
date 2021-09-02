@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	postgresTemplateName  = "postgres.gotpl"
+	postgresTemplateName = "postgres.gotpl"
 )
 
 const PostgresLayerName = "storage_postgres"
@@ -23,6 +23,10 @@ type postgresLayer struct {
 
 func NewPostgresLayer(template UseCaseTemplate, storage Storage) postgresLayer {
 	return postgresLayer{template: template, storage: storage}
+}
+
+func (d postgresLayer) Init(m model.Layer) error {
+	return nil
 }
 
 func (d postgresLayer) Create(data model.Layer) error {
@@ -54,4 +58,3 @@ func (d postgresLayer) Override(m model.Layer) error {
 func (d postgresLayer) AddField(m model.Layer) error {
 	return nil
 }
-
