@@ -1186,7 +1186,7 @@ func (%[4]s %[3]s) Create(m *model.%[3]s) error {
 
 // Update this method updates a model.%[3]s by id
 func (%[4]s %[3]s) Update(m *model.%[3]s) error {
-	stmt, err := e.db.Prepare(psqlUpdateByIDAndEmployerID)
+	stmt, err := e.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}

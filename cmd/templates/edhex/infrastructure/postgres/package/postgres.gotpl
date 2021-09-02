@@ -61,7 +61,7 @@ func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
 
 // Update this method updates a model.{{ .Model }} by id
 func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
-	stmt, err := e.db.Prepare(psqlUpdateByIDAndEmployerID)
+	stmt, err := e.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}

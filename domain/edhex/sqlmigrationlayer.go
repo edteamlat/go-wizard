@@ -12,7 +12,9 @@ const (
 	sqlMigrationTemplateName = "sqlmigration.gotpl"
 )
 
-const SQLMigrationLayerName = "sqlmigration"
+const SQLMigrationLayerName = "sqlmigration_postgres"
+
+const sqlMigrationFolder = "sqlmigration"
 
 type sqlMigrationLayer struct {
 	template UseCaseTemplate
@@ -24,20 +26,20 @@ func NewSQLMigrationLayer(template UseCaseTemplate, storage Storage) sqlMigratio
 }
 
 func (d sqlMigrationLayer) Create(data model.Layer) error {
-	if err := d.createNewModelFile(data); err != nil {
+	if err := d.createSQLMigrationFile(data); err != nil {
 		return fmt.Errorf("edhex-sqlmigration: %w", err)
 	}
 
 	return nil
 }
 
-func (d sqlMigrationLayer) createNewModelFile(data model.Layer) error {
+func (d sqlMigrationLayer) createSQLMigrationFile(data model.Layer) error {
 	domainFileBuf := bytes.Buffer{}
 	if err := d.template.Create(&domainFileBuf, sqlMigrationTemplateName, data); err != nil {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath(SQLMigrationLayerName, getFilename(data.Table), false), domainFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(sqlMigrationFolder, getFilename(data.Table), false), domainFileBuf); err != nil {
 		return err
 	}
 
