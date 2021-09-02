@@ -851,11 +851,11 @@ import (
 )
 
 type handler struct {
-	useCase invoice.useCase
+	useCase %[2]s.UseCase
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.useCase) handler {
+func newHandler(useCase %[2]s.UseCase) handler {
 	return handler{useCase: useCase}
 }
 
@@ -974,11 +974,11 @@ import (
 )
 
 type handler struct {
-	useCase invoice.useCase
+	useCase %[2]s.UseCase
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.useCase) handler {
+func newHandler(useCase %[2]s.UseCase) handler {
 	return handler{useCase: useCase}
 }
 

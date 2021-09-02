@@ -15,11 +15,11 @@ import (
 )
 
 type handler struct {
-	useCase invoice.useCase
+	useCase {{ $package }}.UseCase
 	response response.Responser
 }
 
-func newHandler(useCase {{ $package }}.useCase) handler {
+func newHandler(useCase {{ $package }}.UseCase) handler {
 	return handler{useCase: useCase}
 }
 

@@ -24,21 +24,21 @@ func NewModelLayer(template UseCaseTemplate, storage Storage) modelLayer {
 }
 
 func (d modelLayer) Create(data model.Layer) error {
-	if err := d.createNewModelFile(data); err != nil {
+	if err := d.createNewModel(data); err != nil {
 		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
 	return nil
 }
 
-func (d modelLayer) createNewModelFile(data model.Layer) error {
-	domainFileBuf := bytes.Buffer{}
-	if err := d.template.Create(&domainFileBuf, modelTemplateName, data); err != nil {
+func (d modelLayer) createNewModel(data model.Layer) error {
+	fileBuf := bytes.Buffer{}
+	if err := d.template.Create(&fileBuf, modelTemplateName, data); err != nil {
 		return err
 	}
 
 	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-	if err := d.storage.Save(data.GetPath(ModelLayerName, filename, false), domainFileBuf); err != nil {
+	if err := d.storage.Save(data.GetPath(ModelLayerName, filename, false), fileBuf); err != nil {
 		return err
 	}
 

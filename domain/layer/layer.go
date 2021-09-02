@@ -66,6 +66,8 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 		return edhex.NewSQLMigrationLayer(template, storage), nil
 	case edhex.PostgresLayerName:
 		return edhex.NewPostgresLayer(template, storage), nil
+	case edhex.HandlerLayerName:
+		return edhex.NewHandlerLayer(template, storage), nil
 	default:
 		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}
