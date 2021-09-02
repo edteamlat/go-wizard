@@ -53,7 +53,13 @@ func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {
 func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	fileSystemUseCase := filesystem.New()
 
-	tpl, err := template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(templatesFS, "**/**/**/*.gotpl")
+	tpl, err := template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(
+		templatesFS,
+		"**/**/**/*.gotpl",
+		"**/**/**/**/*.gotpl",
+		"**/**/**/**/**/*.gotpl",
+		"**/**/**/**/**/*.gotpl",
+	)
 	if err != nil {
 		log.Fatal(err)
 	}

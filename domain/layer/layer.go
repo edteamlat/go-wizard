@@ -51,7 +51,7 @@ func getLayer(architecture, name string, template UseCaseTemplate, storage Stora
 	case edhexArchitecture:
 		return getEDhexLayer(name, template, storage)
 	default:
-		return nil, fmt.Errorf("layer is not implemented")
+		return nil, fmt.Errorf("architecture `%s` is not implemented", architecture)
 	}
 }
 
@@ -62,7 +62,9 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 		return edhex.NewDomainLayer(template, storage), nil
 	case edhex.ModelLayerName:
 		return edhex.NewModelLayer(template, storage), nil
+	case edhex.SQLMigrationLayerName:
+		return edhex.NewSQLMigrationLayer(template, storage), nil
 	default:
-		return nil, fmt.Errorf("layer is not implemented")
+		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}
 }
