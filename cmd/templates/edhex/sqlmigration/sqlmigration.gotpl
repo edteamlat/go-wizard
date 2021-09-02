@@ -1,10 +1,6 @@
 CREATE TABLE {{.Table}} (
 	id SERIAL NOT NULL,
-	{{- range $i, $field := .Fields -}}
-		{{ if and (ne $field.Name "id") (ne $field.Name "created_at") (ne $field.Name "updated_at") }}
-	{{ $field.Name }} {{ parseToSqlType $field.Type}}{{ if .IsNull }},{{ else }} NOT NULL,{{ end }}
-		{{- end }}
-	{{- end }}
+	{{ printMigrationFieldsWithoutDefaults .Fields }}
 	created_at TIMESTAMP NOT NULL DEFAULT now(),
 	updated_at TIMESTAMP,
 	CONSTRAINT {{ .Table }}_id_pk PRIMARY KEY (id)

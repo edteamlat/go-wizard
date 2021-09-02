@@ -42,6 +42,7 @@ func TestTemplate_Create(t1 *testing.T) {
 	tests = append(tests, getHandlerLayerTests()...)
 	tests = append(tests, getHandlerRouteLayerTests()...)
 	tests = append(tests, getHandlerLayerTests()...)
+	tests = append(tests, getPostgresLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -823,7 +824,7 @@ func getHandlerLayerTests() testTables {
 
 	return testTables{
 		{
-			name: moduleName,
+			name: "one word package",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -946,7 +947,7 @@ func (h handler) GetAllWhere(c echo.Context) error {
 			wantErr: false,
 		},
 		{
-			name: moduleName,
+			name: "two words package",
 			fields: fields{
 				tpl: tpl,
 			},
@@ -1070,4 +1071,230 @@ func (h handler) GetAllWhere(c echo.Context) error {
 		},
 	}
 
+}
+
+func getPostgresLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/postgres/package/postgres.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("postgres.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: "one word package",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "postgres.gotpl",
+				data: model.Layer{
+					Model: "Speciality",
+					Table: "specialities",
+					Fields: model.Fields{
+						{
+							Name:   "id",
+							Type:   "uint",
+							IsNull: false,
+						},
+						{
+							Name:   "name",
+							Type:   "string",
+							IsNull: false,
+						},
+						{
+							Name:   "is_visible",
+							Type:   "bool",
+							IsNull: false,
+						},
+						{
+							Name:   "subtitle",
+							Type:   "string",
+							IsNull: true,
+						},
+						{
+							Name:   "created_at",
+							Type:   "time.Time",
+							IsNull: false,
+						},
+						{
+							Name:   "updated_at",
+							Type:   "time.Time",
+							IsNull: true,
+						},
+					},
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+
+	sqlutil "github.com/alexyslozada/gosqlutils"
+	"sqlbuilder"
+)
+
+const table = "specialities"
+
+var fields = []string{
+	"name",
+	"is_visible",
+	"subtitle",
+}
+
+var constraints = sqlbuilder.Constraints{
+	// here you will add all constraints that you want to controle, ex:
+	// "users_nickname_uk":                model.ErrUsersNicknameUK,
+}
+
+var (
+	psqlInsert                  = sqlbuilder.BuildSQLInsert(table, fields)
+	psqlUpdate                  = sqlbuilder.BuildSQLUpdateByID(table, fields)
+	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
+	psqlGetAll                  = sqlbuilder.BuildSQLSelect(table, fields)
+)
+
+// %[3]s struct that implement the interface domain.%[2]s.Storage
+type %[3]s struct {
+	db *sql.DB
+}
+
+// New returns a new %[3]s storage
+func New(db *sql.DB) %[3]s {
+	return %[3]s{db}
+}
+
+// Create creates a model.%[3]s
+func (%[4]s %[3]s) Create(m *model.%[3]s) error {
+	stmt, err := e.db.Prepare(psqlInsert)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(
+		m.Name,
+	m.IsVisible,
+	sqlutil.StringToNull(m.Subtitle),
+	).Scan(&m.ID, &m.CreatedAt)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Update this method updates a model.%[3]s by id
+func (%[4]s %[3]s) Update(m *model.%[3]s) error {
+	stmt, err := e.db.Prepare(psqlUpdateByIDAndEmployerID)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		m.Name,
+	m.IsVisible,
+	sqlutil.StringToNull(m.Subtitle),
+		m.ID,
+	)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Delete deletes a model.%[3]s by id
+func (%[4]s %[3]s) Delete(ID uint) error {
+	stmt, err := e.db.Prepare(psqlDelete)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(ID)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// GetWhere gets an ordered model.%[3]s with filters
+func (%[4]s %[3]s) GetWhere(specification model.FiltersSpecification) (model.%[3]s, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return model.%[3]s{}, err
+	}
+	defer stmt.Close()
+
+	return e.scanRow(stmt.QueryRow(args...))
+}
+
+// GetAllWhere gets all model.%[3]ss with Fields
+func (%[4]s %[3]s) GetAllWhere(specification model.FiltersSpecification) (model.Specialities, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := model.Specialities{}
+	for rows.Next() {
+		m, err := e.scanRow(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ms = append(ms, m)
+	}
+
+	return ms, nil
+}
+
+func (%[4]s %[3]s) scanRow(s sqlutil.RowScanner) (model.%[3]s, error) {
+	m := model.%[3]s{}
+
+	subtitleNull := sql.NullString{}
+	updatedAtNull := sql.NullTime{}
+
+	err := s.Scan(
+		&m.ID,
+	&m.Name,
+	&m.IsVisible,
+	&subtitleNull,
+	&m.CreatedAt,
+	&updatedAtNull,
+	)
+	if err != nil {
+		return m, err
+	}
+
+	m.Subtitle = subtitleNull.String
+	m.UpdatedAt = updatedAtNull.Time
+
+	return m, nil
+}
+`, moduleName, "speciality", "Speciality", "s"),
+			wantErr: false,
+		},
+	}
 }

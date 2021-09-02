@@ -1,0 +1,161 @@
+{{ $packageName := parseToLower .Model -}}
+{{ $receiverName := getFirstLetter .Model -}}
+{{ $slice := parseToUpperCamelCase .Table -}}
+
+package {{ $packageName }}
+
+import (
+	"database/sql"
+
+	"{{ .ModuleName }}/model"
+
+	sqlutil "github.com/alexyslozada/gosqlutils"
+	"sqlbuilder"
+)
+
+const table = "{{ .Table }}"
+
+var fields = []string{
+	{{ printFieldsWithoutDefaults .Fields }}
+}
+
+var constraints = sqlbuilder.Constraints{
+	// here you will add all constraints that you want to controle, ex:
+	// "users_nickname_uk":                model.ErrUsersNicknameUK,
+}
+
+var (
+	psqlInsert                  = sqlbuilder.BuildSQLInsert(table, fields)
+	psqlUpdate                  = sqlbuilder.BuildSQLUpdateByID(table, fields)
+	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
+	psqlGetAll                  = sqlbuilder.BuildSQLSelect(table, fields)
+)
+
+// {{ .Model }} struct that implement the interface domain.{{ $packageName }}.Storage
+type {{ .Model }} struct {
+	db *sql.DB
+}
+
+// New returns a new {{ .Model }} storage
+func New(db *sql.DB) {{ .Model }} {
+	return {{ .Model }}{db}
+}
+
+// Create creates a model.{{ .Model }}
+func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
+	stmt, err := e.db.Prepare(psqlInsert)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(
+		{{ printStorageFieldsWithoutDefaults .Fields }}
+	).Scan(&m.ID, &m.CreatedAt)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Update this method updates a model.{{ .Model }} by id
+func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
+	stmt, err := e.db.Prepare(psqlUpdateByIDAndEmployerID)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		{{ printStorageFieldsWithoutDefaults .Fields }}
+		m.ID,
+	)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Delete deletes a model.{{ .Model }} by id
+func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
+	stmt, err := e.db.Prepare(psqlDelete)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(ID)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// GetWhere gets an ordered model.{{ .Model }} with filters
+func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return model.{{ .Model }}{}, err
+	}
+	defer stmt.Close()
+
+	return e.scanRow(stmt.QueryRow(args...))
+}
+
+// GetAllWhere gets all model.{{ .Model }}s with Fields
+func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FiltersSpecification) (model.{{ $slice }}, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := model.{{ $slice }}{}
+	for rows.Next() {
+		m, err := e.scanRow(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ms = append(ms, m)
+	}
+
+	return ms, nil
+}
+
+func ({{ $receiverName }} {{ .Model }}) scanRow(s sqlutil.RowScanner) (model.{{ .Model }}, error) {
+	m := model.{{ .Model }}{}
+
+	{{ printStorageNullFields .Fields }}
+
+	err := s.Scan(
+		{{ printStorageNullFieldsScan .Fields }}
+	)
+	if err != nil {
+		return m, err
+	}
+
+	{{ printStorageNullFieldsParse .Fields }}
+
+	return m, nil
+}
