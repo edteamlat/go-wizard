@@ -2,6 +2,7 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -22,7 +23,11 @@ func NewModelLayer(template UseCaseTemplate, storage Storage) modelLayer {
 	return modelLayer{template: template, storage: storage}
 }
 
-func (d modelLayer) Init(m model.Layer) error {
+func (d modelLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "model")); err != nil {
+		return fmt.Errorf("edhex-modellayer: %w", err)
+	}
+
 	return nil
 }
 

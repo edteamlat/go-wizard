@@ -7,6 +7,7 @@ import (
 const (
 	architectureFlag = "architecture"
 	configPathFlag   = "config-path"
+	moduleFlag       = "module"
 )
 
 // rootCmd represents the base command when called without any subcommands

@@ -2,6 +2,7 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/edteamlat/go-wizard/model"
 )
@@ -23,16 +24,24 @@ func NewRootLayer(template UseCaseTemplate, storage Storage) rootLayer {
 	return rootLayer{template: template, storage: storage}
 }
 
-func (d rootLayer) Init(m model.Layer) error {
-	if err := d.createEditorConfig(m); err != nil {
+func (d rootLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(data.ProjectPath); err != nil {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 
-	if err := d.createGitignore(m); err != nil {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "infrastructure")); err != nil {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 
-	if err := d.createREADME(m); err != nil {
+	if err := d.createEditorConfig(data); err != nil {
+		return fmt.Errorf("edhex-rootlayer: %w", err)
+	}
+
+	if err := d.createGitignore(data); err != nil {
+		return fmt.Errorf("edhex-rootlayer: %w", err)
+	}
+
+	if err := d.createREADME(data); err != nil {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 

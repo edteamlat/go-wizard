@@ -18,17 +18,20 @@ import (
 var templatesFS embed.FS
 
 func run(cmd *cobra.Command, args []string, action runner.Action) {
-	configPath := cmd.Flag(configPathFlag)
-	architecture := cmd.Flag(architectureFlag)
+	configPath := cmd.Flag(configPathFlag).Value.String()
+	architecture := cmd.Flag(architectureFlag).Value.String()
+	moduleName := cmd.Flag(moduleFlag).Value.String()
 
-	conf, err := readConfig(configPath.Value.String())
+	conf, err := readConfig(configPath, runner.Init)
 	if err != nil {
 		log.Fatal(err)
 	}
-	conf.Architecture = architecture.Value.String()
-
-	if action == runner.Init {
-		conf.AddDefaultInitLayers()
+	conf.Architecture = architecture
+	if !isEmpty(moduleName) {
+		if err := conf.SetInitPath(moduleName); err != nil {
+			log.Fatal(err)
+		}
+		conf.ModuleName = moduleName
 	}
 
 	layerData := model.NewLayer(conf)
@@ -71,4 +74,8 @@ func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
 	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+}
+
+func isEmpty(s string) bool {
+	return s == ""
 }

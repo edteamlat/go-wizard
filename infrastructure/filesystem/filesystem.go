@@ -21,7 +21,7 @@ func New() FileSystem {
 
 func (f FileSystem) Save(path string, buffer bytes.Buffer) error {
 	dir := filepath.Dir(path)
-	if err := createDir(dir); err != nil {
+	if err := f.CreateDir(dir); err != nil {
 		return fmt.Errorf("filesystem: path: %s, %w, %v", dir, err, reflect.TypeOf(err))
 	}
 
@@ -32,7 +32,7 @@ func (f FileSystem) Save(path string, buffer bytes.Buffer) error {
 	return nil
 }
 
-func createDir(dir string) error {
+func (f FileSystem) CreateDir(dir string) error {
 	d, err := os.Stat(dir)
 	if err != nil && !os.IsNotExist(err) {
 		return err

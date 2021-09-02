@@ -2,6 +2,7 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -24,7 +25,11 @@ func NewPostgresLayer(template UseCaseTemplate, storage Storage) postgresLayer {
 	return postgresLayer{template: template, storage: storage}
 }
 
-func (d postgresLayer) Init(m model.Layer) error {
+func (d postgresLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "infrastructure", "postgres")); err != nil {
+		return fmt.Errorf("edhex-postgreslayer: %w", err)
+	}
+
 	return nil
 }
 

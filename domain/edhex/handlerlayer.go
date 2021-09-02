@@ -2,6 +2,7 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/edteamlat/go-wizard/model"
 )
@@ -24,7 +25,11 @@ func NewHandlerLayer(template UseCaseTemplate, storage Storage) handlerLayer {
 	return handlerLayer{template: template, storage: storage}
 }
 
-func (d handlerLayer) Init(m model.Layer) error {
+func (d handlerLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "infrastructure", "handler")); err != nil {
+		return fmt.Errorf("edhex-domainlayer: %w", err)
+	}
+
 	return nil
 }
 

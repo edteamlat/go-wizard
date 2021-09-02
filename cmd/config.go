@@ -5,11 +5,19 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/edteamlat/go-wizard/model"
 	"gopkg.in/yaml.v3"
+
+	"github.com/edteamlat/go-wizard/domain/runner"
+	"github.com/edteamlat/go-wizard/model"
 )
 
-func readConfig(filename string) (model.Config, error) {
+func readConfig(filename string, action runner.Action) (model.Config, error) {
+	if action == runner.Init {
+		conf := model.Config{}
+		conf.AddDefaultInitLayers()
+		return conf, nil
+	}
+
 	log.Printf("Loading configuration file from %s...", filename)
 
 	fileBytes, err := ioutil.ReadFile(filename)

@@ -2,6 +2,7 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -24,7 +25,11 @@ func NewSQLMigrationLayer(template UseCaseTemplate, storage Storage) sqlMigratio
 	return sqlMigrationLayer{template: template, storage: storage}
 }
 
-func (d sqlMigrationLayer) Init(m model.Layer) error {
+func (d sqlMigrationLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "sqlmigration")); err != nil {
+		return fmt.Errorf("edhex-sqlmigration: %w", err)
+	}
+
 	return nil
 }
 

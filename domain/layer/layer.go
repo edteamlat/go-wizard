@@ -28,6 +28,7 @@ type UseCaseTemplate interface {
 
 type Storage interface {
 	Save(path string, data bytes.Buffer) error
+	CreateDir(dir string) error
 }
 
 // GetUseCaseLayersFromConf obtains all useCaseLayers that were specified on the Config file
