@@ -47,7 +47,7 @@ func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, stora
 
 // getLayer factory that obtains a new useCaseLayer
 func getLayer(architecture, name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
-	switch name {
+	switch architecture {
 	case edhexArchitecture:
 		return getEDhexLayer(name, template, storage)
 	default:
@@ -60,6 +60,8 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 	switch name {
 	case edhex.DomainLayerName:
 		return edhex.NewDomainLayer(template, storage), nil
+	case edhex.ModelLayerName:
+		return edhex.NewModelLayer(template, storage), nil
 	default:
 		return nil, fmt.Errorf("layer is not implemented")
 	}

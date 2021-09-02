@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// go:embed ../templates
+//go:embed templates
 var templatesFS embed.FS
 
 func run(cmd *cobra.Command, args []string, action runner.Action) {
@@ -53,7 +53,10 @@ func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {
 func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	fileSystemUseCase := filesystem.New()
 
-	tpl := template.Must(template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(templatesFS))
+	tpl, err := template.New("").Funcs(stringparser.GetTemplateFunctions()).ParseFS(templatesFS, "**/**/**/*.gotpl")
+	if err != nil {
+		log.Fatal(err)
+	}
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
 	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)

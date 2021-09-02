@@ -450,7 +450,7 @@ func (u User) Validate() error {
 // Users slice of User
 type Users []User
 
-func (u Users) IsEmpty() bool { return len(Users) == 0 }
+func (u Users) IsEmpty() bool { return len(u) == 0 }
 `, "`"),
 			wantErr: false,
 		},
@@ -511,7 +511,7 @@ func (u UserRole) Validate() error {
 // UserRoles slice of UserRole
 type UserRoles []UserRole
 
-func (u UserRoles) IsEmpty() bool { return len(UserRoles) == 0 }
+func (u UserRoles) IsEmpty() bool { return len(u) == 0 }
 `, "`"),
 			wantErr: false,
 		},
