@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 
@@ -38,13 +37,13 @@ func (d postgresLayer) Create(data model.Layer) error {
 }
 
 func (d postgresLayer) createPostgres(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, postgresTemplateName, data); err != nil {
-		return err
-	}
-
 	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-	if err := d.storage.Save(data.GetPath(postgresFolder, filename, false), fileBuf); err != nil {
+
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  postgresTemplateName,
+		Path:  data.GetPath(postgresFolder, filename, true),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 

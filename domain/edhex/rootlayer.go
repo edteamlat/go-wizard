@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -10,6 +9,7 @@ import (
 const (
 	editorConfigTemplateName = "editorconfig.gotpl"
 	gitignoreTemplateName    = "gitignore.gotpl"
+	readmeTemplateName       = "readme.gotpl"
 )
 
 const RootLayerName = "root"
@@ -32,16 +32,19 @@ func (d rootLayer) Init(m model.Layer) error {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 
+	if err := d.createREADME(m); err != nil {
+		return fmt.Errorf("edhex-rootlayer: %w", err)
+	}
+
 	return nil
 }
 
 func (d rootLayer) createEditorConfig(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, editorConfigTemplateName, data); err != nil {
-		return err
-	}
-
-	if err := d.storage.Save(data.GetPath("", ".editorconfig", false), fileBuf); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  editorConfigTemplateName,
+		Path:  data.GetPath("", ".editorconfig", false),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 
@@ -49,12 +52,23 @@ func (d rootLayer) createEditorConfig(data model.Layer) error {
 }
 
 func (d rootLayer) createGitignore(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, gitignoreTemplateName, data); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  gitignoreTemplateName,
+		Path:  data.GetPath("", ".gitignore", false),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 
-	if err := d.storage.Save(data.GetPath("", ".gitignore", false), fileBuf); err != nil {
+	return nil
+}
+
+func (d rootLayer) createREADME(data model.Layer) error {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  readmeTemplateName,
+		Path:  data.GetPath("", "README.md", false),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 

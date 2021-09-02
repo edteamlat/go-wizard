@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 
@@ -38,12 +37,11 @@ func (d sqlMigrationLayer) Create(data model.Layer) error {
 }
 
 func (d sqlMigrationLayer) createSQLMigration(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, sqlMigrationTemplateName, data); err != nil {
-		return err
-	}
-
-	if err := d.storage.Save(data.GetPath(sqlMigrationFolder, getFilename(data.Table), false), fileBuf); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  sqlMigrationTemplateName,
+		Path:  data.GetPath(sqlMigrationFolder, getFilename(data.Table), false),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 

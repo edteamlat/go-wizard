@@ -71,8 +71,8 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 		return edhex.NewHandlerLayer(template, storage), nil
 	case edhex.RootLayerName:
 		return edhex.NewRootLayer(template, storage), nil
-	case "cmd":
-		return edhex.NewDomainLayer(template, storage), nil
+	case edhex.CMDLayerName:
+		return edhex.NewCMDLayer(template, storage), nil
 	default:
 		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}

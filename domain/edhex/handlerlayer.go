@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -42,12 +41,11 @@ func (d handlerLayer) Create(data model.Layer) error {
 }
 
 func (d handlerLayer) createHandler(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, handlerTemplateName, data); err != nil {
-		return err
-	}
-
-	if err := d.storage.Save(data.GetPath(handlerFolder, "handler.go", true), fileBuf); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  handlerTemplateName,
+		Path:  data.GetPath(handlerFolder, "handler.go", true),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 
@@ -55,12 +53,11 @@ func (d handlerLayer) createHandler(data model.Layer) error {
 }
 
 func (d handlerLayer) createRoute(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, routeTemplateName, data); err != nil {
-		return err
-	}
-
-	if err := d.storage.Save(data.GetPath(handlerFolder, "route.go", true), fileBuf); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  routeTemplateName,
+		Path:  data.GetPath(handlerFolder, "route.go", true),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 

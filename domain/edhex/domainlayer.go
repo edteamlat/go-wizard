@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 
@@ -41,13 +40,13 @@ func (d domainLayer) Create(data model.Layer) error {
 }
 
 func (d domainLayer) createDomainFile(data model.Layer) error {
-	domainFileBuf := bytes.Buffer{}
-	if err := d.template.Create(&domainFileBuf, domainTemplateName, data); err != nil {
-		return err
-	}
-
 	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-	if err := d.storage.Save(data.GetPath(DomainLayerName, filename, true), domainFileBuf); err != nil {
+
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  domainTemplateName,
+		Path:  data.GetPath(DomainLayerName, filename, true),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 
@@ -55,12 +54,11 @@ func (d domainLayer) createDomainFile(data model.Layer) error {
 }
 
 func (d domainLayer) createUseCaseFile(data model.Layer) error {
-	useCaseFileBuf := bytes.Buffer{}
-	if err := d.template.Create(&useCaseFileBuf, useCaseTemplateName, data); err != nil {
-		return err
-	}
-
-	if err := d.storage.Save(data.GetPath(DomainLayerName, "usecase.go", true), useCaseFileBuf); err != nil {
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  useCaseTemplateName,
+		Path:  data.GetPath(DomainLayerName, "usecase.go", true),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 

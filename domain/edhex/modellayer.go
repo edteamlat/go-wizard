@@ -1,7 +1,6 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 
@@ -36,13 +35,13 @@ func (d modelLayer) Create(data model.Layer) error {
 }
 
 func (d modelLayer) createNewModel(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, modelTemplateName, data); err != nil {
-		return err
-	}
-
 	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-	if err := d.storage.Save(data.GetPath(ModelLayerName, filename, false), fileBuf); err != nil {
+
+	if err := createTemplate(d.template, d.storage, model.Template{
+		Name:  modelTemplateName,
+		Path:  data.GetPath(ModelLayerName, filename, false),
+		Layer: data,
+	}); err != nil {
 		return err
 	}
 
