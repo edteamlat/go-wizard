@@ -11,20 +11,26 @@ import (
 
 func GetTemplateFunctions() template.FuncMap {
 	return template.FuncMap{
-		"parseToUpperCamelCase": parseToUpperCamelCase,
-		"parseToUpper":          parseToUpper,
-		"parseToLower":          parseToLower,
-		"parseToKebabCase":      parseToKebabCase,
-		"parseToLowerCamelCase": parseToLowerCamelCase,
-		"parseToSnakeCase":      parseToSnakeCase,
-		"parseToUpperSnakeCase": parseToUpperSnakeCase,
-		"getFirstLetter":        getFirstLetter,
-		"increment":             increment,
-		"decrement":             decrement,
-		"parseToSqlType":        parseToSqlType,
-		"handleNull":            handleNull,
-		"handleNullOnScan":      handleNullOnScan,
-		"parseNullFieldsOnScan": parseNullFieldsOnScan,
+		"parseToUpperCamelCase":               parseToUpperCamelCase,
+		"parseToUpper":                        parseToUpper,
+		"parseToLower":                        parseToLower,
+		"parseToKebabCase":                    parseToKebabCase,
+		"parseToLowerCamelCase":               parseToLowerCamelCase,
+		"parseToSnakeCase":                    parseToSnakeCase,
+		"parseToUpperSnakeCase":               parseToUpperSnakeCase,
+		"getFirstLetter":                      getFirstLetter,
+		"increment":                           increment,
+		"decrement":                           decrement,
+		"parseToSqlType":                      parseToSqlType,
+		"handleNull":                          handleNull,
+		"handleNullOnScan":                    handleNullOnScan,
+		"parseNullFieldsOnScan":               parseNullFieldsOnScan,
+		"printFieldsWithoutDefaults":          printFieldsWithoutDefaults,
+		"printStorageFieldsWithoutDefaults":   printStorageFieldsWithoutDefaults,
+		"printMigrationFieldsWithoutDefaults": printMigrationFieldsWithoutDefaults,
+		"printStorageNullFields":              printStorageNullFields,
+		"printStorageNullFieldsScan":          printStorageNullFieldsScan,
+		"printStorageNullFieldsParse":         printStorageNullFieldsParse,
 	}
 }
 
@@ -103,8 +109,10 @@ func handleNull(f model.Field) string {
 		return fmt.Sprintf("sqlutil.StringToNull(m.%s)", field)
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		return fmt.Sprintf("sqlutil.IntToNull(int64(m.%s))", field)
-	case "float64", "float32":
+	case "float32":
 		return fmt.Sprintf("sqlutil.FloatToNull(float64(m.%s))", field)
+	case "float64":
+		return fmt.Sprintf("sqlutil.FloatToNull(m.%s)", field)
 	case "time.Time":
 		return fmt.Sprintf("sqlutil.TimeToNull(m.%s)", field)
 	default:
@@ -117,40 +125,137 @@ func handleNullOnScan(f model.Field) string {
 		return ""
 	}
 
+	name := parseToLowerCamelCase(f.Name)
+
 	switch f.Type {
 	case "string":
-		return fmt.Sprintf("%s := sql.NullString{}", f.Name)
+		return fmt.Sprintf("%sNull := sql.NullString{}", name)
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		return fmt.Sprintf("%s := sql.NullInt64{}", f.Name)
+		return fmt.Sprintf("%sNull := sql.NullInt64{}", name)
 	case "float64", "float32":
-		return fmt.Sprintf("%s := sql.NullFloat64{}", f.Name)
+		return fmt.Sprintf("%sNull := sql.NullFloat64{}", name)
 	case "time.Time":
-		return fmt.Sprintf("%s := sql.NullTime{}", f.Name)
+		return fmt.Sprintf("%sNull := sql.NullTime{}", name)
 	case "bool":
-		return fmt.Sprintf("%s := sql.NullBool{}", f.Name)
+		return fmt.Sprintf("%sNull := sql.NullBool{}", name)
 	default:
-		return fmt.Sprintf("invalid data type: %s", f.Type)
+		return fmt.Sprintf("invalid data type: %s", name)
 	}
 }
 
 func parseNullFieldsOnScan(f model.Field) string {
-	field := strcase.UpperCamelCase(f.Name)
+	field := parseToUpperCamelCase(f.Name)
 	if !f.IsNull {
 		return ""
 	}
 
+	fieldNull := parseToLowerCamelCase(f.Name) + "Null"
+
 	switch f.Type {
 	case "string":
-		return fmt.Sprintf("m.%s = %s.String", field, f.Name)
+		return fmt.Sprintf("m.%s = %s.String", field, fieldNull)
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		return fmt.Sprintf("m.%s = %s(%s.Int64)", field, f.Type, f.Name)
-	case "float64", "float32":
-		return fmt.Sprintf("m.%s = %s(%s.Float64)", field, f.Type, f.Name)
+		return fmt.Sprintf("m.%s = %s(%s.Int64)", field, f.Type, fieldNull)
+	case "float32":
+		return fmt.Sprintf("m.%s = %s(%s.Float64)", field, f.Type, fieldNull)
+	case "float64":
+		return fmt.Sprintf("m.%s = %s.Float64", field, fieldNull)
 	case "time.Time":
-		return fmt.Sprintf("m.%s = %s.Time", field, f.Name)
+		return fmt.Sprintf("m.%s = %s.Time", field, fieldNull)
 	case "bool":
-		return fmt.Sprintf("m.%s = %s.Bool", field, f.Name)
+		return fmt.Sprintf("m.%s = %s.Bool", field, fieldNull)
 	default:
-		return fmt.Sprintf("invalid data type: %s", f.Type)
+		return fmt.Sprintf("invalid data type: %s", fieldNull)
 	}
+}
+
+func printFieldsWithoutDefaults(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if isDefaultField(field.Name) {
+			continue
+		}
+
+		msg += fmt.Sprintf("\"%s\",\n\t", field.Name)
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func printStorageFieldsWithoutDefaults(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if isDefaultField(field.Name) {
+			continue
+		}
+
+		msg += fmt.Sprintf("%s,\n\t", handleNull(field))
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func printMigrationFieldsWithoutDefaults(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if isDefaultField(field.Name) {
+			continue
+		}
+
+		msg += fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type), parseNull(field.IsNull))
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func printStorageNullFields(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if !field.IsNull {
+			continue
+		}
+
+		msg += fmt.Sprintf("%s\n\t", handleNullOnScan(field))
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func printStorageNullFieldsScan(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if field.IsNull {
+			msg += fmt.Sprintf("&%sNull,\n\t", parseToLowerCamelCase(field.Name))
+			continue
+		}
+
+		msg += fmt.Sprintf("&m.%s,\n\t", parseToUpperCamelCase(field.Name))
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func printStorageNullFieldsParse(fields model.Fields) string {
+	msg := ""
+	for _, field := range fields {
+		if !field.IsNull {
+			continue
+		}
+
+		msg += fmt.Sprintf("%s\n\t", parseNullFieldsOnScan(field))
+	}
+
+	return strings.TrimSpace(msg)
+}
+
+func isDefaultField(field string) bool {
+	return field == "id" || field == "created_at" || field == "updated_at"
+}
+
+func parseNull(isNull bool) string {
+	if isNull {
+		return ""
+	}
+
+	return " NOT NULL"
 }

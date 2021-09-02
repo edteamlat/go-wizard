@@ -1,6 +1,7 @@
 {{ $package := parseToLower .Model -}}
+{{ $routeResource := parseToKebabCase .Table -}}
 
-package $package
+package {{ $package }}
 
 import (
 	"database/sql"
@@ -13,9 +14,9 @@ import (
 
 // NewRouter returns a router to handle model.{{ .Model }} requests
 func NewRouter(specification model.RouterSpecification) {
-	handler :=	buildHandler(specification)
+	handler := buildHandler(specification)
 
-	// build middlewares to validate permissions to the routes
+	// build middlewares to validate permissions on the routes
 
 	adminRoutes(specification, handler)
 	privateRoutes(specification, handler)
@@ -31,7 +32,7 @@ func buildHandler(specification model.RouterSpecification) handler {
 
 // adminRoutes handle the routes that requires a token and permissions to certain users
 func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
-	route := api.Group("api/v1/admin/{{ parseToKebabCase .Table }}", middlewares...)
+	route := api.Group("api/v1/admin/{{ $routeResource }}", middlewares...)
 
 	route.POST("", h.Create)
 	route.PUT("/:id", h.Update)
@@ -43,7 +44,7 @@ func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) 
 
 // privateRoutes handle the routes that requires a token
 func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
-	route := api.Group("/api/v1/private/{{ parseToKebabCase .Table }}", middlewares...)
+	route := api.Group("/api/v1/private/{{ $routeResource }}", middlewares...)
 
 	route.POST("", h.Create)
 	route.PUT("/:id", h.Update)
@@ -55,7 +56,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/{{ parseToKebabCase .Table }}")
+	route := api.Group("/api/v1/{{ $routeResource }}")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)

@@ -1,4 +1,4 @@
-{{ $package := parseToLower.Model -}}
+{{ $package := parseToLower .Model -}}
 
 package {{ $package}}
 
@@ -15,11 +15,11 @@ import (
 )
 
 type handler struct {
-	useCase invoice.useCase
+	useCase {{ $package }}.UseCase
 	response response.Responser
 }
 
-func newHandler(useCase {{ $package }}.useCase) handler {
+func newHandler(useCase {{ $package }}.UseCase) handler {
 	return handler{useCase: useCase}
 }
 
@@ -80,15 +80,15 @@ func (h handler) GetWhere(c echo.Context) error {
 
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
-	return err
+		return err
 	}
 
-	{{ parseToLowerCamelCase .Model }}, err := h.useCase.GetAllWhere(filtersSpecification)
+	{{ parseToLowerCamelCase .Model }}Data, err := h.useCase.GetAllWhere(filtersSpecification)
 	if err != nil {
-	return h.response.Error(c, "useCase.GetWhere()", err)
+		return h.response.Error(c, "useCase.GetWhere()", err)
 	}
 
-	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}))
+	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Model }}Data))
 }
 
 // GetAllWhere handles the search of all model.{{ .Model }}
@@ -107,4 +107,3 @@ func (h handler) GetAllWhere(c echo.Context) error {
 
 	return c.JSON(h.response.OK({{ parseToLowerCamelCase .Table }}))
 }
-

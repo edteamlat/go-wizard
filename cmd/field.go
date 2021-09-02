@@ -11,7 +11,7 @@ var fieldCmd = &cobra.Command{
 	Use:   "field",
 	Short: "Adds a field to a package",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("field called")
+		fmt.Println("Command not supported yet")
 	},
 }
 

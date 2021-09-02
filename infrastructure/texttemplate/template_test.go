@@ -39,6 +39,10 @@ func TestTemplate_Create(t1 *testing.T) {
 	tests = append(tests, getDomainUseCaseLayerTests()...)
 	tests = append(tests, getModelLayerTests()...)
 	tests = append(tests, getSQLMigrationLayerTests()...)
+	tests = append(tests, getHandlerLayerTests()...)
+	tests = append(tests, getHandlerRouteLayerTests()...)
+	tests = append(tests, getHandlerLayerTests()...)
+	tests = append(tests, getPostgresLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -446,7 +450,7 @@ func (u User) Validate() error {
 // Users slice of User
 type Users []User
 
-func (u Users) IsEmpty() bool { return len(Users) == 0 }
+func (u Users) IsEmpty() bool { return len(u) == 0 }
 `, "`"),
 			wantErr: false,
 		},
@@ -507,7 +511,7 @@ func (u UserRole) Validate() error {
 // UserRoles slice of UserRole
 type UserRoles []UserRole
 
-func (u UserRoles) IsEmpty() bool { return len(UserRoles) == 0 }
+func (u UserRoles) IsEmpty() bool { return len(u) == 0 }
 `, "`"),
 			wantErr: false,
 		},
@@ -649,6 +653,647 @@ COMMENT ON TABLE course_prices IS 'Write your comment';
 -- Register the permission module for the routes
 INSERT INTO modules (name) VALUES ('COURSE_PRICE');
 `,
+			wantErr: false,
+		},
+	}
+}
+
+func getHandlerRouteLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/handler/package/route.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("route.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "route.gotpl",
+				data: model.Layer{
+					Model:      "Invoice",
+					Table:      "invoices",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package invoice
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/domain/%[2]s"
+	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+)
+
+// NewRouter returns a router to handle model.Invoice requests
+func NewRouter(specification model.RouterSpecification) {
+	handler := buildHandler(specification)
+
+	// build middlewares to validate permissions on the routes
+
+	adminRoutes(specification, handler)
+	privateRoutes(specification, handler)
+	publicRoutes(specification, handler)
+}
+
+func buildHandler(specification model.RouterSpecification) handler {
+	responser := response.New(specification.Logger)
+
+	useCase := %[2]s.New(%[2]sStorage.New(specification.DB))
+	return newHandler(useCase, responser)
+}
+
+// adminRoutes handle the routes that requires a token and permissions to certain users
+func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("api/v1/admin/invoices", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// privateRoutes handle the routes that requires a token
+func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("/api/v1/private/invoices", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// publicRoutes handle the routes that not requires a validation of any kind to be use
+func publicRoutes(api *echo.Echo, h handler) {
+	route := api.Group("/api/v1/invoices")
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+`, moduleName, "invoice"),
+			wantErr: false,
+		},
+		{
+			name: moduleName,
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "route.gotpl",
+				data: model.Layer{
+					Model:      "InvoiceItem",
+					Table:      "invoice_items",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package invoiceitem
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/domain/%[2]s"
+	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+)
+
+// NewRouter returns a router to handle model.InvoiceItem requests
+func NewRouter(specification model.RouterSpecification) {
+	handler := buildHandler(specification)
+
+	// build middlewares to validate permissions on the routes
+
+	adminRoutes(specification, handler)
+	privateRoutes(specification, handler)
+	publicRoutes(specification, handler)
+}
+
+func buildHandler(specification model.RouterSpecification) handler {
+	responser := response.New(specification.Logger)
+
+	useCase := %[2]s.New(%[2]sStorage.New(specification.DB))
+	return newHandler(useCase, responser)
+}
+
+// adminRoutes handle the routes that requires a token and permissions to certain users
+func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("api/v1/admin/invoice-items", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// privateRoutes handle the routes that requires a token
+func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
+	route := api.Group("/api/v1/private/invoice-items", middlewares...)
+
+	route.POST("", h.Create)
+	route.PUT("/:id", h.Update)
+	route.DELETE("/:id", h.Delete)
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+
+// publicRoutes handle the routes that not requires a validation of any kind to be use
+func publicRoutes(api *echo.Echo, h handler) {
+	route := api.Group("/api/v1/invoice-items")
+
+	route.GET("", h.GetAllWhere)
+	route.GET("/:id", h.GetWhere)
+}
+`, moduleName, "invoiceitem"),
+			wantErr: false,
+		},
+	}
+}
+
+func getHandlerLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/handler/package/handler.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("handler.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: "one word package",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "handler.gotpl",
+				data: model.Layer{
+					Model:      "Order",
+					Table:      "orders",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"%[1]s/%[2]s"
+	"%[1]s/infrastructure/handler/request"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/model"
+)
+
+type handler struct {
+	useCase %[2]s.UseCase
+	response response.Responser
+}
+
+func newHandler(useCase %[2]s.UseCase) handler {
+	return handler{useCase: useCase}
+}
+
+// Create handles the creation of a model.%[3]s
+func (h handler) Create(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.%[3]s
+func (h handler) Update(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = uint(ID)
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.%[3]s
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(uint(ID))
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.%[3]s
+func (h handler) GetWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderData, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderData))
+}
+
+// GetAllWhere handles the search of all model.%[3]s
+func (h handler) GetAllWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orders, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orders))
+}
+`, moduleName, "order", "Order"),
+			wantErr: false,
+		},
+		{
+			name: "two words package",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "handler.gotpl",
+				data: model.Layer{
+					Model:      "OrderItem",
+					Table:      "OrderItems",
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strings"
+
+	"%[1]s/%[2]s"
+	"%[1]s/infrastructure/handler/request"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/model"
+)
+
+type handler struct {
+	useCase %[2]s.UseCase
+	response response.Responser
+}
+
+func newHandler(useCase %[2]s.UseCase) handler {
+	return handler{useCase: useCase}
+}
+
+// Create handles the creation of a model.%[3]s
+func (h handler) Create(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.%[3]s
+func (h handler) Update(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = uint(ID)
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.%[3]s
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(uint(ID))
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.%[3]s
+func (h handler) GetWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItemData, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItemData))
+}
+
+// GetAllWhere handles the search of all model.%[3]s
+func (h handler) GetAllWhere(c echo.Context) error {
+	userID := request.GetUserID(c)
+
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItems, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItems))
+}
+`, moduleName, "orderitem", "OrderItem"),
+			wantErr: false,
+		},
+	}
+
+}
+
+func getPostgresLayerTests() testTables {
+	path := fmt.Sprintf("%s/infrastructure/postgres/package/postgres.gotpl", edhexTemplatesPath)
+	tpl := template.Must(template.New("postgres.gotpl").Funcs(stringparser.GetTemplateFunctions()).ParseFiles(path))
+
+	return testTables{
+		{
+			name: "one word package",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "postgres.gotpl",
+				data: model.Layer{
+					Model: "Speciality",
+					Table: "specialities",
+					Fields: model.Fields{
+						{
+							Name:   "id",
+							Type:   "uint",
+							IsNull: false,
+						},
+						{
+							Name:   "name",
+							Type:   "string",
+							IsNull: false,
+						},
+						{
+							Name:   "is_visible",
+							Type:   "bool",
+							IsNull: false,
+						},
+						{
+							Name:   "subtitle",
+							Type:   "string",
+							IsNull: true,
+						},
+						{
+							Name:   "created_at",
+							Type:   "time.Time",
+							IsNull: false,
+						},
+						{
+							Name:   "updated_at",
+							Type:   "time.Time",
+							IsNull: true,
+						},
+					},
+					ModuleName: moduleName,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"database/sql"
+
+	"%[1]s/model"
+
+	sqlutil "github.com/alexyslozada/gosqlutils"
+	"sqlbuilder"
+)
+
+const table = "specialities"
+
+var fields = []string{
+	"name",
+	"is_visible",
+	"subtitle",
+}
+
+var constraints = sqlbuilder.Constraints{
+	// here you will add all constraints that you want to controle, ex:
+	// "users_nickname_uk":                model.ErrUsersNicknameUK,
+}
+
+var (
+	psqlInsert                  = sqlbuilder.BuildSQLInsert(table, fields)
+	psqlUpdate                  = sqlbuilder.BuildSQLUpdateByID(table, fields)
+	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
+	psqlGetAll                  = sqlbuilder.BuildSQLSelect(table, fields)
+)
+
+// %[3]s struct that implement the interface domain.%[2]s.Storage
+type %[3]s struct {
+	db *sql.DB
+}
+
+// New returns a new %[3]s storage
+func New(db *sql.DB) %[3]s {
+	return %[3]s{db}
+}
+
+// Create creates a model.%[3]s
+func (%[4]s %[3]s) Create(m *model.%[3]s) error {
+	stmt, err := e.db.Prepare(psqlInsert)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(
+		m.Name,
+	m.IsVisible,
+	sqlutil.StringToNull(m.Subtitle),
+	).Scan(&m.ID, &m.CreatedAt)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Update this method updates a model.%[3]s by id
+func (%[4]s %[3]s) Update(m *model.%[3]s) error {
+	stmt, err := e.db.Prepare(psqlUpdate)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		m.Name,
+	m.IsVisible,
+	sqlutil.StringToNull(m.Subtitle),
+		m.ID,
+	)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// Delete deletes a model.%[3]s by id
+func (%[4]s %[3]s) Delete(ID uint) error {
+	stmt, err := e.db.Prepare(psqlDelete)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(ID)
+	if err != nil {
+		return sqlbuilder.CheckConstraint(constraints, err)
+	}
+
+	return nil
+}
+
+// GetWhere gets an ordered model.%[3]s with filters
+func (%[4]s %[3]s) GetWhere(specification model.FiltersSpecification) (model.%[3]s, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return model.%[3]s{}, err
+	}
+	defer stmt.Close()
+
+	return e.scanRow(stmt.QueryRow(args...))
+}
+
+// GetAllWhere gets all model.%[3]ss with Fields
+func (%[4]s %[3]s) GetAllWhere(specification model.FiltersSpecification) (model.Specialities, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+	query := psqlGetAll + " " + conditions
+
+	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
+
+	stmt, err := e.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := model.Specialities{}
+	for rows.Next() {
+		m, err := e.scanRow(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ms = append(ms, m)
+	}
+
+	return ms, nil
+}
+
+func (%[4]s %[3]s) scanRow(s sqlutil.RowScanner) (model.%[3]s, error) {
+	m := model.%[3]s{}
+
+	subtitleNull := sql.NullString{}
+	updatedAtNull := sql.NullTime{}
+
+	err := s.Scan(
+		&m.ID,
+	&m.Name,
+	&m.IsVisible,
+	&subtitleNull,
+	&m.CreatedAt,
+	&updatedAtNull,
+	)
+	if err != nil {
+		return m, err
+	}
+
+	m.Subtitle = subtitleNull.String
+	m.UpdatedAt = updatedAtNull.Time
+
+	return m, nil
+}
+`, moduleName, "speciality", "Speciality", "s"),
 			wantErr: false,
 		},
 	}

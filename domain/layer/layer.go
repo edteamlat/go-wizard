@@ -13,6 +13,7 @@ const edhexArchitecture = "edhex"
 
 // UseCase use case to generate a layer
 type UseCase interface {
+	Init(m model.Layer) error
 	Create(m model.Layer) error
 	Override(m model.Layer) error
 	AddField(m model.Layer) error
@@ -47,11 +48,11 @@ func GetUseCaseLayersFromConf(conf model.Config, template UseCaseTemplate, stora
 
 // getLayer factory that obtains a new useCaseLayer
 func getLayer(architecture, name string, template UseCaseTemplate, storage Storage) (UseCase, error) {
-	switch name {
+	switch architecture {
 	case edhexArchitecture:
 		return getEDhexLayer(name, template, storage)
 	default:
-		return nil, fmt.Errorf("layer is not implemented")
+		return nil, fmt.Errorf("architecture `%s` is not implemented", architecture)
 	}
 }
 
@@ -60,7 +61,19 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 	switch name {
 	case edhex.DomainLayerName:
 		return edhex.NewDomainLayer(template, storage), nil
+	case edhex.ModelLayerName:
+		return edhex.NewModelLayer(template, storage), nil
+	case edhex.SQLMigrationLayerName:
+		return edhex.NewSQLMigrationLayer(template, storage), nil
+	case edhex.PostgresLayerName:
+		return edhex.NewPostgresLayer(template, storage), nil
+	case edhex.HandlerLayerName:
+		return edhex.NewHandlerLayer(template, storage), nil
+	case edhex.RootLayerName:
+		return edhex.NewRootLayer(template, storage), nil
+	case "cmd":
+		return edhex.NewDomainLayer(template, storage), nil
 	default:
-		return nil, fmt.Errorf("layer is not implemented")
+		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}
 }
