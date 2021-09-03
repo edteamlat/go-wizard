@@ -3,7 +3,6 @@ package edhex
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
 )
@@ -13,6 +12,48 @@ const (
 )
 
 const ModelLayerName = "model"
+const modelFolder = "model"
+
+var (
+	modelInitActionTemplates = model.Templates{
+		{
+			Name:     "error.gotpl",
+			Filename: "error.go",
+		},
+		{
+			Name:     "model_test.gotpl",
+			Filename: "model_test.go",
+		},
+		{
+			Name:     "model.gotpl",
+			Filename: "model.go",
+		},
+		{
+			Name:     "modelconfig.gotpl",
+			Filename: "config.gotpl",
+		},
+		{
+			Name:     "modellogger.gotpl",
+			Filename: "logger.go",
+		},
+		{
+			Name:     "modelremoteconfig.gotpl",
+			Filename: "remoteconfig.go",
+		},
+		{
+			Name:     "modelrouter.gotpl",
+			Filename: "router.go",
+		},
+	}
+
+	modelAddActionTemplates = model.Templates{
+		{
+			Name:     "newmodel.gotpl",
+			Filename: "%s.go", // the name will be the name of the package
+			Path:     modelFolder,
+		},
+	}
+)
 
 type modelLayer struct {
 	template UseCaseTemplate
@@ -28,26 +69,17 @@ func (d modelLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
-	return nil
-}
-
-func (d modelLayer) Create(data model.Layer) error {
-	if err := d.createNewModel(data); err != nil {
-		return fmt.Errorf("edhex-modellayer: %w", err)
+	modelInitActionTemplates.SetPath(modelFolder)
+	if err := bulkTemplates(d.template, d.storage, modelInitActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
 	return nil
 }
 
-func (d modelLayer) createNewModel(data model.Layer) error {
-	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  modelTemplateName,
-		Path:  data.GetPath(ModelLayerName, filename, false),
-		Layer: data,
-	}); err != nil {
-		return err
+func (d modelLayer) Create(data model.Layer) error {
+	if err := bulkTemplates(d.template, d.storage, modelAddActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
 	return nil

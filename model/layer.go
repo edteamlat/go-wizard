@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 )
@@ -48,6 +49,8 @@ func NewLayer(conf Config) Layer {
 
 func (l *Layer) GetPath(layerName, filename string, withPackage bool) string {
 	if withPackage {
+		packageName := strings.ToLower(l.Model)
+		filename = fmt.Sprintf(filename, packageName)
 		return filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename)
 	}
 

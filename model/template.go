@@ -19,3 +19,10 @@ func (t *Template) SetLayerData(data Layer) {
 
 // Templates slice of Template
 type Templates []Template
+
+// SetPath is used when the path is the same for every template
+func (t Templates) SetPath(path string) {
+	for _, v := range t {
+		v.Path = path
+	}
+}
