@@ -7,14 +7,56 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const (
-	handlerTemplateName = "handler.gotpl"
-	routeTemplateName   = "route.gotpl"
-)
-
+const handlerFolder = "infrastructure/handler"
 const HandlerLayerName = "handler_echo"
 
-const handlerFolder = "infrastructure/handler"
+var handlerInitActionTemplates = model.Templates{
+	{
+		Name:     "fields.gotpl",
+		Filename: "fields.go",
+		Path:     filepath.Join(handlerFolder, "request"),
+	},
+	{
+		Name:     "parameter.gotpl",
+		Filename: "parameter.go",
+		Path:     filepath.Join(handlerFolder, "request"),
+	},
+	{
+		Name:     "token.gotpl",
+		Filename: "token",
+		Path:     filepath.Join(handlerFolder, "request"),
+	},
+	{
+		Name:     "message.gotpl",
+		Filename: "message.go",
+		Path:     filepath.Join(handlerFolder, "response"),
+	},
+	{
+		Name:     "response.gotpl",
+		Filename: "response.go",
+		Path:     filepath.Join(handlerFolder, "response"),
+	},
+	{
+		Name:     "router.gotpl",
+		Filename: "router.go",
+		Path:     handlerFolder,
+	},
+}
+
+var handlerAddActionTemplates = model.Templates{
+	{
+		Name:        "handler.gotpl",
+		Filename:    "handler.go",
+		Path:        handlerFolder,
+		WithPackage: true,
+	},
+	{
+		Name:        "route.gotpl",
+		Filename:    "route.go",
+		Path:        handlerFolder,
+		WithPackage: true,
+	},
+}
 
 type handlerLayer struct {
 	template UseCaseTemplate
@@ -30,40 +72,16 @@ func (d handlerLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
+	if err := bulkTemplates(d.template, d.storage, handlerInitActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-domainlayer: %w", err)
+	}
+
 	return nil
 }
 
 func (d handlerLayer) Create(data model.Layer) error {
-	if err := d.createHandler(data); err != nil {
-		return fmt.Errorf("edhex-handlerlayer: %w", err)
-	}
-
-	if err := d.createRoute(data); err != nil {
-		return fmt.Errorf("edhex-handlerlayer: %w", err)
-	}
-
-	return nil
-}
-
-func (d handlerLayer) createHandler(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  handlerTemplateName,
-		Path:  data.GetPath(handlerFolder, "handler.go", true),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d handlerLayer) createRoute(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  routeTemplateName,
-		Path:  data.GetPath(handlerFolder, "route.go", true),
-		Layer: data,
-	}); err != nil {
-		return err
+	if err := bulkTemplates(d.template, d.storage, handlerAddActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
 	return nil

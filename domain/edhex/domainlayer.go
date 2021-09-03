@@ -29,12 +29,10 @@ func (d domainLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
-
 	return nil
 }
 
 func (d domainLayer) Create(data model.Layer) error {
-
 	if err := d.createDomainFile(data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
