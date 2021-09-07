@@ -7,7 +7,7 @@ import (
 )
 
 func bulkTemplates(template UseCaseTemplate, storage Storage, templates model.Templates, data model.Layer) error {
-	for _, v := range handlerInitActionTemplates {
+	for _, v := range templates {
 		v.SetPathPrefix(data)
 		v.SetLayerData(data)
 
@@ -21,7 +21,7 @@ func bulkTemplates(template UseCaseTemplate, storage Storage, templates model.Te
 
 func createTemplate(template UseCaseTemplate, storage Storage, data model.Template) error {
 	fileBuf := bytes.Buffer{}
-	if err := template.Create(&fileBuf, cmdConfigTemplateName, data.Layer); err != nil {
+	if err := template.Create(&fileBuf, data.Name, data.Layer); err != nil {
 		return err
 	}
 

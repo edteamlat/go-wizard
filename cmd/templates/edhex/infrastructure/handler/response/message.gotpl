@@ -7,6 +7,8 @@ import (
 	"runtime"
 
 	"{{ .ModuleName }}/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 // errorTypes
@@ -49,7 +51,7 @@ func New(logger model.Logger) API {
 	return API{logger: logger}
 }
 
-// OK returns an sucessfull message response
+// OK returns a successfully message response
 func (a API) OK(data interface{}) (int, model.MessageResponse) {
 	return http.StatusOK, model.MessageResponse{
 		Data:     data,
@@ -57,7 +59,7 @@ func (a API) OK(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// Created returns an created message response
+// Created returns a created message response
 func (a API) Created(data interface{}) (int, model.MessageResponse) {
 	return http.StatusCreated, model.MessageResponse{
 		Data:     data,
@@ -73,7 +75,7 @@ func (a API) Updated(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// Deleted returns an deleted message response
+// Deleted returns a deleted message response
 func (a API) Deleted(data interface{}) (int, model.MessageResponse) {
 	return http.StatusOK, model.MessageResponse{
 		Data:     data,
@@ -81,7 +83,7 @@ func (a API) Deleted(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// NotFound returns an not found message response
+// NotFound returns a not found message response
 func (a API) NotFound() (int, string) {
 	return http.StatusNotFound, ""
 }

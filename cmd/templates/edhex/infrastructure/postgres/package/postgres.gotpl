@@ -95,8 +95,8 @@ func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
 }
 
 // GetWhere gets an ordered model.{{ .Model }} with filters
-func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FieldsSpecification) (model.{{ .Model }}, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
@@ -111,8 +111,8 @@ func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FiltersSpec
 }
 
 // GetAllWhere gets all model.{{ .Model }}s with Fields
-func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FiltersSpecification) (model.{{ $slice }}, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FieldsSpecification) (model.{{ $slice }}, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)

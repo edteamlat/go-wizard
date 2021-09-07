@@ -23,7 +23,7 @@ var handlerInitActionTemplates = model.Templates{
 	},
 	{
 		Name:     "token.gotpl",
-		Filename: "token",
+		Filename: "token.go",
 		Path:     filepath.Join(handlerFolder, "request"),
 	},
 	{

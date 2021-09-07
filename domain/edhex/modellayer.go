@@ -19,30 +19,47 @@ var (
 		{
 			Name:     "error.gotpl",
 			Filename: "error.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "model_test.gotpl",
 			Filename: "model_test.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "model.gotpl",
 			Filename: "model.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "modelconfig.gotpl",
-			Filename: "config.gotpl",
+			Filename: "config.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "modellogger.gotpl",
 			Filename: "logger.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "modelremoteconfig.gotpl",
 			Filename: "remoteconfig.go",
+			Path:     modelFolder,
 		},
 		{
 			Name:     "modelrouter.gotpl",
 			Filename: "router.go",
+			Path:     modelFolder,
+		},
+		{
+			Name:     "messagehandler.gotpl",
+			Filename: "messagehandler.go",
+			Path:     modelFolder,
+		},
+		{
+			Name:     "filter.gotpl",
+			Filename: "filter.go",
+			Path:     modelFolder,
 		},
 	}
 
@@ -71,7 +88,7 @@ func (d modelLayer) Init(data model.Layer) error {
 
 	modelInitActionTemplates.SetPath(modelFolder)
 	if err := bulkTemplates(d.template, d.storage, modelInitActionTemplates, data); err != nil {
-		return fmt.Errorf("edhex-domainlayer: %w", err)
+		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
 	return nil
@@ -79,7 +96,7 @@ func (d modelLayer) Init(data model.Layer) error {
 
 func (d modelLayer) Create(data model.Layer) error {
 	if err := bulkTemplates(d.template, d.storage, modelAddActionTemplates, data); err != nil {
-		return fmt.Errorf("edhex-domainlayer: %w", err)
+		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
 	return nil

@@ -77,8 +77,8 @@ func ({{ $reciverName }} {{ $reciverType }}) Delete(ID uint) error {
 }
 
 // GetWhere returns a model.{{ .Model }} according to filters and sorts
-func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.FieldsSpecification) (model.{{ .Model }}, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return model.{{ .Model }}{}, fmt.Errorf("{{ $packageName }}: %w", err)
 	}
 
@@ -95,8 +95,8 @@ func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.Filter
 }
 
 // GetAllWhere returns a model.{{ parseToUpperCamelCase .Table }} according to filters and sorts
-func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification model.FiltersSpecification) (model.{{ parseToUpperCamelCase .Table }}, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification model.FieldsSpecification) (model.{{ parseToUpperCamelCase .Table }}, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return nil, fmt.Errorf("{{ $packageName }}: %w", err)
 	}
 

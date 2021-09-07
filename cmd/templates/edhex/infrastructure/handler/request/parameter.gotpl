@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// ExtractIDFromRequest extracts id of the c.Param
+// ExtractIDFromURLParam extracts id of the c.Param
 func ExtractIDFromURLParam(c echo.Context) (int, error) {
 	return strconv.Atoi(c.Param("id"))
 }
@@ -16,7 +16,7 @@ func ExtractIDFromURLParamByName(name string, c echo.Context) (int, error) {
 	return strconv.Atoi(c.Param(name))
 }
 
-// ExtractIDFromURLParamByName extracts id of the c.Param
+// ExtractIDFromFormParamByName extracts id of the c.Param
 func ExtractIDFromFormParamByName(name string, c echo.Context) (int, error) {
 	paramValue := c.FormValue(name)
 	if paramValue == "" {

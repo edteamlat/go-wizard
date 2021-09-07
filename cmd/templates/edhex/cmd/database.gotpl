@@ -1,14 +1,15 @@
 package main
 
 import (
-	"sql"
+	"fmt"
+	"database/sql"
 
 	"{{ .ModuleName }}/model"
 )
 
-func newDBConnection(dbConf model.Database) (*sql.DB, err) {
-	if config.SSLMode == "" {
-		config.SSLMode = "disable"
+func newDBConnection(dbConf model.Database) (*sql.DB, error) {
+	if dbConf.SSLMode == "" {
+		dbConf.SSLMode = "disable"
 	}
 
 	dns := fmt.Sprintf(

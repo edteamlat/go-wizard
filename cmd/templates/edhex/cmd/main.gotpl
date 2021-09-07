@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"{{ .ModuleName }}/model"
 	"{{ .ModuleName }}/handler/response"
 	"{{ .ModuleName }}/handler"
 )
@@ -27,7 +28,11 @@ func main() {
 		RemoteConfig: remoteConfig,
 	})
 
-	logger.Info("Starting service")
-	port := fmt.Sprintf(":%d", config.PortHTTP)
-	logger.Fatal(api.Start(port))
+	port := fmt.Sprintf(":%d", config.ServerPort)
+	if config.IsHttps {
+		logger.Fatal(api.StartTLS(port, config.CertPem, config.KeyPem))
+	} else {
+		logger.Info("Starting service")
+		logger.Fatal(api.Start(port))
+	}
 }

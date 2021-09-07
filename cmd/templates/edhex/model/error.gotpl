@@ -29,7 +29,6 @@ func NewError() *Error {
 
 // Error implements the interface error
 func (e *Error) Error() string {
-
 	return fmt.Sprintf("Status: %d:%s | Endpoint: %s%s | Where: %s | Who: %s | UserID: %d | Err: %v",
 		e.statusHTTP, e.code, e.endpoint, e.formatQueryParams(), e.where, e.who, e.userID, e.err)
 }
@@ -55,10 +54,10 @@ func (e *Error) SetWhere(where string) { e.where = where }
 // HasWhere returns true if the struct has the where field
 func (e *Error) HasWhere() bool { return e.where != "" }
 
-// Who gets the who field
+// Who gets who field
 func (e *Error) Who() string { return e.who }
 
-// SetWho sets the who field
+// SetWho sets who field
 func (e *Error) SetWho(who string) { e.who = who }
 
 // Endpoint gets the endpoint field
@@ -76,7 +75,7 @@ func (e *Error) SetQueryParams(queryParams string) { e.queryParams = queryParams
 // HasQueryParams returns true if queryParams has value
 func (e *Error) HasQueryParams() bool { return e.queryParams != "" }
 
-// HasWho returns true if the struct has the who field
+// HasWho returns true if the struct has who field
 func (e *Error) HasWho() bool { return e.who != "" }
 
 // APIMessage gets the api message field

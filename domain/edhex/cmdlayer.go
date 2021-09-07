@@ -2,22 +2,47 @@ package edhex
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const (
-	cmdConfigTemplateName       = "config.gotpl"
-	cmdDatabaseTemplateName     = "database.gotpl"
-	cmdEchoTemplateName         = "echo.gotpl"
-	cmdLoggerTemplateName       = "logger.gotpl"
-	cmdMainTemplateName         = "main.gotpl"
-	cmdRemoteConfigTemplateName = "remoteconfig.gotpl"
-)
-
 const CMDLayerName = "cmd"
 
-const packageName = "edhex-cmdlayer"
+const cmdFolder = "cmd"
+
+var cmdInitActionTemplates = model.Templates{
+	{
+		Name:     "config.gotpl",
+		Filename: "config.go",
+		Path:     cmdFolder,
+	},
+	{
+		Name:     "database.gotpl",
+		Filename: "database.go",
+		Path:     cmdFolder,
+	},
+	{
+		Name:     "echo.gotpl",
+		Filename: "echo.go",
+		Path:     cmdFolder,
+	},
+	{
+		Name:     "logger.gotpl",
+		Filename: "logger.go",
+		Path:     cmdFolder,
+	},
+	{
+		Name:     "main.gotpl",
+		Filename: "main.go",
+		Path:     cmdFolder,
+	},
+	{
+		Name:     "remoteconfig.gotpl",
+		Filename: "remoteconfig.go",
+		Path:     cmdFolder,
+	},
+}
 
 type cmdLayer struct {
 	template UseCaseTemplate
@@ -28,105 +53,13 @@ func NewCMDLayer(template UseCaseTemplate, storage Storage) cmdLayer {
 	return cmdLayer{template: template, storage: storage}
 }
 
-func (d cmdLayer) Init(m model.Layer) error {
-	if err := d.createConfig(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
+func (d cmdLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "cmd")); err != nil {
+		return fmt.Errorf("edhex-cmdlayer: %w", err)
 	}
 
-	if err := d.createDatabase(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	if err := d.createDatabase(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	if err := d.createEcho(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	if err := d.createLogger(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	if err := d.createMain(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	if err := d.createRemoteConfig(m); err != nil {
-		return fmt.Errorf("%s: %w", packageName, err)
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createConfig(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdConfigTemplateName,
-		Path:  data.GetPath(CMDLayerName, "config.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createDatabase(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdDatabaseTemplateName,
-		Path:  data.GetPath(CMDLayerName, "database.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createEcho(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdEchoTemplateName,
-		Path:  data.GetPath(CMDLayerName, "http.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createLogger(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdLoggerTemplateName,
-		Path:  data.GetPath(CMDLayerName, "logger.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createMain(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdMainTemplateName,
-		Path:  data.GetPath(CMDLayerName, "main.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d cmdLayer) createRemoteConfig(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  cmdRemoteConfigTemplateName,
-		Path:  data.GetPath(CMDLayerName, "remoteconfig.go", false),
-		Layer: data,
-	}); err != nil {
-		return err
+	if err := bulkTemplates(d.template, d.storage, cmdInitActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-cmdlayer: %w", err)
 	}
 
 	return nil

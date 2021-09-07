@@ -337,8 +337,8 @@ func (u User) Delete(ID uint) error {
 }
 
 // GetWhere returns a model.User according to filters and sorts
-func (u User) GetWhere(specification model.FiltersSpecification) (model.User, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func (u User) GetWhere(specification model.FieldsSpecification) (model.User, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return model.User{}, fmt.Errorf("user: %w", err)
 	}
 
@@ -355,8 +355,8 @@ func (u User) GetWhere(specification model.FiltersSpecification) (model.User, er
 }
 
 // GetAllWhere returns a model.Users according to filters and sorts
-func (u User) GetAllWhere(specification model.FiltersSpecification) (model.Users, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func (u User) GetAllWhere(specification model.FieldsSpecification) (model.Users, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return nil, fmt.Errorf("user: %w", err)
 	}
 
@@ -1222,8 +1222,8 @@ func (%[4]s %[3]s) Delete(ID uint) error {
 }
 
 // GetWhere gets an ordered model.%[3]s with filters
-func (%[4]s %[3]s) GetWhere(specification model.FiltersSpecification) (model.%[3]s, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func (%[4]s %[3]s) GetWhere(specification model.FieldsSpecification) (model.%[3]s, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
@@ -1238,8 +1238,8 @@ func (%[4]s %[3]s) GetWhere(specification model.FiltersSpecification) (model.%[3
 }
 
 // GetAllWhere gets all model.%[3]ss with Fields
-func (%[4]s %[3]s) GetAllWhere(specification model.FiltersSpecification) (model.Specialities, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func (%[4]s %[3]s) GetAllWhere(specification model.FieldsSpecification) (model.Specialities, error) {
+	conditions, args := sqlbuilder.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)

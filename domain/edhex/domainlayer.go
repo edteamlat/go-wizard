@@ -3,17 +3,28 @@ package edhex
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const (
-	domainTemplateName  = "domain.gotpl"
-	useCaseTemplateName = "usecase.gotpl"
-)
-
 const DomainLayerName = "domain"
+
+const domainFolder = "domain"
+
+var domainAddActionTemplates = model.Templates{
+	{
+		Name:        "domain.gotpl",
+		Filename:    "%s.go", // the name will be the name of the package
+		Path:        domainFolder,
+		WithPackage: true,
+	},
+	{
+		Name:        "usecase.gotpl",
+		Filename:    "usecase.go",
+		Path:        domainFolder,
+		WithPackage: true,
+	},
+}
 
 type domainLayer struct {
 	template UseCaseTemplate
@@ -33,38 +44,8 @@ func (d domainLayer) Init(data model.Layer) error {
 }
 
 func (d domainLayer) Create(data model.Layer) error {
-	if err := d.createDomainFile(data); err != nil {
+	if err := bulkTemplates(d.template, d.storage, domainAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
-	}
-
-	if err := d.createUseCaseFile(data); err != nil {
-		return fmt.Errorf("edhex-domainlayer: %w", err)
-	}
-
-	return nil
-}
-
-func (d domainLayer) createDomainFile(data model.Layer) error {
-	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  domainTemplateName,
-		Path:  data.GetPath(DomainLayerName, filename, true),
-		Layer: data,
-	}); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d domainLayer) createUseCaseFile(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
-		Name:  useCaseTemplateName,
-		Path:  data.GetPath(DomainLayerName, "usecase.go", true),
-		Layer: data,
-	}); err != nil {
-		return err
 	}
 
 	return nil
