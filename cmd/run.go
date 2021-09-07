@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"embed"
+	"log"
 	"text/template"
 
 	"github.com/edteamlat/go-wizard/domain/layer"
@@ -10,7 +11,6 @@ import (
 	"github.com/edteamlat/go-wizard/infrastructure/filesystem"
 	"github.com/edteamlat/go-wizard/infrastructure/texttemplate"
 	"github.com/edteamlat/go-wizard/model"
-	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
 )
 
