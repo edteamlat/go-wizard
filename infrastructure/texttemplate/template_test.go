@@ -92,19 +92,17 @@ type UseCase interface {
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.User, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
+	GetWhere(specification model.FieldsSpecification) (model.User, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.Users, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.User) error
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.User, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
+	GetWhere(specification model.FieldsSpecification) (model.User, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.Users, error)
 }
 `,
 			wantErr: false,
@@ -134,19 +132,17 @@ type UseCase interface {
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
+	GetWhere(specification model.FieldsSpecification) (model.UserLogin, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.UserLogins, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.UserLogin) error
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
+	GetWhere(specification model.FieldsSpecification) (model.UserLogin, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -176,19 +172,17 @@ type UseCase interface {
 	Update(m *model.UserRole) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
+	GetWhere(specification model.FieldsSpecification) (model.UserRole, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.UserRoles, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.UserRole) error
 	Update(m *model.UserRole) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
+	GetWhere(specification model.FieldsSpecification) (model.UserRole, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.UserRoles, error)
 }
 `,
 			wantErr: false,
@@ -218,19 +212,17 @@ type UseCase interface {
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.Role, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
+	GetWhere(specification model.FieldsSpecification) (model.Role, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.Roles, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.Role) error
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.Role, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
+	GetWhere(specification model.FieldsSpecification) (model.Role, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.Roles, error)
 }
 `,
 			wantErr: false,
@@ -679,12 +671,12 @@ func getHandlerRouteLayerTests() testTables {
 			wantWr: fmt.Sprintf(`package invoice
 
 import (
-	"database/sql"
-
 	"%[1]s/model"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/domain/%[2]s"
 	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+
+	"github.com/labstack/echo/v4"
 )
 
 // NewRouter returns a router to handle model.Invoice requests
@@ -693,9 +685,9 @@ func NewRouter(specification model.RouterSpecification) {
 
 	// build middlewares to validate permissions on the routes
 
-	adminRoutes(specification, handler)
-	privateRoutes(specification, handler)
-	publicRoutes(specification, handler)
+	adminRoutes(specification.Api, handler)
+	privateRoutes(specification.Api, handler)
+	publicRoutes(specification.Api, handler)
 }
 
 func buildHandler(specification model.RouterSpecification) handler {
@@ -755,12 +747,12 @@ func publicRoutes(api *echo.Echo, h handler) {
 			wantWr: fmt.Sprintf(`package invoiceitem
 
 import (
-	"database/sql"
-
 	"%[1]s/model"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/domain/%[2]s"
 	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+
+	"github.com/labstack/echo/v4"
 )
 
 // NewRouter returns a router to handle model.InvoiceItem requests
@@ -769,9 +761,9 @@ func NewRouter(specification model.RouterSpecification) {
 
 	// build middlewares to validate permissions on the routes
 
-	adminRoutes(specification, handler)
-	privateRoutes(specification, handler)
-	publicRoutes(specification, handler)
+	adminRoutes(specification.Api, handler)
+	privateRoutes(specification.Api, handler)
+	publicRoutes(specification.Api, handler)
 }
 
 func buildHandler(specification model.RouterSpecification) handler {
@@ -844,7 +836,7 @@ import (
 	"errors"
 	"strings"
 
-	"%[1]s/%[2]s"
+	"%[1]s/domain/%[2]s"
 	"%[1]s/infrastructure/handler/request"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/model"
@@ -855,8 +847,8 @@ type handler struct {
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.UseCase) handler {
-	return handler{useCase: useCase}
+func newHandler(useCase %[2]s.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
 }
 
 // Create handles the creation of a model.%[3]s
@@ -912,8 +904,6 @@ func (h handler) Delete(c echo.Context) error {
 
 // GetWhere handles the search of a model.%[3]s
 func (h handler) GetWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -929,8 +919,6 @@ func (h handler) GetWhere(c echo.Context) error {
 
 // GetAllWhere handles the search of all model.%[3]s
 func (h handler) GetAllWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -967,7 +955,7 @@ import (
 	"errors"
 	"strings"
 
-	"%[1]s/%[2]s"
+	"%[1]s/domain/%[2]s"
 	"%[1]s/infrastructure/handler/request"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/model"
@@ -978,8 +966,8 @@ type handler struct {
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.UseCase) handler {
-	return handler{useCase: useCase}
+func newHandler(useCase %[2]s.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
 }
 
 // Create handles the creation of a model.%[3]s
@@ -1035,8 +1023,6 @@ func (h handler) Delete(c echo.Context) error {
 
 // GetWhere handles the search of a model.%[3]s
 func (h handler) GetWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -1052,8 +1038,6 @@ func (h handler) GetWhere(c echo.Context) error {
 
 // GetAllWhere handles the search of all model.%[3]s
 func (h handler) GetAllWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -1166,7 +1150,7 @@ func New(db *sql.DB) %[3]s {
 
 // Create creates a model.%[3]s
 func (%[4]s %[3]s) Create(m *model.%[3]s) error {
-	stmt, err := e.db.Prepare(psqlInsert)
+	stmt, err := %[4]s.db.Prepare(psqlInsert)
 	if err != nil {
 		return err
 	}
@@ -1186,7 +1170,7 @@ func (%[4]s %[3]s) Create(m *model.%[3]s) error {
 
 // Update this method updates a model.%[3]s by id
 func (%[4]s %[3]s) Update(m *model.%[3]s) error {
-	stmt, err := e.db.Prepare(psqlUpdate)
+	stmt, err := %[4]s.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}
@@ -1207,7 +1191,7 @@ func (%[4]s %[3]s) Update(m *model.%[3]s) error {
 
 // Delete deletes a model.%[3]s by id
 func (%[4]s %[3]s) Delete(ID uint) error {
-	stmt, err := e.db.Prepare(psqlDelete)
+	stmt, err := %[4]s.db.Prepare(psqlDelete)
 	if err != nil {
 		return err
 	}
@@ -1228,13 +1212,13 @@ func (%[4]s %[3]s) GetWhere(specification model.FieldsSpecification) (model.%[3]
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
 		return model.%[3]s{}, err
 	}
 	defer stmt.Close()
 
-	return e.scanRow(stmt.QueryRow(args...))
+	return %[4]s.scanRow(stmt.QueryRow(args...))
 }
 
 // GetAllWhere gets all model.%[3]ss with Fields
@@ -1245,7 +1229,7 @@ func (%[4]s %[3]s) GetAllWhere(specification model.FieldsSpecification) (model.S
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
 	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
@@ -1259,7 +1243,7 @@ func (%[4]s %[3]s) GetAllWhere(specification model.FieldsSpecification) (model.S
 
 	ms := model.Specialities{}
 	for rows.Next() {
-		m, err := e.scanRow(rows)
+		m, err := %[4]s.scanRow(rows)
 		if err != nil {
 			return nil, err
 		}

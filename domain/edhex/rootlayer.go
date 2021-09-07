@@ -2,6 +2,8 @@ package edhex
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/edteamlat/go-wizard/model"
@@ -21,6 +23,10 @@ var rootInitActionTemplates = model.Templates{
 	{
 		Name:     "readme.gotpl",
 		Filename: "README.md",
+	},
+	{
+		Name:     "wizard.gotpl",
+		Filename: "wizard-config.yaml",
 	},
 }
 
@@ -46,7 +52,49 @@ func (d rootLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 
+	if err := d.runCommands(data); err != nil {
+		return fmt.Errorf("edhex-rootlayer: %w", err)
+	}
+
 	return nil
+}
+
+func (d rootLayer) runCommands(data model.Layer) error {
+	if err := d.CDToProject(data.GetProjectName()); err != nil {
+		return err
+	}
+
+	if err := d.initGit(); err != nil {
+		return err
+	}
+
+	if err := d.initGoMod(data.ModuleName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d rootLayer) CDToProject(projectName string) error {
+	return os.Chdir(fmt.Sprintf("./%s", projectName))
+}
+
+func (d rootLayer) initGoMod(moduleName string) error {
+	cmd := exec.Command("go", "mod", "init", moduleName)
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	tidyCMD := exec.Command("go", "mod", "tidy")
+
+	return tidyCMD.Run()
+}
+
+func (d rootLayer) initGit() error {
+	cmd := exec.Command("git", "init")
+
+	return cmd.Run()
 }
 
 func (d rootLayer) Create(data model.Layer) error { return nil }

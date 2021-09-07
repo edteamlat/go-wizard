@@ -2,20 +2,19 @@ package request
 
 import (
 	"encoding/json"
-	"sqlbuilder"
 
-	"{{ .ModuleName }}/handler/response"
+	"{{ .ModuleName }}/model"
 
 	"github.com/labstack/echo/v4"
 )
 
-func GetFiltersSpecification(c echo.Context) (model.FiltersSpecification, error) {
+func GetFiltersSpecification(c echo.Context) (model.FieldsSpecification, error) {
 	filters := c.QueryParam("filters")
 	fields := sqlbuilder.Fields{}
 	if filters != "" {
 		err := json.Unmarshal([]byte(filters), &fields)
 		if err != nil {
-			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
 		}
 	}
 
@@ -24,7 +23,7 @@ func GetFiltersSpecification(c echo.Context) (model.FiltersSpecification, error)
 	if sorts != "" {
 		err := json.Unmarshal([]byte(sorts), &sortsFields)
 		if err != nil {
-			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
 		}
 	}
 
@@ -33,11 +32,11 @@ func GetFiltersSpecification(c echo.Context) (model.FiltersSpecification, error)
 	if pagination != "" {
 		err := json.Unmarshal([]byte(pagination), &pag)
 		if err != nil {
-			return model.FiltersSpecification{}, response.Failed("GetWhere().json.Unmarshal()", response.UnexpectedError, err)
+			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
 		}
 	}
 
-	return model.FiltersSpecification{
+	return model.FieldsSpecification{
 		Filters:    fields,
 		Sorts:      sortsFields,
 		Pagination: pag,

@@ -11,17 +11,15 @@ type UseCase interface {
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
+	GetWhere(specification model.FieldsSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.{{ $modelSlice }}, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.{{ .Model }}) error
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
+	GetWhere(specification model.FieldsSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification model.FieldsSpecification) (model.{{ $modelSlice }}, error)
 }

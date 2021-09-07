@@ -1,8 +1,8 @@
 package main
 
 import (
-	"json"
-	"ioutil"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 
 	"{{ .ModuleName }}/model"

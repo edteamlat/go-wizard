@@ -48,11 +48,19 @@ func NewLayer(conf Config) Layer {
 }
 
 func (l *Layer) GetPath(layerName, filename string, withPackage bool) string {
-	if withPackage {
+	if strings.HasPrefix(filename, "%s.") {
 		packageName := strings.ToLower(l.Model)
 		filename = fmt.Sprintf(filename, packageName)
+	}
+
+	if withPackage {
 		return filepath.Join(l.ProjectPath, layerName, strings.ToLower(l.Model), filename)
 	}
 
 	return filepath.Join(l.ProjectPath, layerName, filename)
+}
+
+func (l Layer) GetProjectName() string {
+	moduleSplit := strings.Split(l.ModuleName, "/")
+	return moduleSplit[len(moduleSplit)-1]
 }

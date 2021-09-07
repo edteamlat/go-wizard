@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	"{{ .ModuleName }}/model"
+	"{{ .ModuleNale }}/infrastructure/handler/request"
 
 	"github.com/labstack/echo/v4"
 )
@@ -101,7 +102,7 @@ func (a API) BindFailed(c echo.Context, err error) error {
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho("c.Bind()")
 
-	a.logger.Warning("%s", e.Error())
+	a.logger.Warnf("%s", e.Error())
 	return e
 }
 
@@ -118,10 +119,9 @@ func (a API) UnexpectedError(c echo.Context, who string, err error) *model.Error
 	e.SetQueryParams(c.QueryParams().Encode())
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho(who)
-	e.SetEmployerID(request.GetEmployerID(c))
 	e.SetUserID(request.GetUserID(c))
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 
@@ -141,11 +141,11 @@ func (a API) ErrorHandled(c echo.Context, who string, e *model.Error) *model.Err
 	}
 
 	if e.StatusHTTP() < http.StatusInternalServerError {
-		a.logger.Warning("%s", e.Error())
+		a.logger.Warnf("%s", e.Error())
 		return e
 	}
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 
@@ -159,15 +159,14 @@ func (a API) AuthorizationError(c echo.Context, who string, e *model.Error, http
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho(who)
 	e.SetStatusHTTP(httpStatusCode)
-	e.SetEmployerID(request.GetEmployerID(c))
 	e.SetUserID(request.GetUserID(c))
 
 	if e.StatusHTTP() < http.StatusInternalServerError {
-		a.logger.Warning("%s", e.Error())
+		a.logger.Warnf("%s", e.Error())
 		return e
 	}
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 

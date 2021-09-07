@@ -20,9 +20,13 @@ var templatesFS embed.FS
 func run(cmd *cobra.Command, args []string, action runner.Action) {
 	configPath := cmd.Flag(configPathFlag).Value.String()
 	architecture := cmd.Flag(architectureFlag).Value.String()
-	moduleName := cmd.Flag(moduleFlag).Value.String()
 
-	conf, err := readConfig(configPath, runner.Init)
+	moduleName := ""
+	if action == runner.Init {
+		moduleName = cmd.Flag(moduleFlag).Value.String()
+	}
+
+	conf, err := readConfig(configPath, action)
 	if err != nil {
 		log.Fatal(err)
 	}

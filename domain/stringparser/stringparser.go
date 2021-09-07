@@ -98,7 +98,7 @@ func parseToSqlType(v string) string {
 }
 
 func handleNull(f model.Field) string {
-	field := strcase.UpperCamelCase(f.Name)
+	field := parseToUpperCamelCase(f.Name)
 
 	if !f.IsNull {
 		return fmt.Sprintf("m.%s", field)

@@ -43,7 +43,7 @@ func New(db *sql.DB) {{ .Model }} {
 
 // Create creates a model.{{ .Model }}
 func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
-	stmt, err := e.db.Prepare(psqlInsert)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlInsert)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
 
 // Update this method updates a model.{{ .Model }} by id
 func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
-	stmt, err := e.db.Prepare(psqlUpdate)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
 
 // Delete deletes a model.{{ .Model }} by id
 func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
-	stmt, err := e.db.Prepare(psqlDelete)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlDelete)
 	if err != nil {
 		return err
 	}
@@ -101,13 +101,13 @@ func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FieldsSpeci
 
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {
 		return model.{{ .Model }}{}, err
 	}
 	defer stmt.Close()
 
-	return e.scanRow(stmt.QueryRow(args...))
+	return {{ $receiverName }}.scanRow(stmt.QueryRow(args...))
 }
 
 // GetAllWhere gets all model.{{ .Model }}s with Fields
@@ -118,7 +118,7 @@ func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FieldsSp
 	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
 	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FieldsSp
 
 	ms := model.{{ $slice }}{}
 	for rows.Next() {
-		m, err := e.scanRow(rows)
+		m, err := {{ $receiverName }}.scanRow(rows)
 		if err != nil {
 			return nil, err
 		}

@@ -42,6 +42,11 @@ var cmdInitActionTemplates = model.Templates{
 		Filename: "remoteconfig.go",
 		Path:     cmdFolder,
 	},
+	{
+		Name:     "configuration-example.gotpl",
+		Filename: "configuration.json",
+		Path:     cmdFolder,
+	},
 }
 
 type cmdLayer struct {

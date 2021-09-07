@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"gopkg.in/yaml.v3"
 
@@ -18,8 +19,6 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 		return conf, nil
 	}
 
-	log.Printf("Loading configuration file from %s...", filename)
-
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return model.Config{}, fmt.Errorf("config: could not read file %s, %w", filename, err)
@@ -28,6 +27,14 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 	conf := model.Config{}
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
 		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
+	}
+	if conf.ProjectPath == "" {
+		dir, err := os.Getwd()
+		if err != nil {
+			return conf, fmt.Errorf("config: could not get project path")
+		}
+
+		conf.ProjectPath = dir
 	}
 
 	log.Println("Configuration file has been loaded.")
