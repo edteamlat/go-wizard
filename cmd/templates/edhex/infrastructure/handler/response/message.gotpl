@@ -7,7 +7,7 @@ import (
 	"runtime"
 
 	"{{ .ModuleName }}/model"
-	"{{ .ModuleNale }}/infrastructure/handler/request"
+	"{{ .ModuleName }}/infrastructure/handler/request"
 
 	"github.com/labstack/echo/v4"
 )

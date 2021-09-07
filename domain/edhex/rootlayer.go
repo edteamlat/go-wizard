@@ -82,13 +82,7 @@ func (d rootLayer) CDToProject(projectName string) error {
 func (d rootLayer) initGoMod(moduleName string) error {
 	cmd := exec.Command("go", "mod", "init", moduleName)
 
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	tidyCMD := exec.Command("go", "mod", "tidy")
-
-	return tidyCMD.Run()
+	return cmd.Run()
 }
 
 func (d rootLayer) initGit() error {

@@ -1,4 +1,5 @@
-project_path: $GOPATH/src/
+# if you don't specify a field, the wizard will use the working directory (pwd)
+project_path: /home/username/Documents/code/
 module_name: github.com/edteamlat/go-wizzard
 
 # Use for the name of the structs of the different layers
@@ -12,6 +13,7 @@ table: user_roles
 table_comment: Write your comment here
 
 # a list of objects where you specify the name, type and if it allows nulls
+# by default, the id, created_at and updated_at fields, will be added
 fields:
   - name: user_id
     type: uint
