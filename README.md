@@ -87,7 +87,7 @@ go-wizard help init
 ```
 
 ### Add package command
-With this command you can create the CRUD on the available layers that will read from a config yaml file:
+With this command you can create the CRUD on the available layers that will read from a config yaml file that is generated when you run the init command:
 ```yaml
 # if you don't specify this field, the wizard will automatically use the path of working directory (pwd)
 project_path: /home/username/Documents/code/
