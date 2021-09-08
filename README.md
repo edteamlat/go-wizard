@@ -9,9 +9,9 @@ Architecture. It allows you to generate the initial structure of a project and t
 2. Create a package on the different layers ✅
 3. Add one field on the desired layers (database, model, storage, etc.) WIP 🛠
 4. Remove one field on the desired layers (database, model, storage, etc.) WIP 🛠
-5. Override a package. WIP 🛠
+5. Override a package WIP 🛠
 
-## ⚙ Install
+## ⚙ Installation
 
 This command will install the CLI on $GOPATH/bin so make sure that you have that on your $PATH.
 
@@ -19,7 +19,7 @@ This command will install the CLI on $GOPATH/bin so make sure that you have that
 go install github.com/edteamlat/go-wizard@latest
 ```
 
-If you want a different version, just replace the `@latest` with the desired version.
+If you want a different version, just replace the `@latest` with the version `@v1.0.0`
 
 ## 💻 Usage
 
@@ -31,7 +31,7 @@ To create the initial structure of a new project you just need to run the next c
 go-wizard init -m github.com/edteamlat/my-app
 ```
 
-This will create the project on the current directory with the directories to work with the hexagonal architecture,
+This will create the project on the current directory with the layers to work with the hexagonal architecture, and
 it'll automatically init git and the go modules.
 
 ```bash
@@ -80,11 +80,18 @@ Inside the created project, you must run the next command to install the depende
 ```bash
 go mod init
 ```
+
+If you want to get more information about this command, run:
+```bash
+go-wizard help init
+```
+
 ### Add package command
 With this command you can create the CRUD on the available layers that will read from a config yaml file:
 ```yaml
-# if you don't specify a field, the wizard will use the working directory (pwd)
+# if you don't specify this field, the wizard will automatically use the path of working directory (pwd)
 project_path: /home/username/Documents/code/
+
 # the module_name is used to create the imports
 module_name: github.com/edteamlat/go-wizzard
 
@@ -117,11 +124,48 @@ fields:
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it
-layers: # by default the fields' id, created_at and updated_at will be created
+layers:
   - domain
   - handler_echo # we only support the echo framework for now
   - storage_postgres # we don't support other db system for now
   - model
   - sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
 ```
-This config file is added when you exec the init command on the root with the name `wizard.yaml`
+
+This config file is added on the root of your project  with the name `wizard-config.yaml` when you exec the init command.
+
+To create a new package just fill the config file and exec the next command:
+```bash
+go-wizard add package
+```
+
+With the config file of above this command will generate the following:
+```bash
+├── cmd
+├── domain
+│   └── userrole
+│       ├── usecase.go
+│       └── userrole.go
+├── infrastructure
+│   ├── handler
+│   │   ├── request
+│   │   ├── response
+│   │   ├── userrole
+│   │   │   ├── handler.go
+│   │   │   └── route.go
+│   └── postgres
+│       └── userrole
+│           └── userrole.go
+├── model
+│   └── userrole.go
+├── sqlmigration
+│   └── 20210908_063849_create_user_roles_table.sql
+```
+
+Now you can enter into every file that was generated to see what's inside.
+
+
+If you want to get more information about this command, run:
+```bash
+go-wizard help add
+```
