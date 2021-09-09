@@ -44,7 +44,7 @@ var cmdInitActionTemplates = model.Templates{
 	},
 	{
 		Name:     "configuration-example.gotpl",
-		Filename: "configuration.json",
+		Filename: "configuration.json.example",
 		Path:     cmdFolder,
 	},
 }

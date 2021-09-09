@@ -56,11 +56,6 @@ var (
 			Filename: "messagehandler.go",
 			Path:     modelFolder,
 		},
-		{
-			Name:     "filter.gotpl",
-			Filename: "filter.go",
-			Path:     modelFolder,
-		},
 	}
 
 	modelAddActionTemplates = model.Templates{

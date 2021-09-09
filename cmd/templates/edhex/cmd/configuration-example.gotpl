@@ -23,5 +23,5 @@
 		"password": "edteam",
 		"name": "cursos",
 		"sslmode": "disable"
-	},
+	}
 }

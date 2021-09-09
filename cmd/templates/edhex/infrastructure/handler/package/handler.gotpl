@@ -3,15 +3,12 @@
 package {{ $package}}
 
 import (
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"strings"
-
 	"{{ .ModuleName }}/domain/{{ $package }}"
 	"{{ .ModuleName }}/infrastructure/handler/request"
 	"{{ .ModuleName }}/infrastructure/handler/response"
 	"{{ .ModuleName }}/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type handler struct {

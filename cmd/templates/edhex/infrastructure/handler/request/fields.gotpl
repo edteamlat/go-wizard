@@ -1,42 +1,42 @@
 package request
 
 import (
+	"fmt"
 	"encoding/json"
 
-	"{{ .ModuleName }}/model"
-
 	"github.com/labstack/echo/v4"
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
-func GetFiltersSpecification(c echo.Context) (model.FieldsSpecification, error) {
+func GetFiltersSpecification(c echo.Context) (models.FieldsSpecification, error) {
 	filters := c.QueryParam("filters")
-	fields := sqlbuilder.Fields{}
+	fields := models.Fields{}
 	if filters != "" {
 		err := json.Unmarshal([]byte(filters), &fields)
 		if err != nil {
-			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
+			return models.FieldsSpecification{}, fmt.Errorf("invalid filter parameter")
 		}
 	}
 
 	sorts := c.QueryParam("sorts")
-	sortsFields := sqlbuilder.SortFields{}
+	sortsFields := models.SortFields{}
 	if sorts != "" {
 		err := json.Unmarshal([]byte(sorts), &sortsFields)
 		if err != nil {
-			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
+			return models.FieldsSpecification{}, fmt.Errorf("invalid filter parameter")
 		}
 	}
 
 	pagination := c.QueryParam("pagination")
-	pag := sqlbuilder.Pagination{}
+	pag := models.Pagination{}
 	if pagination != "" {
 		err := json.Unmarshal([]byte(pagination), &pag)
 		if err != nil {
-			return model.FieldsSpecification{}, model.ErrInvalidFilterParam
+			return models.FieldsSpecification{}, fmt.Errorf("invalid filter parameter")
 		}
 	}
 
-	return model.FieldsSpecification{
+	return models.FieldsSpecification{
 		Filters:    fields,
 		Sorts:      sortsFields,
 		Pagination: pag,

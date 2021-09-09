@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"{{ .ModuleName }}/model"
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 var allowedFieldsForQuery = []string{
@@ -77,7 +78,7 @@ func ({{ $reciverName }} {{ $reciverType }}) Delete(ID uint) error {
 }
 
 // GetWhere returns a model.{{ .Model }} according to filters and sorts
-func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.FieldsSpecification) (model.{{ .Model }}, error) {
+func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error) {
 	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return model.{{ .Model }}{}, fmt.Errorf("{{ $packageName }}: %w", err)
 	}
@@ -95,7 +96,7 @@ func ({{ $reciverName }} {{ $reciverType }}) GetWhere(specification model.Fields
 }
 
 // GetAllWhere returns a model.{{ parseToUpperCamelCase .Table }} according to filters and sorts
-func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification model.FieldsSpecification) (model.{{ parseToUpperCamelCase .Table }}, error) {
+func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification models.FieldsSpecification) (model.{{ parseToUpperCamelCase .Table }}, error) {
 	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return nil, fmt.Errorf("{{ $packageName }}: %w", err)
 	}
