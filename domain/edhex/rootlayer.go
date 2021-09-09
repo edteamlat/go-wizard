@@ -48,7 +48,7 @@ func (d rootLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 
-	if err := bulkTemplates(d.template, d.storage, rootInitActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, rootInitActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-rootlayer: %w", err)
 	}
 

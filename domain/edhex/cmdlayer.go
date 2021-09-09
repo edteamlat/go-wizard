@@ -63,7 +63,7 @@ func (d cmdLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-cmdlayer: %w", err)
 	}
 
-	if err := bulkTemplates(d.template, d.storage, cmdInitActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, cmdInitActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-cmdlayer: %w", err)
 	}
 

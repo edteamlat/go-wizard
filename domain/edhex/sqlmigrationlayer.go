@@ -42,7 +42,7 @@ func (d sqlMigrationLayer) Create(data model.Layer) error {
 }
 
 func (d sqlMigrationLayer) createSQLMigration(data model.Layer) error {
-	if err := createTemplate(d.template, d.storage, model.Template{
+	if err := createFromTemplate(d.template, d.storage, model.Template{
 		Name:  sqlMigrationTemplateName,
 		Path:  data.GetPath(sqlMigrationFolder, getFilename(data.Table), false),
 		Layer: data,

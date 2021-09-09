@@ -72,7 +72,7 @@ func (d handlerLayer) Init(data model.Layer) error {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
-	if err := bulkTemplates(d.template, d.storage, handlerInitActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, handlerInitActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 
@@ -80,7 +80,7 @@ func (d handlerLayer) Init(data model.Layer) error {
 }
 
 func (d handlerLayer) Create(data model.Layer) error {
-	if err := bulkTemplates(d.template, d.storage, handlerAddActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, handlerAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 

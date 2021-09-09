@@ -44,7 +44,7 @@ func (d domainLayer) Init(data model.Layer) error {
 }
 
 func (d domainLayer) Create(data model.Layer) error {
-	if err := bulkTemplates(d.template, d.storage, domainAddActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, domainAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-domainlayer: %w", err)
 	}
 

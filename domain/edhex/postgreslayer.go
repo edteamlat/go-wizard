@@ -44,7 +44,7 @@ func (d postgresLayer) Create(data model.Layer) error {
 func (d postgresLayer) createPostgres(data model.Layer) error {
 	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
 
-	if err := createTemplate(d.template, d.storage, model.Template{
+	if err := createFromTemplate(d.template, d.storage, model.Template{
 		Name:  postgresTemplateName,
 		Path:  data.GetPath(postgresFolder, filename, true),
 		Layer: data,

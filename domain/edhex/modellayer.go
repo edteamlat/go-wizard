@@ -82,7 +82,7 @@ func (d modelLayer) Init(data model.Layer) error {
 	}
 
 	modelInitActionTemplates.SetPath(modelFolder)
-	if err := bulkTemplates(d.template, d.storage, modelInitActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, modelInitActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
@@ -90,7 +90,7 @@ func (d modelLayer) Init(data model.Layer) error {
 }
 
 func (d modelLayer) Create(data model.Layer) error {
-	if err := bulkTemplates(d.template, d.storage, modelAddActionTemplates, data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, modelAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-modellayer: %w", err)
 	}
 
