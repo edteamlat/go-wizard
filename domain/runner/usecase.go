@@ -1,6 +1,8 @@
 package runner
 
 import (
+	"fmt"
+
 	"github.com/edteamlat/go-wizard/domain/layer"
 	"github.com/edteamlat/go-wizard/model"
 )
@@ -21,10 +23,15 @@ func (r *runner) AppendLayer(layer ...layer.UseCase) {
 
 // GenerateLayers runs the generation of every layer
 func (r runner) GenerateLayers(a Action, m model.Layer) error {
-	for _, layerUseCase := range r.layers {
+	for k, layerUseCase := range r.layers {
+		prefix := fmt.Sprintf("[%d/%d]", k+1, len(r.layers))
+
 		if err := r.exec(a, m, layerUseCase); err != nil {
-			return err
+			layerUseCase.FailureMsg(prefix, err)
+			continue
 		}
+
+		layerUseCase.SuccessfulMsg(prefix)
 	}
 
 	return nil

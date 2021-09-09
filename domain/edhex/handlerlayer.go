@@ -94,3 +94,11 @@ func (d handlerLayer) Override(m model.Layer) error {
 func (d handlerLayer) AddField(m model.Layer) error {
 	return nil
 }
+
+func (d handlerLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s handler layer generated ✅\n", prefixCount)
+}
+
+func (d handlerLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s handler layer failed 🚨, %s\n", prefixCount, err.Error())
+}

@@ -17,6 +17,9 @@ type UseCase interface {
 	Create(m model.Layer) error
 	Override(m model.Layer) error
 	AddField(m model.Layer) error
+
+	SuccessfulMsg(prefixCount string)
+	FailureMsg(prefixCount string, err error)
 }
 
 // UseCaseLayers slice of useCaseLayers

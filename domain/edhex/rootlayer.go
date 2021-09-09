@@ -96,3 +96,11 @@ func (d rootLayer) Create(data model.Layer) error { return nil }
 func (d rootLayer) Override(m model.Layer) error { return nil }
 
 func (d rootLayer) AddField(m model.Layer) error { return nil }
+
+func (d rootLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s root layer generated ✅\n", prefixCount)
+}
+
+func (d rootLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s root layer failed 🚨, %s\n", prefixCount, err.Error())
+}

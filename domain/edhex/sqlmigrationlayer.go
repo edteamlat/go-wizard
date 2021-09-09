@@ -65,3 +65,11 @@ func (d sqlMigrationLayer) Override(m model.Layer) error {
 func (d sqlMigrationLayer) AddField(m model.Layer) error {
 	return nil
 }
+
+func (d sqlMigrationLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s sql-migration layer generated ✅\n", prefixCount)
+}
+
+func (d sqlMigrationLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s sql-migration layer failed 🚨, %s\n", prefixCount, err.Error())
+}

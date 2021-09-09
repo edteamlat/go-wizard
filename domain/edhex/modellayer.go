@@ -104,3 +104,11 @@ func (d modelLayer) Override(m model.Layer) error {
 func (d modelLayer) AddField(m model.Layer) error {
 	return nil
 }
+
+func (d modelLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s model layer generated ✅\n", prefixCount)
+}
+
+func (d modelLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s model layer failed 🚨, %s\n", prefixCount, err.Error())
+}

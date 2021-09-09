@@ -75,3 +75,11 @@ func (d cmdLayer) Create(data model.Layer) error { return nil }
 func (d cmdLayer) Override(m model.Layer) error { return nil }
 
 func (d cmdLayer) AddField(m model.Layer) error { return nil }
+
+func (d cmdLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s cmd layer generated ✅\n", prefixCount)
+}
+
+func (d cmdLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s cmd layer failed 🚨, %s\n", prefixCount, err.Error())
+}

@@ -58,3 +58,11 @@ func (d domainLayer) Override(m model.Layer) error {
 func (d domainLayer) AddField(m model.Layer) error {
 	return nil
 }
+
+func (d domainLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s domain layer generated ✅\n", prefixCount)
+}
+
+func (d domainLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s domain layer failed 🚨, %s\n", prefixCount, err.Error())
+}

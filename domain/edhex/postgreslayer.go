@@ -62,3 +62,11 @@ func (d postgresLayer) Override(m model.Layer) error {
 func (d postgresLayer) AddField(m model.Layer) error {
 	return nil
 }
+
+func (d postgresLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s postgres layer generated ✅\n", prefixCount)
+}
+
+func (d postgresLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s postgres layer failed 🚨, %s\n", prefixCount, err.Error())
+}
