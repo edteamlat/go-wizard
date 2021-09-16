@@ -1,6 +1,6 @@
 # if you don't specify a field, the wizard will use the working directory (pwd)
-project_path: /home/username/Documents/code/
-module_name: github.com/edteamlat/go-wizzard
+# project_path: /home/username/Documents/code/
+module_name: {{ .ModuleName }}
 
 # Use for the name of the structs of the different layers
 model: UserRole
@@ -18,11 +18,8 @@ fields:
   - name: user_id
     type: uint
     is_null: false
-  - name: description
-    type: string
-    is_null: true
-  - name: created_at
-    type: time.Time
+  - name: role_id
+    type: uint
     is_null: false
 
 # The available layers that we can generate

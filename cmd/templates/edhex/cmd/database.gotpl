@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"{{ .ModuleName }}/model"
+
+	_ "github.com/lib/pq"
 )
 
 func newDBConnection(dbConf model.Database) (*sql.DB, error) {

@@ -732,7 +732,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/invoices")
+	route := api.Group("/api/v1/public/invoices")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)
@@ -808,7 +808,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/invoice-items")
+	route := api.Group("/api/v1/public/invoice-items")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)
