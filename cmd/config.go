@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -28,16 +27,16 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
 		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
 	}
-	if conf.ProjectPath == "" {
-		dir, err := os.Getwd()
-		if err != nil {
-			return conf, fmt.Errorf("config: could not get project path")
-		}
-
-		conf.ProjectPath = dir
+	if !conf.IsProjectPathEmpty() {
+		return conf, nil
 	}
 
-	log.Println("Configuration file has been loaded.")
+	dir, err := os.Getwd()
+	if err != nil {
+		return conf, fmt.Errorf("config: could not get project path, %w", err)
+	}
+
+	conf.ProjectPath = dir
 
 	return conf, nil
 }

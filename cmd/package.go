@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/edteamlat/go-wizard/domain/runner"
 	"github.com/spf13/cobra"
 )
 
@@ -9,7 +10,7 @@ var packageCmd = &cobra.Command{
 	Use:   "package",
 	Short: "Adds a package to the project.",
 	Run: func(cmd *cobra.Command, args []string) {
-		run(cmd, args, "")
+		run(cmd, args, runner.NewPackage)
 	},
 }
 

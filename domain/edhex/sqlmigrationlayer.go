@@ -8,13 +8,16 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const (
-	sqlMigrationTemplateName = "sqlmigration.gotpl"
-)
-
 const SQLMigrationLayerName = "sqlmigration_postgres"
 
 const sqlMigrationFolder = "sqlmigration"
+
+var sqlmigrationAddActionTemplates = model.Templates{
+	{
+		Name: "sqlmigration.gotpl",
+		Path: sqlMigrationFolder,
+	},
+}
 
 type sqlMigrationLayer struct {
 	template UseCaseTemplate
@@ -34,23 +37,19 @@ func (d sqlMigrationLayer) Init(data model.Layer) error {
 }
 
 func (d sqlMigrationLayer) Create(data model.Layer) error {
-	if err := d.createSQLMigration(data); err != nil {
+	d.setFilenameToTemplates(sqlmigrationAddActionTemplates, data.Table)
+
+	if err := bulkFromTemplates(d.template, d.storage, sqlmigrationAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-sqlmigration: %w", err)
 	}
 
 	return nil
 }
 
-func (d sqlMigrationLayer) createSQLMigration(data model.Layer) error {
-	if err := createFromTemplate(d.template, d.storage, model.Template{
-		Name:  sqlMigrationTemplateName,
-		Path:  data.GetPath(sqlMigrationFolder, getFilename(data.Table), false),
-		Layer: data,
-	}); err != nil {
-		return err
+func (d sqlMigrationLayer) setFilenameToTemplates(templates model.Templates, table string) {
+	for k := range templates {
+		templates[k].Filename = getFilename(table)
 	}
-
-	return nil
 }
 
 func getFilename(table string) string {

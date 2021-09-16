@@ -14,12 +14,15 @@ const edhexArchitecture = "edhex"
 // UseCase use case to generate a layer
 type UseCase interface {
 	Init(m model.Layer) error
-	Create(m model.Layer) error
-	Override(m model.Layer) error
-	AddField(m model.Layer) error
 
 	SuccessfulMsg(prefixCount string)
 	FailureMsg(prefixCount string, err error)
+}
+
+type UseCasePackage interface {
+	Create(m model.Layer) error
+	Override(m model.Layer) error
+	AddField(m model.Layer) error
 }
 
 // UseCaseLayers slice of useCaseLayers

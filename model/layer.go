@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+type ModuleName string
+
+func (m ModuleName) GetProjectName() string {
+	moduleSplit := strings.Split(string(m), "/")
+	return moduleSplit[len(moduleSplit)-1]
+}
+
 type Layer struct {
 	Model        string
 	Table        string
@@ -16,7 +23,7 @@ type Layer struct {
 	ProjectPath string
 
 	// ModuleName is used to build the imports
-	ModuleName string
+	ModuleName ModuleName
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
@@ -58,9 +65,4 @@ func (l *Layer) GetPath(layerName, filename string, withPackage bool) string {
 	}
 
 	return filepath.Join(l.ProjectPath, layerName, filename)
-}
-
-func (l Layer) GetProjectName() string {
-	moduleSplit := strings.Split(l.ModuleName, "/")
-	return moduleSplit[len(moduleSplit)-1]
 }

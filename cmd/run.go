@@ -32,10 +32,10 @@ func run(cmd *cobra.Command, args []string, action runner.Action) {
 	}
 	conf.Architecture = architecture
 	if !isEmpty(moduleName) {
-		if err := conf.SetInitPath(moduleName); err != nil {
+		if err := conf.SetInitPath(model.ModuleName(moduleName)); err != nil {
 			log.Fatal(err)
 		}
-		conf.ModuleName = moduleName
+		conf.ModuleName = model.ModuleName(moduleName)
 	}
 
 	layerData := model.NewLayer(conf)

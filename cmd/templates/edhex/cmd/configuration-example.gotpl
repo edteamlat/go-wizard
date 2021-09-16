@@ -1,10 +1,6 @@
 {
 	"is_https": false,
 	"server_port": 1101,
-	"cert_pem": "./certificates/cert.pem",
-	"key_pem": "./certificates/key.pem",
-	"private_file_sign": "./certificates/app.rsa",
-	"public_file_sign": "./certificates/app.rsa.pub",
 	"log_folder": "./logs",
 	"allowed_origins": [
 		"*"

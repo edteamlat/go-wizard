@@ -8,8 +8,6 @@ type Configuration struct {
 	LogPretty       bool     `json:"log_pretty"`
 	CertPem         string   `json:"cert_pem"`
 	KeyPem          string   `json:"key_pem"`
-	PublicFileSign  string   `json:"public_file_sign"`
-	PrivateFileSign string   `json:"private_file_sign"`
 	AllowedOrigins  []string `json:"allowed_origins"`
 	AllowedMethods  []string `json:"allowed_methods"`
 	Database        Database `json:"database"`

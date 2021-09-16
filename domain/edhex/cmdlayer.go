@@ -59,8 +59,10 @@ func NewCMDLayer(template UseCaseTemplate, storage Storage) cmdLayer {
 }
 
 func (d cmdLayer) Init(data model.Layer) error {
-	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "cmd")); err != nil {
-		return fmt.Errorf("edhex-cmdlayer: %w", err)
+	if err := d.createDirs(data); err != nil {
+		if err != nil {
+			return fmt.Errorf("edhex-cmdlayer: %w", err)
+		}
 	}
 
 	if err := bulkFromTemplates(d.template, d.storage, cmdInitActionTemplates, data); err != nil {
@@ -70,11 +72,21 @@ func (d cmdLayer) Init(data model.Layer) error {
 	return nil
 }
 
-func (d cmdLayer) Create(data model.Layer) error { return nil }
+func (d cmdLayer) createDirs(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "cmd")); err != nil {
+		return err
+	}
 
-func (d cmdLayer) Override(m model.Layer) error { return nil }
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "cmd", "certificates")); err != nil {
+		return err
+	}
 
-func (d cmdLayer) AddField(m model.Layer) error { return nil }
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "cmd", "logs")); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (d cmdLayer) SuccessfulMsg(prefixCount string) {
 	fmt.Printf("%s cmd layer generated ✅\n", prefixCount)

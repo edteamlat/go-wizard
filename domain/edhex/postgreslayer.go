@@ -3,18 +3,21 @@ package edhex
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/edteamlat/go-wizard/model"
-)
-
-const (
-	postgresTemplateName = "postgres.gotpl"
 )
 
 const PostgresLayerName = "storage_postgres"
 
 const postgresFolder = "infrastructure/postgres"
+
+var postgresAddActionTemplates = model.Templates{
+	{
+		Name:     "postgres.gotpl",
+		Filename: "%s.go", // the name will be the name of the package
+		Path:     postgresFolder,
+	},
+}
 
 type postgresLayer struct {
 	template UseCaseTemplate
@@ -34,22 +37,8 @@ func (d postgresLayer) Init(data model.Layer) error {
 }
 
 func (d postgresLayer) Create(data model.Layer) error {
-	if err := d.createPostgres(data); err != nil {
+	if err := bulkFromTemplates(d.template, d.storage, postgresAddActionTemplates, data); err != nil {
 		return fmt.Errorf("edhex-postgreslayer: %w", err)
-	}
-
-	return nil
-}
-
-func (d postgresLayer) createPostgres(data model.Layer) error {
-	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-
-	if err := createFromTemplate(d.template, d.storage, model.Template{
-		Name:  postgresTemplateName,
-		Path:  data.GetPath(postgresFolder, filename, true),
-		Layer: data,
-	}); err != nil {
-		return err
 	}
 
 	return nil

@@ -60,7 +60,7 @@ func (d rootLayer) Init(data model.Layer) error {
 }
 
 func (d rootLayer) runCommands(data model.Layer) error {
-	if err := d.CDToProject(data.GetProjectName()); err != nil {
+	if err := d.CDToProject(data.ModuleName.GetProjectName()); err != nil {
 		return err
 	}
 
@@ -68,7 +68,7 @@ func (d rootLayer) runCommands(data model.Layer) error {
 		return err
 	}
 
-	if err := d.initGoMod(data.ModuleName); err != nil {
+	if err := d.initGoMod(string(data.ModuleName)); err != nil {
 		return err
 	}
 
@@ -90,12 +90,6 @@ func (d rootLayer) initGit() error {
 
 	return cmd.Run()
 }
-
-func (d rootLayer) Create(data model.Layer) error { return nil }
-
-func (d rootLayer) Override(m model.Layer) error { return nil }
-
-func (d rootLayer) AddField(m model.Layer) error { return nil }
 
 func (d rootLayer) SuccessfulMsg(prefixCount string) {
 	fmt.Printf("%s root layer generated ✅\n", prefixCount)
