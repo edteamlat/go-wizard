@@ -44,8 +44,7 @@ my-app
 │   ├── logger.go
 │   ├── main.go
 │   └── remoteconfig.go
-├── domain
-├── go.mod
+├── domain/
 ├── infrastructure
 │   ├── handler
 │   │   ├── request
@@ -56,7 +55,7 @@ my-app
 │   │   │   ├── message.go
 │   │   │   └── response.go
 │   │   └── router.go
-│   └── postgres
+│   └── postgres/
 ├── model
 │   ├── config.go
 │   ├── error.go
@@ -68,6 +67,8 @@ my-app
 │   ├── remoteconfig.go
 │   └── router.go
 ├── README.md
+├── go.mod
+├── go.sum
 ├── sqlmigration
 └── wizard-config.yaml
 ```
@@ -141,7 +142,7 @@ go-wizard add package
 
 With the config file of above this command will generate the following:
 ```bash
-├── cmd
+├── cmd/
 ├── domain
 │   └── userrole
 │       ├── usecase.go
