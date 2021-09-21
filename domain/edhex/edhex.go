@@ -12,5 +12,6 @@ type UseCaseTemplate interface {
 }
 
 type Storage interface {
+	CreateDir(dir string) error
 	Save(path string, data bytes.Buffer) error
 }

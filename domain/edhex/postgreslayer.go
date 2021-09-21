@@ -1,20 +1,23 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
-	"strings"
+	"path/filepath"
 
 	"github.com/edteamlat/go-wizard/model"
-)
-
-const (
-	postgresTemplateName = "postgres.gotpl"
 )
 
 const PostgresLayerName = "storage_postgres"
 
 const postgresFolder = "infrastructure/postgres"
+
+var postgresAddActionTemplates = model.Templates{
+	{
+		Name:     "postgres.gotpl",
+		Filename: "%s.go", // the name will be the name of the package
+		Path:     postgresFolder,
+	},
+}
 
 type postgresLayer struct {
 	template UseCaseTemplate
@@ -25,27 +28,17 @@ func NewPostgresLayer(template UseCaseTemplate, storage Storage) postgresLayer {
 	return postgresLayer{template: template, storage: storage}
 }
 
-func (d postgresLayer) Init(m model.Layer) error {
-	return nil
-}
-
-func (d postgresLayer) Create(data model.Layer) error {
-	if err := d.createPostgres(data); err != nil {
+func (d postgresLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "infrastructure", "postgres")); err != nil {
 		return fmt.Errorf("edhex-postgreslayer: %w", err)
 	}
 
 	return nil
 }
 
-func (d postgresLayer) createPostgres(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, postgresTemplateName, data); err != nil {
-		return err
-	}
-
-	filename := fmt.Sprintf("%s.go", strings.ToLower(data.Model))
-	if err := d.storage.Save(data.GetPath(postgresFolder, filename, false), fileBuf); err != nil {
-		return err
+func (d postgresLayer) Create(data model.Layer) error {
+	if err := bulkFromTemplates(d.template, d.storage, postgresAddActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-postgreslayer: %w", err)
 	}
 
 	return nil
@@ -57,4 +50,12 @@ func (d postgresLayer) Override(m model.Layer) error {
 
 func (d postgresLayer) AddField(m model.Layer) error {
 	return nil
+}
+
+func (d postgresLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s postgres layer generated ✅\n", prefixCount)
+}
+
+func (d postgresLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s postgres layer failed 🚨, %s\n", prefixCount, err.Error())
 }

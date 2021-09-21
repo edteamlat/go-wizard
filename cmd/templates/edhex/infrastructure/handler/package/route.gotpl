@@ -4,12 +4,12 @@
 package {{ $package }}
 
 import (
-	"database/sql"
-
 	"{{ .ModuleName }}/model"
 	"{{ .ModuleName }}/infrastructure/handler/response"
 	"{{ .ModuleName }}/domain/{{ $package }}"
 	{{ $package }}Storage "{{ .ModuleName }}/infrastructure/postgres/{{ $package }}"
+
+	"github.com/labstack/echo/v4"
 )
 
 // NewRouter returns a router to handle model.{{ .Model }} requests
@@ -18,9 +18,9 @@ func NewRouter(specification model.RouterSpecification) {
 
 	// build middlewares to validate permissions on the routes
 
-	adminRoutes(specification, handler)
-	privateRoutes(specification, handler)
-	publicRoutes(specification, handler)
+	adminRoutes(specification.Api, handler)
+	privateRoutes(specification.Api, handler)
+	publicRoutes(specification.Api, handler)
 }
 
 func buildHandler(specification model.RouterSpecification) handler {
@@ -56,7 +56,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/{{ $routeResource }}")
+	route := api.Group("/api/v1/public/{{ $routeResource }}")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)

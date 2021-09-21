@@ -10,7 +10,8 @@ import (
 	"{{ .ModuleName }}/model"
 
 	sqlutil "github.com/alexyslozada/gosqlutils"
-	"sqlbuilder"
+	"github.com/AJRDRGZ/db-query-builder/models"
+	"github.com/AJRDRGZ/db-query-builder/postgres"
 )
 
 const table = "{{ .Table }}"
@@ -19,16 +20,16 @@ var fields = []string{
 	{{ printFieldsWithoutDefaults .Fields }}
 }
 
-var constraints = sqlbuilder.Constraints{
+var constraints = postgres.Constraints{
 	// here you will add all constraints that you want to controle, ex:
 	// "users_nickname_uk":                model.ErrUsersNicknameUK,
 }
 
 var (
-	psqlInsert                  = sqlbuilder.BuildSQLInsert(table, fields)
-	psqlUpdate                  = sqlbuilder.BuildSQLUpdateByID(table, fields)
+	psqlInsert                  = postgres.BuildSQLInsert(table, fields)
+	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
 	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
-	psqlGetAll                  = sqlbuilder.BuildSQLSelect(table, fields)
+	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
 )
 
 // {{ .Model }} struct that implement the interface domain.{{ $packageName }}.Storage
@@ -43,7 +44,7 @@ func New(db *sql.DB) {{ .Model }} {
 
 // Create creates a model.{{ .Model }}
 func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
-	stmt, err := e.db.Prepare(psqlInsert)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlInsert)
 	if err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
 		{{ printStorageFieldsWithoutDefaults .Fields }}
 	).Scan(&m.ID, &m.CreatedAt)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
@@ -61,7 +62,7 @@ func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
 
 // Update this method updates a model.{{ .Model }} by id
 func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
-	stmt, err := e.db.Prepare(psqlUpdate)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}
@@ -72,7 +73,7 @@ func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
 		m.ID,
 	)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
@@ -80,7 +81,7 @@ func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
 
 // Delete deletes a model.{{ .Model }} by id
 func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
-	stmt, err := e.db.Prepare(psqlDelete)
+	stmt, err := {{ $receiverName }}.db.Prepare(psqlDelete)
 	if err != nil {
 		return err
 	}
@@ -88,37 +89,37 @@ func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
 
 	_, err = stmt.Exec(ID)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
 }
 
 // GetWhere gets an ordered model.{{ .Model }} with filters
-func ({{ $receiverName }} {{ .Model }}) GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func ({{ $receiverName }} {{ .Model }}) GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error) {
+	conditions, args := postgres.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
-	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {
 		return model.{{ .Model }}{}, err
 	}
 	defer stmt.Close()
 
-	return e.scanRow(stmt.QueryRow(args...))
+	return {{ $receiverName }}.scanRow(stmt.QueryRow(args...))
 }
 
 // GetAllWhere gets all model.{{ .Model }}s with Fields
-func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FiltersSpecification) (model.{{ $slice }}, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification models.FieldsSpecification) (model.{{ $slice }}, error) {
+	conditions, args := postgres.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
-	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
-	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
+	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
+	query += " " + postgres.BuildSQLPagination(specification.Pagination)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification model.FiltersS
 
 	ms := model.{{ $slice }}{}
 	for rows.Next() {
-		m, err := e.scanRow(rows)
+		m, err := {{ $receiverName }}.scanRow(rows)
 		if err != nil {
 			return nil, err
 		}

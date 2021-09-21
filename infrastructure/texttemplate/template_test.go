@@ -85,6 +85,8 @@ func getDomainLayerTests() testTables {
 
 import (
 	"github.com/edteamlat/go-wizard/model"
+
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 type UseCase interface {
@@ -92,19 +94,17 @@ type UseCase interface {
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.User, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
+	GetWhere(specification models.FieldsSpecification) (model.User, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.Users, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.User) error
 	Update(m *model.User) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.User, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Users, error)
+	GetWhere(specification models.FieldsSpecification) (model.User, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.Users, error)
 }
 `,
 			wantErr: false,
@@ -127,6 +127,8 @@ type Storage interface {
 
 import (
 	"github.com/edteamlat/go-wizard/model"
+
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 type UseCase interface {
@@ -134,19 +136,17 @@ type UseCase interface {
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
+	GetWhere(specification models.FieldsSpecification) (model.UserLogin, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.UserLogins, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.UserLogin) error
 	Update(m *model.UserLogin) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserLogin, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserLogins, error)
+	GetWhere(specification models.FieldsSpecification) (model.UserLogin, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.UserLogins, error)
 }
 `,
 			wantErr: false,
@@ -169,6 +169,8 @@ type Storage interface {
 
 import (
 	"github.com/edteamlat/go-wizard/model"
+
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 type UseCase interface {
@@ -176,19 +178,17 @@ type UseCase interface {
 	Update(m *model.UserRole) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
+	GetWhere(specification models.FieldsSpecification) (model.UserRole, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.UserRoles, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.UserRole) error
 	Update(m *model.UserRole) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.UserRole, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.UserRoles, error)
+	GetWhere(specification models.FieldsSpecification) (model.UserRole, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.UserRoles, error)
 }
 `,
 			wantErr: false,
@@ -211,6 +211,8 @@ type Storage interface {
 
 import (
 	"github.com/edteamlat/go-wizard/model"
+
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 type UseCase interface {
@@ -218,19 +220,17 @@ type UseCase interface {
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.Role, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
+	GetWhere(specification models.FieldsSpecification) (model.Role, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.Roles, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.Role) error
 	Update(m *model.Role) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.Role, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.Roles, error)
+	GetWhere(specification models.FieldsSpecification) (model.Role, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.Roles, error)
 }
 `,
 			wantErr: false,
@@ -270,6 +270,7 @@ import (
 	"fmt"
 
 	"github.com/edteamlat/go-wizard/model"
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 var allowedFieldsForQuery = []string{
@@ -337,8 +338,8 @@ func (u User) Delete(ID uint) error {
 }
 
 // GetWhere returns a model.User according to filters and sorts
-func (u User) GetWhere(specification model.FiltersSpecification) (model.User, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func (u User) GetWhere(specification models.FieldsSpecification) (model.User, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return model.User{}, fmt.Errorf("user: %w", err)
 	}
 
@@ -355,8 +356,8 @@ func (u User) GetWhere(specification model.FiltersSpecification) (model.User, er
 }
 
 // GetAllWhere returns a model.Users according to filters and sorts
-func (u User) GetAllWhere(specification model.FiltersSpecification) (model.Users, error) {
-	if err := specification.Fields.ValidateNames(allowedFieldsForQuery); err != nil {
+func (u User) GetAllWhere(specification models.FieldsSpecification) (model.Users, error) {
+	if err := specification.Filters.ValidateNames(allowedFieldsForQuery); err != nil {
 		return nil, fmt.Errorf("user: %w", err)
 	}
 
@@ -679,12 +680,12 @@ func getHandlerRouteLayerTests() testTables {
 			wantWr: fmt.Sprintf(`package invoice
 
 import (
-	"database/sql"
-
 	"%[1]s/model"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/domain/%[2]s"
 	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+
+	"github.com/labstack/echo/v4"
 )
 
 // NewRouter returns a router to handle model.Invoice requests
@@ -693,9 +694,9 @@ func NewRouter(specification model.RouterSpecification) {
 
 	// build middlewares to validate permissions on the routes
 
-	adminRoutes(specification, handler)
-	privateRoutes(specification, handler)
-	publicRoutes(specification, handler)
+	adminRoutes(specification.Api, handler)
+	privateRoutes(specification.Api, handler)
+	publicRoutes(specification.Api, handler)
 }
 
 func buildHandler(specification model.RouterSpecification) handler {
@@ -731,7 +732,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/invoices")
+	route := api.Group("/api/v1/public/invoices")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)
@@ -755,12 +756,12 @@ func publicRoutes(api *echo.Echo, h handler) {
 			wantWr: fmt.Sprintf(`package invoiceitem
 
 import (
-	"database/sql"
-
 	"%[1]s/model"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/domain/%[2]s"
 	%[2]sStorage "%[1]s/infrastructure/postgres/%[2]s"
+
+	"github.com/labstack/echo/v4"
 )
 
 // NewRouter returns a router to handle model.InvoiceItem requests
@@ -769,9 +770,9 @@ func NewRouter(specification model.RouterSpecification) {
 
 	// build middlewares to validate permissions on the routes
 
-	adminRoutes(specification, handler)
-	privateRoutes(specification, handler)
-	publicRoutes(specification, handler)
+	adminRoutes(specification.Api, handler)
+	privateRoutes(specification.Api, handler)
+	publicRoutes(specification.Api, handler)
 }
 
 func buildHandler(specification model.RouterSpecification) handler {
@@ -807,7 +808,7 @@ func privateRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc
 
 // publicRoutes handle the routes that not requires a validation of any kind to be use
 func publicRoutes(api *echo.Echo, h handler) {
-	route := api.Group("/api/v1/invoice-items")
+	route := api.Group("/api/v1/public/invoice-items")
 
 	route.GET("", h.GetAllWhere)
 	route.GET("/:id", h.GetWhere)
@@ -839,15 +840,12 @@ func getHandlerLayerTests() testTables {
 			wantWr: fmt.Sprintf(`package %[2]s
 
 import (
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"strings"
-
-	"%[1]s/%[2]s"
+	"%[1]s/domain/%[2]s"
 	"%[1]s/infrastructure/handler/request"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type handler struct {
@@ -855,8 +853,8 @@ type handler struct {
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.UseCase) handler {
-	return handler{useCase: useCase}
+func newHandler(useCase %[2]s.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
 }
 
 // Create handles the creation of a model.%[3]s
@@ -912,8 +910,6 @@ func (h handler) Delete(c echo.Context) error {
 
 // GetWhere handles the search of a model.%[3]s
 func (h handler) GetWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -929,8 +925,6 @@ func (h handler) GetWhere(c echo.Context) error {
 
 // GetAllWhere handles the search of all model.%[3]s
 func (h handler) GetAllWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -962,15 +956,12 @@ func (h handler) GetAllWhere(c echo.Context) error {
 			wantWr: fmt.Sprintf(`package %[2]s
 
 import (
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"strings"
-
-	"%[1]s/%[2]s"
+	"%[1]s/domain/%[2]s"
 	"%[1]s/infrastructure/handler/request"
 	"%[1]s/infrastructure/handler/response"
 	"%[1]s/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type handler struct {
@@ -978,8 +969,8 @@ type handler struct {
 	response response.Responser
 }
 
-func newHandler(useCase %[2]s.UseCase) handler {
-	return handler{useCase: useCase}
+func newHandler(useCase %[2]s.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
 }
 
 // Create handles the creation of a model.%[3]s
@@ -1035,8 +1026,6 @@ func (h handler) Delete(c echo.Context) error {
 
 // GetWhere handles the search of a model.%[3]s
 func (h handler) GetWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -1052,8 +1041,6 @@ func (h handler) GetWhere(c echo.Context) error {
 
 // GetAllWhere handles the search of all model.%[3]s
 func (h handler) GetAllWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -1131,7 +1118,8 @@ import (
 	"%[1]s/model"
 
 	sqlutil "github.com/alexyslozada/gosqlutils"
-	"sqlbuilder"
+	"github.com/AJRDRGZ/db-query-builder/models"
+	"github.com/AJRDRGZ/db-query-builder/postgres"
 )
 
 const table = "specialities"
@@ -1142,16 +1130,16 @@ var fields = []string{
 	"subtitle",
 }
 
-var constraints = sqlbuilder.Constraints{
+var constraints = postgres.Constraints{
 	// here you will add all constraints that you want to controle, ex:
 	// "users_nickname_uk":                model.ErrUsersNicknameUK,
 }
 
 var (
-	psqlInsert                  = sqlbuilder.BuildSQLInsert(table, fields)
-	psqlUpdate                  = sqlbuilder.BuildSQLUpdateByID(table, fields)
+	psqlInsert                  = postgres.BuildSQLInsert(table, fields)
+	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
 	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
-	psqlGetAll                  = sqlbuilder.BuildSQLSelect(table, fields)
+	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
 )
 
 // %[3]s struct that implement the interface domain.%[2]s.Storage
@@ -1166,7 +1154,7 @@ func New(db *sql.DB) %[3]s {
 
 // Create creates a model.%[3]s
 func (%[4]s %[3]s) Create(m *model.%[3]s) error {
-	stmt, err := e.db.Prepare(psqlInsert)
+	stmt, err := %[4]s.db.Prepare(psqlInsert)
 	if err != nil {
 		return err
 	}
@@ -1178,7 +1166,7 @@ func (%[4]s %[3]s) Create(m *model.%[3]s) error {
 	sqlutil.StringToNull(m.Subtitle),
 	).Scan(&m.ID, &m.CreatedAt)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
@@ -1186,7 +1174,7 @@ func (%[4]s %[3]s) Create(m *model.%[3]s) error {
 
 // Update this method updates a model.%[3]s by id
 func (%[4]s %[3]s) Update(m *model.%[3]s) error {
-	stmt, err := e.db.Prepare(psqlUpdate)
+	stmt, err := %[4]s.db.Prepare(psqlUpdate)
 	if err != nil {
 		return err
 	}
@@ -1199,7 +1187,7 @@ func (%[4]s %[3]s) Update(m *model.%[3]s) error {
 		m.ID,
 	)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
@@ -1207,7 +1195,7 @@ func (%[4]s %[3]s) Update(m *model.%[3]s) error {
 
 // Delete deletes a model.%[3]s by id
 func (%[4]s %[3]s) Delete(ID uint) error {
-	stmt, err := e.db.Prepare(psqlDelete)
+	stmt, err := %[4]s.db.Prepare(psqlDelete)
 	if err != nil {
 		return err
 	}
@@ -1215,37 +1203,37 @@ func (%[4]s %[3]s) Delete(ID uint) error {
 
 	_, err = stmt.Exec(ID)
 	if err != nil {
-		return sqlbuilder.CheckConstraint(constraints, err)
+		return postgres.CheckConstraint(constraints, err)
 	}
 
 	return nil
 }
 
 // GetWhere gets an ordered model.%[3]s with filters
-func (%[4]s %[3]s) GetWhere(specification model.FiltersSpecification) (model.%[3]s, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func (%[4]s %[3]s) GetWhere(specification models.FieldsSpecification) (model.%[3]s, error) {
+	conditions, args := postgres.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
-	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
+	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
 		return model.%[3]s{}, err
 	}
 	defer stmt.Close()
 
-	return e.scanRow(stmt.QueryRow(args...))
+	return %[4]s.scanRow(stmt.QueryRow(args...))
 }
 
 // GetAllWhere gets all model.%[3]ss with Fields
-func (%[4]s %[3]s) GetAllWhere(specification model.FiltersSpecification) (model.Specialities, error) {
-	conditions, args := sqlbuilder.BuildSQLWhere(specification.Fields)
+func (%[4]s %[3]s) GetAllWhere(specification models.FieldsSpecification) (model.Specialities, error) {
+	conditions, args := postgres.BuildSQLWhere(specification.Filters)
 	query := psqlGetAll + " " + conditions
 
-	query += " " + sqlbuilder.BuildSQLOrderBy(specification.Sorts)
-	query += " " + sqlbuilder.BuildSQLPagination(specification.Pagination)
+	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
+	query += " " + postgres.BuildSQLPagination(specification.Pagination)
 
-	stmt, err := e.db.Prepare(query)
+	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
@@ -1259,7 +1247,7 @@ func (%[4]s %[3]s) GetAllWhere(specification model.FiltersSpecification) (model.
 
 	ms := model.Specialities{}
 	for rows.Next() {
-		m, err := e.scanRow(rows)
+		m, err := %[4]s.scanRow(rows)
 		if err != nil {
 			return nil, err
 		}

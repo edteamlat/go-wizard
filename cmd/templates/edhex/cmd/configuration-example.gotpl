@@ -1,0 +1,23 @@
+{
+	"is_https": false,
+	"server_port": 1101,
+	"log_folder": "./logs",
+	"allowed_origins": [
+		"*"
+	],
+	"allowed_methods": [
+		"POST",
+		"DELETE",
+		"PUT",
+		"GET"
+	],
+	"database": {
+		"engine": "postgres",
+		"server": "127.0.0.1",
+		"port": 5432,
+		"user": "edteam",
+		"password": "edteam",
+		"name": "cursos",
+		"sslmode": "disable"
+	}
+}

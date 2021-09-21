@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"embed"
+	"log"
 	"text/template"
 
 	"github.com/edteamlat/go-wizard/domain/layer"
@@ -10,7 +11,6 @@ import (
 	"github.com/edteamlat/go-wizard/infrastructure/filesystem"
 	"github.com/edteamlat/go-wizard/infrastructure/texttemplate"
 	"github.com/edteamlat/go-wizard/model"
-	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
 )
 
@@ -18,17 +18,24 @@ import (
 var templatesFS embed.FS
 
 func run(cmd *cobra.Command, args []string, action runner.Action) {
-	configPath := cmd.Flag(configPathFlag)
-	architecture := cmd.Flag(architectureFlag)
+	configPath := cmd.Flag(configPathFlag).Value.String()
+	architecture := cmd.Flag(architectureFlag).Value.String()
 
-	conf, err := readConfig(configPath.Value.String())
+	moduleName := ""
+	if action == runner.Init {
+		moduleName = cmd.Flag(moduleFlag).Value.String()
+	}
+
+	conf, err := readConfig(configPath, action)
 	if err != nil {
 		log.Fatal(err)
 	}
-	conf.Architecture = architecture.Value.String()
-
-	if action == runner.Init {
-		conf.AddDefaultInitLayers()
+	conf.Architecture = architecture
+	if !isEmpty(moduleName) {
+		if err := conf.SetInitPath(model.ModuleName(moduleName)); err != nil {
+			log.Fatal(err)
+		}
+		conf.ModuleName = model.ModuleName(moduleName)
 	}
 
 	layerData := model.NewLayer(conf)
@@ -71,4 +78,8 @@ func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 	templateUseCase := texttemplate.NewTemplate(tpl)
 
 	return layer.GetUseCaseLayersFromConf(conf, templateUseCase, fileSystemUseCase)
+}
+
+func isEmpty(s string) bool {
+	return s == ""
 }

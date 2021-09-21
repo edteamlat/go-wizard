@@ -7,6 +7,7 @@ import (
 const (
 	architectureFlag = "architecture"
 	configPathFlag   = "config-path"
+	moduleFlag       = "module"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -35,5 +36,5 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().StringP(architectureFlag, "a", "edhex", "Indicates the architecture that will be use. By default it uses `edhex`.")
-	rootCmd.PersistentFlags().StringP(configPathFlag, "c", "config.yaml", "Indicates the path of the config file. By default it uses `./config.yaml`.")
+	rootCmd.PersistentFlags().StringP(configPathFlag, "c", "./wizard-config.yaml", "Indicates the path of the config file. By default it uses `./config.yaml`.")
 }

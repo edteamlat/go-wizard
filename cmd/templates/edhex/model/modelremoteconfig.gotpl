@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // RemoteConfig is used to manage configurations that are remote, ej: in a table of a database
 type RemoteConfig interface {
 	GetString(name string) (string, bool)

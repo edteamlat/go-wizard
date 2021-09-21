@@ -9,9 +9,9 @@ func TestValidateNil(t *testing.T) {
 		Model   interface{}
 		WantErr error
 	}{
-		{Model: FiltersSpecification{}, WantErr: nil},
-		{Model: &FiltersSpecification{}, WantErr: nil},
-		{Model: FiltersSpecification{}, WantErr: nil},
+		{Model: Configuration{}, WantErr: nil},
+		{Model: &Configuration{}, WantErr: nil},
+		{Model: Configuration{}, WantErr: nil},
 		{Model: nil, WantErr: ErrNilPointer},
 	}
 

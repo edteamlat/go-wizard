@@ -4,6 +4,8 @@ package {{ parseToLower .Model }}
 
 import (
 	"{{ .ModuleName }}/model"
+
+	"github.com/AJRDRGZ/db-query-builder/models"
 )
 
 type UseCase interface {
@@ -11,17 +13,15 @@ type UseCase interface {
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
+	GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.{{ $modelSlice }}, error)
 }
 
 type Storage interface {
-	GetTx() (model.Transaction, error)
-
 	Create(m *model.{{ .Model }}) error
 	Update(m *model.{{ .Model }}) error
 	Delete(ID uint) error
 
-	GetWhere(specification model.FiltersSpecification) (model.{{ .Model }}, error)
-	GetAllWhere(specification model.FiltersSpecification) (model.{{ $modelSlice }}, error)
+	GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error)
+	GetAllWhere(specification models.FieldsSpecification) (model.{{ $modelSlice }}, error)
 }

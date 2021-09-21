@@ -7,9 +7,10 @@ import (
 type Action string
 
 const (
-	Override Action = "override"
-	NewField Action = "new-field"
-	Init     Action = "init"
+	Override   Action = "override"
+	NewField   Action = "new-field"
+	Init       Action = "init"
+	NewPackage Action = "new-package"
 )
 
 type UseCase interface {

@@ -3,14 +3,20 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
+	"os"
 
-	"github.com/edteamlat/go-wizard/model"
 	"gopkg.in/yaml.v3"
+
+	"github.com/edteamlat/go-wizard/domain/runner"
+	"github.com/edteamlat/go-wizard/model"
 )
 
-func readConfig(filename string) (model.Config, error) {
-	log.Printf("Loading configuration file from %s...", filename)
+func readConfig(filename string, action runner.Action) (model.Config, error) {
+	if action == runner.Init {
+		conf := model.Config{}
+		conf.AddDefaultInitLayers()
+		return conf, nil
+	}
 
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -21,8 +27,16 @@ func readConfig(filename string) (model.Config, error) {
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
 		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
 	}
+	if !conf.IsProjectPathEmpty() {
+		return conf, nil
+	}
 
-	log.Println("Configuration file has been loaded.")
+	dir, err := os.Getwd()
+	if err != nil {
+		return conf, fmt.Errorf("config: could not get project path, %w", err)
+	}
+
+	conf.ProjectPath = dir
 
 	return conf, nil
 }

@@ -7,6 +7,9 @@ import (
 	"runtime"
 
 	"{{ .ModuleName }}/model"
+	"{{ .ModuleName }}/infrastructure/handler/request"
+
+	"github.com/labstack/echo/v4"
 )
 
 // errorTypes
@@ -49,7 +52,7 @@ func New(logger model.Logger) API {
 	return API{logger: logger}
 }
 
-// OK returns an sucessfull message response
+// OK returns a successfully message response
 func (a API) OK(data interface{}) (int, model.MessageResponse) {
 	return http.StatusOK, model.MessageResponse{
 		Data:     data,
@@ -57,7 +60,7 @@ func (a API) OK(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// Created returns an created message response
+// Created returns a created message response
 func (a API) Created(data interface{}) (int, model.MessageResponse) {
 	return http.StatusCreated, model.MessageResponse{
 		Data:     data,
@@ -73,7 +76,7 @@ func (a API) Updated(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// Deleted returns an deleted message response
+// Deleted returns a deleted message response
 func (a API) Deleted(data interface{}) (int, model.MessageResponse) {
 	return http.StatusOK, model.MessageResponse{
 		Data:     data,
@@ -81,7 +84,7 @@ func (a API) Deleted(data interface{}) (int, model.MessageResponse) {
 	}
 }
 
-// NotFound returns an not found message response
+// NotFound returns a not found message response
 func (a API) NotFound() (int, string) {
 	return http.StatusNotFound, ""
 }
@@ -99,7 +102,7 @@ func (a API) BindFailed(c echo.Context, err error) error {
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho("c.Bind()")
 
-	a.logger.Warning("%s", e.Error())
+	a.logger.Warnf("%s", e.Error())
 	return e
 }
 
@@ -116,10 +119,9 @@ func (a API) UnexpectedError(c echo.Context, who string, err error) *model.Error
 	e.SetQueryParams(c.QueryParams().Encode())
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho(who)
-	e.SetEmployerID(request.GetEmployerID(c))
 	e.SetUserID(request.GetUserID(c))
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 
@@ -139,11 +141,11 @@ func (a API) ErrorHandled(c echo.Context, who string, e *model.Error) *model.Err
 	}
 
 	if e.StatusHTTP() < http.StatusInternalServerError {
-		a.logger.Warning("%s", e.Error())
+		a.logger.Warnf("%s", e.Error())
 		return e
 	}
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 
@@ -157,15 +159,14 @@ func (a API) AuthorizationError(c echo.Context, who string, e *model.Error, http
 	e.SetWhere(fmt.Sprintf("%s:%d", runtime.FuncForPC(fun).Name(), line))
 	e.SetWho(who)
 	e.SetStatusHTTP(httpStatusCode)
-	e.SetEmployerID(request.GetEmployerID(c))
 	e.SetUserID(request.GetUserID(c))
 
 	if e.StatusHTTP() < http.StatusInternalServerError {
-		a.logger.Warning("%s", e.Error())
+		a.logger.Warnf("%s", e.Error())
 		return e
 	}
 
-	a.logger.Error("%s", e.Error())
+	a.logger.Errorf("%s", e.Error())
 	return e
 }
 

@@ -1,7 +1,0 @@
-package main
-
-// loadSignatures loads the signatures needed to sign jwt
-func loadSignatures(conf Configuration, logger model.Logger) {
-	// implement me
-}
-

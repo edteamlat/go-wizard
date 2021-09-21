@@ -27,5 +27,7 @@ By default will use edhex if no arquitecture is specified.
 }
 
 func init() {
+	initCmd.Flags().StringP(moduleFlag, "m", "", "Indicates the module name of the project.")
+
 	rootCmd.AddCommand(initCmd)
 }

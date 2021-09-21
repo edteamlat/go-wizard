@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 
-	"{{ .ModuleName }}/handler/response"
-	"{{ .ModuleName }}/handler"
+	"{{ .ModuleName }}/model"
+	"{{ .ModuleName }}/infrastructure/handler/response"
+	"{{ .ModuleName }}/infrastructure/handler"
 )
 
 
@@ -14,10 +14,11 @@ func main() {
 	config := newConfiguration("./configuration.json")
 	api := newHTTP(config, response.HTTPErrorHandler)
 	logger := newLogger(config.LogFolder, false)
-	db := newDBConnection(config)
-	remoteConfig := newRemoteConfig(conf.Database)
-
-	loadSignatures(config, logger)
+	db, err := newDBConnection(config.Database)
+	if err != nil {
+		log.Fatal(err)
+	}
+	remoteConfig := newRemoteConfig(config.Database)
 
 	handler.InitRoutes(model.RouterSpecification{
 		Config:       config,
@@ -27,7 +28,11 @@ func main() {
 		RemoteConfig: remoteConfig,
 	})
 
-	logger.Info("Starting service")
-	port := fmt.Sprintf(":%d", config.PortHTTP)
-	logger.Fatal(api.Start(port))
+	port := fmt.Sprintf(":%d", config.ServerPort)
+	if config.IsHttps {
+		log.Fatal(api.StartTLS(port, config.CertPem, config.KeyPem))
+	} else {
+		log.Println("Starting service")
+		log.Fatal(api.Start(port))
+	}
 }

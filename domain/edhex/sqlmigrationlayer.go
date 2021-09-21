@@ -1,20 +1,23 @@
 package edhex
 
 import (
-	"bytes"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/edteamlat/go-wizard/model"
 )
 
-const (
-	sqlMigrationTemplateName = "sqlmigration.gotpl"
-)
-
 const SQLMigrationLayerName = "sqlmigration_postgres"
 
 const sqlMigrationFolder = "sqlmigration"
+
+var sqlmigrationAddActionTemplates = model.Templates{
+	{
+		Name: "sqlmigration.gotpl",
+		Path: sqlMigrationFolder,
+	},
+}
 
 type sqlMigrationLayer struct {
 	template UseCaseTemplate
@@ -25,29 +28,28 @@ func NewSQLMigrationLayer(template UseCaseTemplate, storage Storage) sqlMigratio
 	return sqlMigrationLayer{template: template, storage: storage}
 }
 
-func (d sqlMigrationLayer) Init(m model.Layer) error {
-	return nil
-}
-
-func (d sqlMigrationLayer) Create(data model.Layer) error {
-	if err := d.createSQLMigration(data); err != nil {
+func (d sqlMigrationLayer) Init(data model.Layer) error {
+	if err := d.storage.CreateDir(filepath.Join(data.ProjectPath, "sqlmigration")); err != nil {
 		return fmt.Errorf("edhex-sqlmigration: %w", err)
 	}
 
 	return nil
 }
 
-func (d sqlMigrationLayer) createSQLMigration(data model.Layer) error {
-	fileBuf := bytes.Buffer{}
-	if err := d.template.Create(&fileBuf, sqlMigrationTemplateName, data); err != nil {
-		return err
-	}
+func (d sqlMigrationLayer) Create(data model.Layer) error {
+	d.setFilenameToTemplates(sqlmigrationAddActionTemplates, data.Table)
 
-	if err := d.storage.Save(data.GetPath(sqlMigrationFolder, getFilename(data.Table), false), fileBuf); err != nil {
-		return err
+	if err := bulkFromTemplates(d.template, d.storage, sqlmigrationAddActionTemplates, data); err != nil {
+		return fmt.Errorf("edhex-sqlmigration: %w", err)
 	}
 
 	return nil
+}
+
+func (d sqlMigrationLayer) setFilenameToTemplates(templates model.Templates, table string) {
+	for k := range templates {
+		templates[k].Filename = getFilename(table)
+	}
 }
 
 func getFilename(table string) string {
@@ -61,4 +63,12 @@ func (d sqlMigrationLayer) Override(m model.Layer) error {
 
 func (d sqlMigrationLayer) AddField(m model.Layer) error {
 	return nil
+}
+
+func (d sqlMigrationLayer) SuccessfulMsg(prefixCount string) {
+	fmt.Printf("%s sql-migration layer generated ✅\n", prefixCount)
+}
+
+func (d sqlMigrationLayer) FailureMsg(prefixCount string, err error) {
+	fmt.Printf("%s sql-migration layer failed 🚨, %s\n", prefixCount, err.Error())
 }

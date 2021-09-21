@@ -3,15 +3,12 @@
 package {{ $package}}
 
 import (
-	"database/sql"
-	"encoding/json"
-	"errors"
-	"strings"
-
-	"{{ .ModuleName }}/{{ $package }}"
+	"{{ .ModuleName }}/domain/{{ $package }}"
 	"{{ .ModuleName }}/infrastructure/handler/request"
 	"{{ .ModuleName }}/infrastructure/handler/response"
 	"{{ .ModuleName }}/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type handler struct {
@@ -19,8 +16,8 @@ type handler struct {
 	response response.Responser
 }
 
-func newHandler(useCase {{ $package }}.UseCase) handler {
-	return handler{useCase: useCase}
+func newHandler(useCase {{ $package }}.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
 }
 
 // Create handles the creation of a model.{{ .Model }}
@@ -76,8 +73,6 @@ func (h handler) Delete(c echo.Context) error {
 
 // GetWhere handles the search of a model.{{ .Model }}
 func (h handler) GetWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err
@@ -93,8 +88,6 @@ func (h handler) GetWhere(c echo.Context) error {
 
 // GetAllWhere handles the search of all model.{{ .Model }}
 func (h handler) GetAllWhere(c echo.Context) error {
-	userID := request.GetUserID(c)
-
 	filtersSpecification, err := request.GetFiltersSpecification(c)
 	if err != nil {
 		return err

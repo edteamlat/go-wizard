@@ -14,6 +14,12 @@ const edhexArchitecture = "edhex"
 // UseCase use case to generate a layer
 type UseCase interface {
 	Init(m model.Layer) error
+
+	SuccessfulMsg(prefixCount string)
+	FailureMsg(prefixCount string, err error)
+}
+
+type UseCasePackage interface {
 	Create(m model.Layer) error
 	Override(m model.Layer) error
 	AddField(m model.Layer) error
@@ -28,6 +34,7 @@ type UseCaseTemplate interface {
 
 type Storage interface {
 	Save(path string, data bytes.Buffer) error
+	CreateDir(dir string) error
 }
 
 // GetUseCaseLayersFromConf obtains all useCaseLayers that were specified on the Config file
@@ -71,8 +78,8 @@ func getEDhexLayer(name string, template UseCaseTemplate, storage Storage) (UseC
 		return edhex.NewHandlerLayer(template, storage), nil
 	case edhex.RootLayerName:
 		return edhex.NewRootLayer(template, storage), nil
-	case "cmd":
-		return edhex.NewDomainLayer(template, storage), nil
+	case edhex.CMDLayerName:
+		return edhex.NewCMDLayer(template, storage), nil
 	default:
 		return nil, fmt.Errorf("edhex: layer `%s` is not implemented", name)
 	}
