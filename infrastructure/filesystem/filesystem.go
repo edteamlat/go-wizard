@@ -13,6 +13,8 @@ import (
 
 const goExt = ".go"
 
+const readWritePermission = 0666
+
 type FileSystem struct{}
 
 func New() FileSystem {
@@ -25,7 +27,7 @@ func (f FileSystem) Save(path string, buffer bytes.Buffer) error {
 		return fmt.Errorf("filesystem: path: %s, %w, %v", dir, err, reflect.TypeOf(err))
 	}
 
-	if err := ioutil.WriteFile(path, getFormattedFile(path, buffer), os.ModePerm); err != nil {
+	if err := ioutil.WriteFile(path, getFormattedFile(path, buffer), readWritePermission); err != nil {
 		return fmt.Errorf("filesystem: could not create file %s, %w", path, err)
 	}
 
