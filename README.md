@@ -1,4 +1,5 @@
 # 🧙 Go Wizard
+>This README.md is also available in [Spanish](README_ES.md).
 
 Is a command line interface that provides you with useful commands to help you build your application with the Hexagonal
 Architecture. It allows you to generate the initial structure of a project and to generate every layer of a new package.
@@ -13,7 +14,7 @@ Architecture. It allows you to generate the initial structure of a project and t
 
 ## ⚙ Installation
 
-This command will install the CLI on $GOPATH/bin so make sure that you have that on your $PATH.
+This command will install the CLI on `$GOPATH/bin` so make sure that you have that on your `$PATH`.
 
 ```bash
 go install github.com/edteamlat/go-wizard@latest
@@ -23,7 +24,7 @@ If you want a different version, just replace the `@latest` with the version `@v
 
 ## 💻 Usage
 
-### Init command
+### `init` command
 
 To create the initial structure of a new project you just need to run the next command:
 
@@ -86,7 +87,7 @@ If you want to get more information about this command, run:
 go-wizard help init
 ```
 
-### Add package command
+### `add package` command
 With this command you can create the CRUD on the available layers that will read from a config yaml file that is generated when you run the init command:
 ```yaml
 # if you don't specify this field, the wizard will automatically use the path of working directory (pwd)
@@ -95,11 +96,11 @@ project_path: /home/username/Documents/code/
 # the module_name is used to create the imports
 module_name: github.com/edteamlat/go-wizzard
 
-# Use for the name of the structs of the different layers
+# Is Use for the name of the structs of the different layers
 model: UserRole
 
 # Will be use for the table name and constraints
-# also, it'll be converted to camel case to be use
+# also, it'll be converted to UpperCamelCase to be use
 # for the Slice model
 table: user_roles
 
