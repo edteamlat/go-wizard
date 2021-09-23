@@ -36,41 +36,43 @@ This will create the project on the current directory with the layers to work wi
 it'll automatically init git and the go modules.
 
 ```bash
-my-app
-├── cmd
-│   ├── config.go
-│   ├── configuration.json
-│   ├── database.go
-│   ├── echo.go
-│   ├── logger.go
-│   ├── main.go
-│   └── remoteconfig.go
-├── domain
-├── go.mod
-├── infrastructure
-│   ├── handler
-│   │   ├── request
-│   │   │   ├── fields.go
-│   │   │   ├── parameter.go
-│   │   │   └── token.go
-│   │   ├── response
-│   │   │   ├── message.go
-│   │   │   └── response.go
-│   │   └── router.go
-│   └── postgres
-├── model
-│   ├── config.go
-│   ├── error.go
-│   ├── filter.go
-│   ├── logger.go
-│   ├── messagehandler.go
-│   ├── model.go
-│   ├── model_test.go
-│   ├── remoteconfig.go
-│   └── router.go
-├── README.md
-├── sqlmigration
-└── wizard-config.yaml
+.
+└── my-app
+    ├── cmd
+    │   ├── certificates
+    │   ├── logs
+    │   ├── config.go
+    │   ├── configuration.json.example
+    │   ├── database.go
+    │   ├── echo.go
+    │   ├── logger.go
+    │   ├── main.go
+    │   └── remoteconfig.go
+    ├── domain
+    ├── infrastructure
+    │   ├── handler
+    │   │   ├── request
+    │   │   │   ├── fields.go
+    │   │   │   ├── parameter.go
+    │   │   │   └── token.go
+    │   │   ├── response
+    │   │   │   ├── message.go
+    │   │   │   └── response.go
+    │   │   └── router.go
+    │   └── postgres
+    ├── model
+    │   ├── config.go
+    │   ├── error.go
+    │   ├── logger.go
+    │   ├── messagehandler.go
+    │   ├── model.go
+    │   ├── model_test.go
+    │   ├── remoteconfig.go
+    │   └── router.go
+    ├── sqlmigration
+    ├── go.mod
+    ├── README.md
+    └── wizard-config.yaml
 ```
 Once the installation is done, you can open your project folder:
 ```bash
@@ -79,7 +81,7 @@ cd my-app
 
 Inside the created project, you must run the next command to install the dependencies:
 ```bash
-go mod init
+go mod tidy
 ```
 
 If you want to get more information about this command, run:

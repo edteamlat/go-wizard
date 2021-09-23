@@ -38,41 +38,43 @@ Esto va a crear el proyecto en el directorio actual donde se esté ejecutando el
 trabajar con la arquitectura hexagonal, y automáticamente va a inicializar git y los módulos de go.
 
 ```bash
-my-app
-├── cmd
-│   ├── config.go
-│   ├── configuration.json
-│   ├── database.go
-│   ├── echo.go
-│   ├── logger.go
-│   ├── main.go
-│   └── remoteconfig.go
-├── domain
-├── go.mod
-├── infrastructure
-│   ├── handler
-│   │   ├── request
-│   │   │   ├── fields.go
-│   │   │   ├── parameter.go
-│   │   │   └── token.go
-│   │   ├── response
-│   │   │   ├── message.go
-│   │   │   └── response.go
-│   │   └── router.go
-│   └── postgres
-├── model
-│   ├── config.go
-│   ├── error.go
-│   ├── filter.go
-│   ├── logger.go
-│   ├── messagehandler.go
-│   ├── model.go
-│   ├── model_test.go
-│   ├── remoteconfig.go
-│   └── router.go
-├── README.md
-├── sqlmigration
-└── wizard-config.yaml
+.
+└── my-app
+    ├── cmd
+    │   ├── certificates
+    │   ├── logs
+    │   ├── config.go
+    │   ├── configuration.json.example
+    │   ├── database.go
+    │   ├── echo.go
+    │   ├── logger.go
+    │   ├── main.go
+    │   └── remoteconfig.go
+    ├── domain
+    ├── infrastructure
+    │   ├── handler
+    │   │   ├── request
+    │   │   │   ├── fields.go
+    │   │   │   ├── parameter.go
+    │   │   │   └── token.go
+    │   │   ├── response
+    │   │   │   ├── message.go
+    │   │   │   └── response.go
+    │   │   └── router.go
+    │   └── postgres
+    ├── model
+    │   ├── config.go
+    │   ├── error.go
+    │   ├── logger.go
+    │   ├── messagehandler.go
+    │   ├── model.go
+    │   ├── model_test.go
+    │   ├── remoteconfig.go
+    │   └── router.go
+    ├── sqlmigration
+    ├── go.mod
+    ├── README.md
+    └── wizard-config.yaml
 ```
 
 Una vez la instalación está terminada, puedes abrir tu proyecto:
@@ -84,7 +86,7 @@ cd my-app
 Dentro del proyecto creado, debes ejecutar el siguiente comando para instalar las dependencias:
 
 ```bash
-go mod init
+go mod tidy
 ```
 
 Si quieres obtener más información de este comando, ejecuta:

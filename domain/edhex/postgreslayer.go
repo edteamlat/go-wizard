@@ -13,9 +13,10 @@ const postgresFolder = "infrastructure/postgres"
 
 var postgresAddActionTemplates = model.Templates{
 	{
-		Name:     "postgres.gotpl",
-		Filename: "%s.go", // the name will be the name of the package
-		Path:     postgresFolder,
+		Name:        "postgres.gotpl",
+		Filename:    "%s.go", // the name will be the name of the package
+		Path:        postgresFolder,
+		WithPackage: true,
 	},
 }
 
