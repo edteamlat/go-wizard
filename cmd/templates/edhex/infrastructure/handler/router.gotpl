@@ -1,6 +1,13 @@
 package handler
 
-import "{{ .ModuleName }}/model"
+import (
+	"net/http"
+	"time"
+
+	"github.com/labstack/echo/v4"
+
+	"{{ .ModuleName }}/model"
+)
 
 // InitRoutes initialize all the routes of the service
 func InitRoutes(specification model.RouterSpecification) {
@@ -15,6 +22,7 @@ func InitRoutes(specification model.RouterSpecification) {
 	// F
 	// G
 	// H
+	healthRoute(specification.Api)
 	// I
 	// J
 	// K
@@ -33,4 +41,17 @@ func InitRoutes(specification model.RouterSpecification) {
 	// X
 	// Y
 	// Z
+}
+
+func healthRoute(e *echo.Echo) {
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(
+			http.StatusOK,
+			map[string]string{
+				"time":         time.Now().String(),
+				"message":      "Hello World!",
+				"service_name": "",
+			},
+		)
+	})
 }
