@@ -17,6 +17,21 @@ func HTTPErrorHandler(err error, c echo.Context) {
 		return
 	}
 
+	// check echo error
+	if echoErr, ok := err.(*echo.HTTPError); ok {
+		msg, ok := echoErr.Message.(string)
+		if !ok {
+			msg = "¡Upps! algo inesperado ocurrió"
+		}
+
+		err = c.JSON(echoErr.Code, model.MessageResponse{
+			Errors: model.Responses{
+				{Code: UnexpectedError, Message: msg},
+			},
+		})
+		return
+	}
+
 	// if the handler not returns a "model.Error" then it returns a generic error JSON response
 	err = c.JSON(http.StatusInternalServerError, model.MessageResponse{
 		Errors: model.Responses{
