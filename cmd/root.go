@@ -8,6 +8,7 @@ const (
 	architectureFlag = "architecture"
 	configPathFlag   = "config-path"
 	moduleFlag       = "module"
+	projectPathFlag  = "project-path"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -37,4 +38,5 @@ func Execute() {
 func init() {
 	rootCmd.PersistentFlags().StringP(architectureFlag, "a", "edhex", "Indicates the architecture that will be use.")
 	rootCmd.PersistentFlags().StringP(configPathFlag, "c", "./wizard-config.yaml", "Indicates the path of the config file.")
+	rootCmd.PersistentFlags().StringP(projectPathFlag, "p", "", "Indicates the project path, thi will override the project_path from the config file.")
 }

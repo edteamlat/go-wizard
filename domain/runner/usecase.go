@@ -23,6 +23,8 @@ func (r *runner) AppendLayer(layer ...layer.UseCase) {
 
 // GenerateLayers runs the generation of every layer
 func (r runner) GenerateLayers(a Action, m model.Layer) error {
+	fmt.Println(getActionMessage(a, m))
+
 	for k, layerUseCase := range r.layers {
 		prefix := fmt.Sprintf("[%d/%d]", k+1, len(r.layers))
 
@@ -57,4 +59,15 @@ func (r runner) exec(a Action, m model.Layer, layerUseCase layer.UseCase) error 
 	}
 
 	return fmt.Errorf("action does not implemented by any layer")
+}
+
+func getActionMessage(action Action, m model.Layer) string {
+	switch action {
+	case Init:
+		return fmt.Sprintf("Inicializando nuevo proyecto en %s", m.ProjectPath)
+	case NewPackage:
+		return fmt.Sprintf("Creando nuevo paquete en %s", m.ProjectPath)
+	default:
+		return ""
+	}
 }

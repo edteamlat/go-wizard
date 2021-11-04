@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"embed"
+	"fmt"
 	"log"
+	"os"
 	"text/template"
 
 	"github.com/edteamlat/go-wizard/domain/layer"
@@ -18,24 +20,32 @@ import (
 var templatesFS embed.FS
 
 func run(cmd *cobra.Command, args []string, action runner.Action) {
-	configPath := cmd.Flag(configPathFlag).Value.String()
-	architecture := cmd.Flag(architectureFlag).Value.String()
-
 	moduleName := ""
 	if action == runner.Init {
 		moduleName = cmd.Flag(moduleFlag).Value.String()
 	}
 
+	configPath := cmd.Flag(configPathFlag).Value.String()
 	conf, err := readConfig(configPath, action)
 	if err != nil {
 		log.Fatal(err)
 	}
-	conf.Architecture = architecture
+
+	conf.Architecture = cmd.Flag(architectureFlag).Value.String()
 	if !isEmpty(moduleName) {
 		if err := conf.SetInitPath(model.ModuleName(moduleName)); err != nil {
 			log.Fatal(err)
 		}
 		conf.ModuleName = model.ModuleName(moduleName)
+	}
+
+	if conf.IsProjectPathEmpty() {
+		projectPath, err := getProjectPath(cmd)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		conf.ProjectPath = projectPath
 	}
 
 	layerData := model.NewLayer(conf)
@@ -82,4 +92,24 @@ func buildUseCaseLayers(conf model.Config) (layer.UseCaseLayers, error) {
 
 func isEmpty(s string) bool {
 	return s == ""
+}
+
+// getProjectFile look if the project path was passed by the flag project-path or if it exists int the env variable GOWIZARD_PROJECT_PATH
+func getProjectPath(cmd *cobra.Command) (string, error) {
+	projectPath := cmd.Flag(projectPathFlag).Value.String()
+	if !isEmpty(projectPath) {
+		return projectPath, nil
+	}
+
+	projectPath = os.Getenv("GOWIZARD_PROJECT_PATH")
+	if !isEmpty(projectPath) {
+		return projectPath, nil
+	}
+
+	projectPath, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("could not get project path, %w", err)
+	}
+
+	return projectPath, nil
 }

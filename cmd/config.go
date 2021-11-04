@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/yaml.v3"
 
@@ -30,13 +29,6 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 	if !conf.IsProjectPathEmpty() {
 		return conf, nil
 	}
-
-	dir, err := os.Getwd()
-	if err != nil {
-		return conf, fmt.Errorf("config: could not get project path, %w", err)
-	}
-
-	conf.ProjectPath = dir
 
 	return conf, nil
 }

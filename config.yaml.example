@@ -1,4 +1,6 @@
-project_path: $GOPATH/src/
+# If you don't specify this field, you can set the the flag `project-path` or set the environment variable `GOWIZARD_PROJECT_PATH`,
+# and if you don't specify neither of those options the wizard will use the working directory (pwd)
+# project_path: /home/username/Documents/code/
 module_name: github.com/edteamlat/go-wizzard
 
 # Use for the name of the structs of the different layers
