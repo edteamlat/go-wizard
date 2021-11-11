@@ -2,7 +2,7 @@ package model
 
 // Configuration model to read a config file to init our app
 type Configuration struct {
-	IsHttps         bool     `json:"port_http"`
+	IsHttps         bool     `json:"is_https"`
 	ServerPort      uint16   `json:"server_port"`
 	LogFolder       string   `json:"log_folder"`
 	LogPretty       bool     `json:"log_pretty"`
