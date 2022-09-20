@@ -2,7 +2,10 @@ package cmd
 
 import (
 	"embed"
+	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"text/template"
 
 	"github.com/edteamlat/go-wizard/domain/layer"
@@ -48,6 +51,24 @@ func run(cmd *cobra.Command, args []string, action runner.Action) {
 	if err := runnerUseCase.GenerateLayers(action, layerData); err != nil {
 		log.Fatal(err)
 	}
+
+	if err := goModTidy(layerData.ProjectPath); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func goModTidy(projectPath string) error {
+	if err := cdToProject(projectPath); err != nil {
+		return err
+	}
+
+	cmd := exec.Command("go", "mod", "tidy")
+
+	return cmd.Run()
+}
+
+func cdToProject(projectName string) error {
+	return os.Chdir(fmt.Sprintf("%s", projectName))
 }
 
 func buildUseCaseRunner(conf model.Config) (runner.UseCase, error) {

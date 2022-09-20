@@ -1,5 +1,5 @@
 # if you don't specify a field, the wizard will use the working directory (pwd)
-# project_path: /home/username/Documents/code/
+project_path: /home/{username}/Documents/code/
 module_name: {{ .ModuleName }}
 
 # Use for the name of the structs of the different layers
