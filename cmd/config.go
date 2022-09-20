@@ -31,6 +31,14 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 		return conf, nil
 	}
 
+	if !conf.HasValidTimeType() {
+		conf.TimeType = model.Timestamp
+	}
+
+	if !conf.HasValidIDType() {
+		conf.IDType = model.IDUint
+	}
+
 	dir, err := os.Getwd()
 	if err != nil {
 		return conf, fmt.Errorf("config: could not get project path, %w", err)

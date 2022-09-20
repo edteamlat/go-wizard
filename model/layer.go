@@ -24,6 +24,9 @@ type Layer struct {
 
 	// ModuleName is used to build the imports
 	ModuleName ModuleName
+
+	TimeType TimeEnum `yaml:"time_type"`
+	IDType   IDEnum   `yaml:"id_type"`
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
@@ -32,15 +35,16 @@ func NewLayer(conf Config) Layer {
 	// adds the default fields
 	fields := Fields{{
 		Name: "id",
-		Type: "uint",
+		Type: string(conf.IDType),
 	}}
 	fields = append(fields, conf.Fields...)
+
 	fields = append(fields, Fields{{
 		Name: "created_at",
-		Type: "time.Time",
+		Type: string(conf.TimeType),
 	}, {
 		Name:   "updated_at",
-		Type:   "time.Time",
+		Type:   string(conf.TimeType),
 		IsNull: true,
 	}}...)
 
@@ -51,6 +55,8 @@ func NewLayer(conf Config) Layer {
 		Table:        conf.Table,
 		TableComment: conf.TableComment,
 		Fields:       fields,
+		TimeType:     conf.TimeType,
+		IDType:       conf.IDType,
 	}
 }
 
