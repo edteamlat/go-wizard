@@ -5,21 +5,24 @@ package model
 
 import (
 	{{if eq .TimeType "time.Time"}}"time"{{end}}
-	{{ if eq .IDType "uuid.UUID" }}"github.com/google/uuid"{{end}}
+	{{- if eq .IDType "uuid.UUID"}}"github.com/google/uuid"{{end}}
 )
+
 // {{ .Model }} model of table {{ .Table }}
 type {{ .Model }} struct {
-	{{ range $i, $field := .Fields -}}
-		{{ parseToUpperCamelCase $field.Name }} {{ $field.Type }} `json:"{{ $field.Name }}"`
-	{{ end -}}
+	{{range .Fields -}}
+	{{ parseToUpperCamelCase .Name }} {{ .Type }} `json:"{{ .Name}}"`
+	{{end -}}
+
 }
 
-{{if eq .IDType "uint" }}
-func ({{ $reciverName }} {{ .Model }}) HasID() bool { return {{ $reciverName }}.ID > 0 }
-{{end}}
-{{if eq .IDType "uuid.UUID" }}
-func ({{ $reciverName }} {{ .Model }}) HasID() bool { return {{ $reciverName }}.ID.String() != "00000000-0000-0000-0000-000000000000" }
-{{end}}
+func ({{ $reciverName }} {{ .Model }}) HasID() bool {
+	{{if eq .IDType "uint" -}}
+		return {{ $reciverName }}.ID > 0
+	{{- else -}}
+		return {{ $reciverName }}.ID.String() != "00000000-0000-0000-0000-000000000000"
+	{{- end}}
+}
 
 func ({{ $reciverName }} {{ .Model }}) Validate() error {
 	// implement validation of fields for creation and update

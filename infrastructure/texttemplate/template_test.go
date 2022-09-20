@@ -426,11 +426,15 @@ func getModelLayerTests() testTables {
 							Type: "time.Time",
 						},
 					},
+					IDType:   model.IDUint,
+					TimeType: model.Timestamp,
 				},
 			},
 			wantWr: fmt.Sprintf(`package model
 
-import "time"
+import (
+	"time"
+)
 
 // User model of table users
 type User struct {
@@ -441,7 +445,9 @@ type User struct {
 	CreatedAt time.Time %[1]sjson:"created_at"%[1]s
 	}
 
-func (u User) HasID() bool { return u.ID > 0 }
+func (u User) HasID() bool {
+	return u.ID > 0
+}
 
 func (u User) Validate() error {
 	// implement validation of fields for creation and update
@@ -487,11 +493,15 @@ func (u Users) IsEmpty() bool { return len(u) == 0 }
 							Type: "time.Time",
 						},
 					},
+					IDType:   model.IDUint,
+					TimeType: model.Timestamp,
 				},
 			},
 			wantWr: fmt.Sprintf(`package model
 
-import "time"
+import (
+	"time"
+)
 
 // UserRole model of table user_roles
 type UserRole struct {
@@ -502,7 +512,9 @@ type UserRole struct {
 	CreatedAt time.Time %[1]sjson:"created_at"%[1]s
 	}
 
-func (u UserRole) HasID() bool { return u.ID > 0 }
+func (u UserRole) HasID() bool {
+	return u.ID > 0
+}
 
 func (u UserRole) Validate() error {
 	// implement validation of fields for creation and update
@@ -567,6 +579,8 @@ func getSQLMigrationLayerTests() testTables {
 							IsNull: true,
 						},
 					},
+					IDType:   model.IDUint,
+					TimeType: model.Timestamp,
 				},
 			},
 			wantWr: `CREATE TABLE courses (
@@ -634,6 +648,8 @@ INSERT INTO modules (name) VALUES ('COURSE');
 							IsNull: true,
 						},
 					},
+					IDType:   model.IDUint,
+					TimeType: model.Timestamp,
 				},
 			},
 			wantWr: `CREATE TABLE course_prices (
