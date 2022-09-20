@@ -12,6 +12,12 @@ table: user_roles
 
 table_comment: Write your comment here
 
+# choose the type of the dates (valid options: time.Time and int64 for unix)
+time_type: time.Time
+
+# choose the type of the primary key (valid options: uint, uuid.UUID)
+id_type: uint
+
 # a list of objects where you specify the name, type and if it allows nulls
 # by default, the id, created_at and updated_at fields, will be added
 fields:

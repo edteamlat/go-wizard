@@ -5,6 +5,20 @@ import (
 	"path/filepath"
 )
 
+type TimeEnum string
+
+const (
+	Timestamp TimeEnum = "time.Time"
+	TimeUnix  TimeEnum = "int64"
+)
+
+type IDEnum string
+
+const (
+	IDUint IDEnum = "uint"
+	IDUUID IDEnum = "uuid.UUID"
+)
+
 // Config model to map configuration from a yaml file
 type Config struct {
 	ProjectPath  string     `yaml:"project_path"`
@@ -14,7 +28,25 @@ type Config struct {
 	TableComment string     `yaml:"table_comment"`
 	Layers       []string   `yaml:"layers"`
 	Fields       Fields     `yaml:"fields"`
+	TimeType     TimeEnum   `yaml:"time_type"`
+	IDType       IDEnum     `yaml:"id_type"`
 	Architecture string
+}
+
+func (c Config) HasValidTimeType() bool {
+	if c.TimeType == Timestamp || c.TimeType == TimeUnix {
+		return true
+	}
+
+	return false
+}
+
+func (c Config) HasValidIDType() bool {
+	if c.IDType == IDUint || c.IDType == IDUUID {
+		return true
+	}
+
+	return false
 }
 
 func (c *Config) SetInitPath(moduleName ModuleName) error {

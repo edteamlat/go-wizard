@@ -3,8 +3,10 @@
 
 package model
 
-import "time"
-
+import (
+	"time"
+	{{ if eq .IDType "uuid.UUID" }}"github.com/google/uuid"{{end}}
+)
 // {{ .Model }} model of table {{ .Table }}
 type {{ .Model }} struct {
 	{{ range $i, $field := .Fields -}}
@@ -12,7 +14,12 @@ type {{ .Model }} struct {
 	{{ end -}}
 }
 
+{{if eq .IDType "uint" }}
 func ({{ $reciverName }} {{ .Model }}) HasID() bool { return {{ $reciverName }}.ID > 0 }
+{{end}}
+{{if eq .IDType "uuid.UUID" }}
+func ({{ $reciverName }} {{ .Model }}) HasID() bool { return {{ $reciverName }}.ID.String() != "00000000-0000-0000-0000-000000000000" }
+{{end}}
 
 func ({{ $reciverName }} {{ .Model }}) Validate() error {
 	// implement validation of fields for creation and update
