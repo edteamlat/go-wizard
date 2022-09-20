@@ -4,7 +4,7 @@
 package model
 
 import (
-	"time"
+	{{if eq .TimeType "time.Time"}}"time"{{end}}
 	{{ if eq .IDType "uuid.UUID" }}"github.com/google/uuid"{{end}}
 )
 // {{ .Model }} model of table {{ .Table }}

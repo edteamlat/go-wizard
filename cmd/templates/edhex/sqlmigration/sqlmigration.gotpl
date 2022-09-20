@@ -1,8 +1,8 @@
 CREATE TABLE {{.Table}} (
-	id SERIAL NOT NULL,
+	{{if eq .IDType "uint"}}id SERIAL NOT NULL{{else}}id UUID NOT NULL{{end}},
 	{{ printMigrationFieldsWithoutDefaults .Fields }}
-	created_at TIMESTAMP NOT NULL DEFAULT now(),
-	updated_at TIMESTAMP,
+	{{if eq .TimeType "time.Time"}}created_at TIMESTAMP NOT NULL DEFAULT now(){{else}}created_at INTEGER NOT NULL DEFAULT now(){{end}},
+	{{if eq .TimeType "time.Time"}}updated_at TIMESTAMP{{else}}updated_at INTEGER{{end}},
 	CONSTRAINT {{ .Table }}_id_pk PRIMARY KEY (id)
 );
 
