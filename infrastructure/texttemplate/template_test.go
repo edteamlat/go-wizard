@@ -1080,7 +1080,7 @@ func (h handler) GetAllWhere(c echo.Context) error {
 			wantErr: false,
 		},
 		{
-			name: "two words package",
+			name: "uuid id",
 			fields: fields{
 				tpl: tpl,
 			},

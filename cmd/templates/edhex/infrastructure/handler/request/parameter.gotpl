@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/google/uuid"
 )
 
 // ExtractIDFromURLParam extracts id of the c.Param
