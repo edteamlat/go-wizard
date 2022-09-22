@@ -1,6 +1,7 @@
 package stringparser
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"text/template"
@@ -173,95 +174,96 @@ func parseNullFieldsOnScan(f model.Field) string {
 }
 
 func printFieldsWithoutDefaults(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
+
 	for _, field := range fields {
 		if isDefaultField(field.Name) {
 			continue
 		}
 
-		msg += fmt.Sprintf("\"%s\",\n\t", field.Name)
+		msg.WriteString(fmt.Sprintf("\"%s\",\n\t", field.Name))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printStorageFieldsWithoutDefaults(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if isDefaultField(field.Name) {
 			continue
 		}
 
-		msg += fmt.Sprintf("%s,\n\t", handleNull(field))
+		msg.WriteString(fmt.Sprintf("%s,\n\t", handleNull(field)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printStorageFieldsWithoutDateDefaults(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if isDefaultDateField(field.Name) {
 			continue
 		}
 
-		msg += fmt.Sprintf("%s,\n\t", handleNull(field))
+		msg.WriteString(fmt.Sprintf("%s,\n\t", handleNull(field)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printMigrationFieldsWithoutDefaults(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if isDefaultField(field.Name) {
 			continue
 		}
 
-		msg += fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type), parseNull(field.IsNull))
+		msg.WriteString(fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type), parseNull(field.IsNull)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printStorageNullFields(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if !field.IsNull {
 			continue
 		}
 
-		msg += fmt.Sprintf("%s\n\t", handleNullOnScan(field))
+		msg.WriteString(fmt.Sprintf("%s\n\t", handleNullOnScan(field)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printStorageNullFieldsScan(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if field.IsNull {
-			msg += fmt.Sprintf("&%sNull,\n\t", parseToLowerCamelCase(field.Name))
+			msg.WriteString(fmt.Sprintf("&%sNull,\n\t", parseToLowerCamelCase(field.Name)))
 			continue
 		}
 
-		msg += fmt.Sprintf("&m.%s,\n\t", parseToUpperCamelCase(field.Name))
+		msg.WriteString(fmt.Sprintf("&m.%s,\n\t", parseToUpperCamelCase(field.Name)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func printStorageNullFieldsParse(fields model.Fields) string {
-	msg := ""
+	msg := bytes.Buffer{}
 	for _, field := range fields {
 		if !field.IsNull {
 			continue
 		}
 
-		msg += fmt.Sprintf("%s\n\t", parseNullFieldsOnScan(field))
+		msg.WriteString(fmt.Sprintf("%s\n\t", parseNullFieldsOnScan(field)))
 	}
 
-	return strings.TrimSpace(msg)
+	return strings.TrimSpace(msg.String())
 }
 
 func isDefaultField(field string) bool {
