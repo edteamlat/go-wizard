@@ -109,13 +109,15 @@ func handleNull(f model.Field) string {
 	case "string":
 		return fmt.Sprintf("nullhandler.StringToNull(m.%s)", field)
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		return fmt.Sprintf("nullhandler.IntToNull(int64(m.%s))", field)
+		return fmt.Sprintf("nullhandler.Int64ToNull(int64(m.%s))", field)
 	case "float32":
-		return fmt.Sprintf("nullhandler.FloatToNull(float64(m.%s))", field)
+		return fmt.Sprintf("nullhandler.Float64ToNull(float64(m.%s))", field)
 	case "float64":
 		return fmt.Sprintf("nullhandler.FloatToNull(m.%s)", field)
 	case "time.Time":
 		return fmt.Sprintf("nullhandler.TimeToNull(m.%s)", field)
+	case "bool":
+		return fmt.Sprintf("nullhandler.BoolToNull(m.%s)", field)
 	default:
 		return fmt.Sprintf("invalid data type: %s", f.Type)
 	}
