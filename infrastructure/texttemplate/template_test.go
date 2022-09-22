@@ -1124,6 +1124,8 @@ func getPostgresLayerTests() testTables {
 						},
 					},
 					ModuleName: moduleName,
+					IDType:     model.IDUUID,
+					TimeType:   model.Timestamp,
 				},
 			},
 			wantWr: fmt.Sprintf(`package %[2]s
@@ -1133,9 +1135,9 @@ import (
 
 	"%[1]s/model"
 
-	sqlutil "github.com/alexyslozada/gosqlutils"
 	"github.com/AJRDRGZ/db-query-builder/models"
 	"github.com/AJRDRGZ/db-query-builder/postgres"
+	"github.com/AJRDRGZ/db-query-builder/nullhandler"
 )
 
 const table = "specialities"
@@ -1152,7 +1154,7 @@ var constraints = postgres.Constraints{
 }
 
 var (
-	psqlInsert                  = postgres.BuildSQLInsert(table, fields)
+	psqlInsert                  = postgres.BuildSQLInsertWithID(table, fields)
 	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
 	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
 	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
@@ -1177,10 +1179,11 @@ func (%[4]s %[3]s) Create(m *model.%[3]s) error {
 	defer stmt.Close()
 
 	err = stmt.QueryRow(
-		m.Name,
+		m.ID,
+	m.Name,
 	m.IsVisible,
-	sqlutil.StringToNull(m.Subtitle),
-	).Scan(&m.ID, &m.CreatedAt)
+	nullhandler.StringToNull(m.Subtitle),
+	).Scan(&m.CreatedAt)
 	if err != nil {
 		return postgres.CheckConstraint(constraints, err)
 	}
@@ -1199,7 +1202,7 @@ func (%[4]s %[3]s) Update(m *model.%[3]s) error {
 	_, err = stmt.Exec(
 		m.Name,
 	m.IsVisible,
-	sqlutil.StringToNull(m.Subtitle),
+	nullhandler.StringToNull(m.Subtitle),
 		m.ID,
 	)
 	if err != nil {
@@ -1274,7 +1277,7 @@ func (%[4]s %[3]s) GetAllWhere(specification models.FieldsSpecification) (model.
 	return ms, nil
 }
 
-func (%[4]s %[3]s) scanRow(s sqlutil.RowScanner) (model.%[3]s, error) {
+func (%[4]s %[3]s) scanRow(s postgres.RowScanner) (model.%[3]s, error) {
 	m := model.%[3]s{}
 
 	subtitleNull := sql.NullString{}

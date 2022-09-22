@@ -9,9 +9,9 @@ import (
 
 	"{{ .ModuleName }}/model"
 
-	sqlutil "github.com/alexyslozada/gosqlutils"
 	"github.com/AJRDRGZ/db-query-builder/models"
 	"github.com/AJRDRGZ/db-query-builder/postgres"
+	"github.com/AJRDRGZ/db-query-builder/nullhandler"
 )
 
 const table = "{{ .Table }}"
@@ -26,7 +26,7 @@ var constraints = postgres.Constraints{
 }
 
 var (
-	psqlInsert                  = postgres.BuildSQLInsert(table, fields)
+	psqlInsert                  = {{ if eq .IDType "uint" }}postgres.BuildSQLInsert(table, fields){{ else }}postgres.BuildSQLInsertWithID(table, fields){{ end }}
 	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
 	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
 	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
@@ -51,8 +51,13 @@ func ({{ $receiverName }} {{ .Model }}) Create(m *model.{{ .Model }}) error {
 	defer stmt.Close()
 
 	err = stmt.QueryRow(
-		{{ printStorageFieldsWithoutDefaults .Fields }}
+		{{- if eq .IDType "uint"}}
+		{{ printStorageFieldsWithoutDefaults .Fields}}
 	).Scan(&m.ID, &m.CreatedAt)
+	{{- else}}
+		{{ printStorageFieldsWithoutDateDefaults .Fields}}
+	).Scan(&m.CreatedAt)
+	{{- end}}
 	if err != nil {
 		return postgres.CheckConstraint(constraints, err)
 	}
@@ -144,7 +149,7 @@ func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification models.FieldsS
 	return ms, nil
 }
 
-func ({{ $receiverName }} {{ .Model }}) scanRow(s sqlutil.RowScanner) (model.{{ .Model }}, error) {
+func ({{ $receiverName }} {{ .Model }}) scanRow(s postgres.RowScanner) (model.{{ .Model }}, error) {
 	m := model.{{ .Model }}{}
 
 	{{ printStorageNullFields .Fields }}
