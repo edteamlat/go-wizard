@@ -25,6 +25,7 @@ fields:
   - name: description
     type: string
     is_null: true
+    field_size: 100 # only for string type, if not specified, it'll be 255, if you put -1, it'll be of type TEXT instead of VARCHAR
   - name: created_at
     type: time.Time
     is_null: false

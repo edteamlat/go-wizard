@@ -24,7 +24,11 @@ fields:
   - name: user_id
     type: uint
     is_null: false
-  - name: role_id
+  - name: description
+	type: string
+	is_null: false
+	field_size: 100 # only for string type, if not specified, it'll be 255, if you put -1, it'll be of type TEXT instead of VARCHAR
+- name: role_id
     type: uint
     is_null: false
 
