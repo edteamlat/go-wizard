@@ -4,11 +4,16 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/google/uuid"
 )
 
 // ExtractIDFromURLParam extracts id of the c.Param
 func ExtractIDFromURLParam(c echo.Context) (int, error) {
 	return strconv.Atoi(c.Param("id"))
+}
+
+func ExtractUUIDFromURLParam(c echo.Context) (uuid.UUID, error) {
+	return uuid.Parse(c.Param("id"))
 }
 
 // ExtractIDFromURLParamByName extracts id of the c.Param

@@ -6,12 +6,13 @@ import (
 	"{{ .ModuleName }}/model"
 
 	"github.com/AJRDRGZ/db-query-builder/models"
+	{{if eq .IDType "uuid.UUID"}}"github.com/google/uuid"{{end -}}
 )
 
 type UseCase interface {
 	Create(m *model.{{ .Model }}) error
 	Update(m *model.{{ .Model }}) error
-	Delete(ID uint) error
+	Delete(ID {{.IDType}}) error
 
 	GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error)
 	GetAllWhere(specification models.FieldsSpecification) (model.{{ $modelSlice }}, error)
@@ -20,7 +21,7 @@ type UseCase interface {
 type Storage interface {
 	Create(m *model.{{ .Model }}) error
 	Update(m *model.{{ .Model }}) error
-	Delete(ID uint) error
+	Delete(ID {{.IDType}}) error
 
 	GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error)
 	GetAllWhere(specification models.FieldsSpecification) (model.{{ $modelSlice }}, error)

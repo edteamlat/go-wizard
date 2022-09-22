@@ -9,6 +9,7 @@ import (
 
 	"{{ .ModuleName }}/model"
 	"github.com/AJRDRGZ/db-query-builder/models"
+	{{if eq .IDType "uuid.UUID"}}"github.com/google/uuid"{{end -}}
 )
 
 var allowedFieldsForQuery = []string{
@@ -68,7 +69,7 @@ func ({{ $reciverName }} {{ $reciverType }}) Update(m *model.{{ .Model }}) error
 }
 
 // Delete deletes a model.{{ .Model }} by id
-func ({{ $reciverName }} {{ $reciverType }}) Delete(ID uint) error {
+func ({{ $reciverName }} {{ $reciverType }}) Delete(ID {{.IDType}}) error {
 	err := {{ $reciverName }}.storage.Delete(ID)
 	if err != nil {
 		return handleStorageErr(err)
