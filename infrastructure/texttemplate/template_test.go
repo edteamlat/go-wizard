@@ -590,7 +590,7 @@ func getSQLMigrationLayerTests() testTables {
 			},
 			wantWr: `CREATE TABLE courses (
 	id SERIAL NOT NULL,
-	title VARCHAR(SIZE) NOT NULL,
+	title VARCHAR(255) NOT NULL,
 	is_premium BOOLEAN NOT NULL,
 	infographics JSON,
 	created_at TIMESTAMP NOT NULL DEFAULT now(),
