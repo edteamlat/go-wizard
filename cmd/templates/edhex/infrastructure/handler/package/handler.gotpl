@@ -43,11 +43,11 @@ func (h handler) Update(c echo.Context) error {
 		return h.response.BindFailed(c, err)
 	}
 
-	ID, err := request.ExtractIDFromURLParam(c)
+	{{if eq .IDType "uint"}}ID, err := request.ExtractIDFromURLParam(c){{else}}ID, err := request.ExtractUUIDFromURLParam(c){{end}}
 	if err != nil {
 		return h.response.BindFailed(c, err)
 	}
-	m.ID = uint(ID)
+	{{if eq .IDType "uint"}}m.ID = uint(ID){{else}}m.ID = ID{{end}}
 
 	if err := h.useCase.Update(&m); err != nil {
 		return h.response.Error(c, "useCase.Update()", err)
@@ -58,12 +58,12 @@ func (h handler) Update(c echo.Context) error {
 
 // Delete handles the deleting of a model.{{ .Model }}
 func (h handler) Delete(c echo.Context) error {
-	ID, err := request.ExtractIDFromURLParam(c)
+	{{if eq .IDType "uint"}}ID, err := request.ExtractIDFromURLParam(c){{else}}ID, err := request.ExtractUUIDFromURLParam(c){{end}}
 	if err != nil {
 		return h.response.BindFailed(c, err)
 	}
 
-	err = h.useCase.Delete(uint(ID))
+	err = h.useCase.Delete({{if eq .IDType "uint"}}uint(ID){{else}}ID{{end}})
 	if err != nil {
 		return h.response.Error(c, "useCase.Delete()", err)
 	}

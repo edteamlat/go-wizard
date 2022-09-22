@@ -12,6 +12,7 @@ import (
 	"github.com/AJRDRGZ/db-query-builder/models"
 	"github.com/AJRDRGZ/db-query-builder/postgres"
 	"github.com/AJRDRGZ/db-query-builder/nullhandler"
+	{{if eq .IDType "uuid.UUID"}}"github.com/google/uuid"{{end}}
 )
 
 const table = "{{ .Table }}"
@@ -85,7 +86,7 @@ func ({{ $receiverName }} {{ .Model }}) Update(m *model.{{ .Model }}) error {
 }
 
 // Delete deletes a model.{{ .Model }} by id
-func ({{ $receiverName }} {{ .Model }}) Delete(ID uint) error {
+func ({{ $receiverName }} {{ .Model }}) Delete(ID {{.IDType}}) error {
 	stmt, err := {{ $receiverName }}.db.Prepare(psqlDelete)
 	if err != nil {
 		return err

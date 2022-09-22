@@ -79,6 +79,7 @@ func getDomainLayerTests() testTables {
 					Table:      "users",
 					Fields:     nil,
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: `package user
@@ -87,7 +88,7 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 
 	"github.com/AJRDRGZ/db-query-builder/models"
-)
+	)
 
 type UseCase interface {
 	Create(m *model.User) error
@@ -121,6 +122,7 @@ type Storage interface {
 					Table:      "user_logins",
 					Fields:     nil,
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: `package userlogin
@@ -129,7 +131,7 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 
 	"github.com/AJRDRGZ/db-query-builder/models"
-)
+	)
 
 type UseCase interface {
 	Create(m *model.UserLogin) error
@@ -163,6 +165,7 @@ type Storage interface {
 					Table:      "user_roles",
 					Fields:     nil,
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: `package userrole
@@ -171,7 +174,7 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 
 	"github.com/AJRDRGZ/db-query-builder/models"
-)
+	)
 
 type UseCase interface {
 	Create(m *model.UserRole) error
@@ -205,6 +208,7 @@ type Storage interface {
 					Table:      "roles",
 					Fields:     nil,
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: `package role
@@ -213,7 +217,7 @@ import (
 	"github.com/edteamlat/go-wizard/model"
 
 	"github.com/AJRDRGZ/db-query-builder/models"
-)
+	)
 
 type UseCase interface {
 	Create(m *model.Role) error
@@ -262,6 +266,7 @@ func getDomainUseCaseLayerTests() testTables {
 						},
 					},
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: `package user
@@ -271,7 +276,7 @@ import (
 
 	"github.com/edteamlat/go-wizard/model"
 	"github.com/AJRDRGZ/db-query-builder/models"
-)
+	)
 
 var allowedFieldsForQuery = []string{
 	"id","created_at",
@@ -851,6 +856,7 @@ func getHandlerLayerTests() testTables {
 					Model:      "Order",
 					Table:      "orders",
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: fmt.Sprintf(`package %[2]s
@@ -967,6 +973,7 @@ func (h handler) GetAllWhere(c echo.Context) error {
 					Model:      "OrderItem",
 					Table:      "OrderItems",
 					ModuleName: moduleName,
+					IDType:     model.IDUint,
 				},
 			},
 			wantWr: fmt.Sprintf(`package %[2]s
@@ -1072,6 +1079,123 @@ func (h handler) GetAllWhere(c echo.Context) error {
 `, moduleName, "orderitem", "OrderItem"),
 			wantErr: false,
 		},
+		{
+			name: "two words package",
+			fields: fields{
+				tpl: tpl,
+			},
+			args: args{
+				templateName: "handler.gotpl",
+				data: model.Layer{
+					Model:      "OrderItem",
+					Table:      "OrderItems",
+					ModuleName: moduleName,
+					IDType:     model.IDUUID,
+				},
+			},
+			wantWr: fmt.Sprintf(`package %[2]s
+
+import (
+	"%[1]s/domain/%[2]s"
+	"%[1]s/infrastructure/handler/request"
+	"%[1]s/infrastructure/handler/response"
+	"%[1]s/model"
+
+	"github.com/labstack/echo/v4"
+)
+
+type handler struct {
+	useCase %[2]s.UseCase
+	response response.Responser
+}
+
+func newHandler(useCase %[2]s.UseCase, response response.Responser) handler {
+	return handler{useCase: useCase, response: response}
+}
+
+// Create handles the creation of a model.%[3]s
+func (h handler) Create(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	if err := h.useCase.Create(&m); err != nil {
+		return h.response.Error(c, "useCase.Create()", err)
+	}
+
+	return c.JSON(h.response.Created(m))
+}
+
+// Update handles the update of a model.%[3]s
+func (h handler) Update(c echo.Context) error {
+	m := model.%[3]s{}
+
+	if err := c.Bind(&m); err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	ID, err := request.ExtractUUIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+	m.ID = ID
+
+	if err := h.useCase.Update(&m); err != nil {
+		return h.response.Error(c, "useCase.Update()", err)
+	}
+
+	return c.JSON(h.response.Updated(m))
+}
+
+// Delete handles the deleting of a model.%[3]s
+func (h handler) Delete(c echo.Context) error {
+	ID, err := request.ExtractUUIDFromURLParam(c)
+	if err != nil {
+		return h.response.BindFailed(c, err)
+	}
+
+	err = h.useCase.Delete(ID)
+	if err != nil {
+		return h.response.Error(c, "useCase.Delete()", err)
+	}
+
+	return c.JSON(h.response.Deleted(nil))
+}
+
+// GetWhere handles the search of a model.%[3]s
+func (h handler) GetWhere(c echo.Context) error {
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItemData, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItemData))
+}
+
+// GetAllWhere handles the search of all model.%[3]s
+func (h handler) GetAllWhere(c echo.Context) error {
+	filtersSpecification, err := request.GetFiltersSpecification(c)
+	if err != nil {
+		return err
+	}
+
+	orderItems, err := h.useCase.GetAllWhere(filtersSpecification)
+	if err != nil {
+		return h.response.Error(c, "useCase.GetAllWhere()", err)
+	}
+
+	return c.JSON(h.response.OK(orderItems))
+}
+`, moduleName, "orderitem", "OrderItem"),
+			wantErr: false,
+		},
 	}
 
 }
@@ -1138,6 +1262,7 @@ import (
 	"github.com/AJRDRGZ/db-query-builder/models"
 	"github.com/AJRDRGZ/db-query-builder/postgres"
 	"github.com/AJRDRGZ/db-query-builder/nullhandler"
+	"github.com/google/uuid"
 )
 
 const table = "specialities"
@@ -1213,7 +1338,7 @@ func (%[4]s %[3]s) Update(m *model.%[3]s) error {
 }
 
 // Delete deletes a model.%[3]s by id
-func (%[4]s %[3]s) Delete(ID uint) error {
+func (%[4]s %[3]s) Delete(ID uuid.UUID) error {
 	stmt, err := %[4]s.db.Prepare(psqlDelete)
 	if err != nil {
 		return err
