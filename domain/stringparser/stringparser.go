@@ -118,7 +118,7 @@ func handleNull(f model.Field) string {
 	case "time.Time":
 		return fmt.Sprintf("nullhandler.TimeToNull(m.%s)", field)
 	case "bool":
-		return fmt.Sprintf("nullhandler.BoolToNull(m.%s)", field)
+		return fmt.Sprintf("nullhandler.BoolToNull(&m.%s)", field)
 	default:
 		return fmt.Sprintf("invalid data type: %s", f.Type)
 	}
