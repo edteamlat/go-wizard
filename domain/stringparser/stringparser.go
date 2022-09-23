@@ -80,14 +80,21 @@ func parseIdToID(v string) string {
 	return strings.ReplaceAll(v, "Id", "ID")
 }
 
-func parseToSqlType(v string) string {
+func parseToSqlType(v string, size int) string {
 	switch v {
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		return "INTEGER"
 	case "float64", "float32":
 		return "NUMERIC(SIZE)"
 	case "string":
-		return "VARCHAR(SIZE)"
+		if size < 0 {
+			return "TEXT"
+		}
+		if size == 0 {
+			return "VARCHAR(255)"
+		}
+
+		return fmt.Sprintf("VARCHAR(%d)", size)
 	case "bool":
 		return "BOOLEAN"
 	case "time.Time":
@@ -109,12 +116,14 @@ func handleNull(f model.Field) string {
 	switch f.Type {
 	case "string":
 		return fmt.Sprintf("nullhandler.StringToNull(m.%s)", field)
-	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+	case "int64":
+		return fmt.Sprintf("nullhandler.Int64ToNull(m.%s)", field)
+	case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32", "uint64":
 		return fmt.Sprintf("nullhandler.Int64ToNull(int64(m.%s))", field)
 	case "float32":
 		return fmt.Sprintf("nullhandler.Float64ToNull(float64(m.%s))", field)
 	case "float64":
-		return fmt.Sprintf("nullhandler.FloatToNull(m.%s)", field)
+		return fmt.Sprintf("nullhandler.Float64ToNull(m.%s)", field)
 	case "time.Time":
 		return fmt.Sprintf("nullhandler.TimeToNull(m.%s)", field)
 	case "bool":
@@ -158,7 +167,9 @@ func parseNullFieldsOnScan(f model.Field) string {
 	switch f.Type {
 	case "string":
 		return fmt.Sprintf("m.%s = %s.String", field, fieldNull)
-	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
+	case "int64":
+		return fmt.Sprintf("m.%s = %s.Int64", field, fieldNull)
+	case "int", "int8", "int16", "int32", "uint", "uint8", "uint16", "uint32", "uint64":
 		return fmt.Sprintf("m.%s = %s(%s.Int64)", field, f.Type, fieldNull)
 	case "float32":
 		return fmt.Sprintf("m.%s = %s(%s.Float64)", field, f.Type, fieldNull)
@@ -220,7 +231,7 @@ func printMigrationFieldsWithoutDefaults(fields model.Fields) string {
 			continue
 		}
 
-		msg.WriteString(fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type), parseNull(field.IsNull)))
+		msg.WriteString(fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type, field.FieldSize), parseNull(field.IsNull)))
 	}
 
 	return strings.TrimSpace(msg.String())

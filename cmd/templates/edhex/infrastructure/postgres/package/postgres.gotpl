@@ -29,7 +29,7 @@ var constraints = postgres.Constraints{
 var (
 	psqlInsert                  = {{ if eq .IDType "uint" }}postgres.BuildSQLInsert(table, fields){{ else }}postgres.BuildSQLInsertWithID(table, fields){{ end }}
 	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
-	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
+	psqlDelete 					= postgres.BuildSQLDelete(table)
 	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
 )
 
@@ -103,10 +103,7 @@ func ({{ $receiverName }} {{ .Model }}) Delete(ID {{.IDType}}) error {
 
 // GetWhere gets an ordered model.{{ .Model }} with filters
 func ({{ $receiverName }} {{ .Model }}) GetWhere(specification models.FieldsSpecification) (model.{{ .Model }}, error) {
-	conditions, args := postgres.BuildSQLWhere(specification.Filters)
-	query := psqlGetAll + " " + conditions
-
-	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
+	query, args := postgres.BuildQueryArgsAndPagination(psqlGetAll, specification.Filters, specification.Sorts, specification.Pagination)
 
 	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {
@@ -119,11 +116,7 @@ func ({{ $receiverName }} {{ .Model }}) GetWhere(specification models.FieldsSpec
 
 // GetAllWhere gets all model.{{ .Model }}s with Fields
 func ({{ $receiverName }} {{ .Model }}) GetAllWhere(specification models.FieldsSpecification) (model.{{ $slice }}, error) {
-	conditions, args := postgres.BuildSQLWhere(specification.Filters)
-	query := psqlGetAll + " " + conditions
-
-	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
-	query += " " + postgres.BuildSQLPagination(specification.Pagination)
+	query, args := postgres.BuildQueryArgsAndPagination(psqlGetAll, specification.Filters, specification.Sorts, specification.Pagination)
 
 	stmt, err := {{ $receiverName }}.db.Prepare(query)
 	if err != nil {

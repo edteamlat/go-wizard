@@ -1,4 +1,8 @@
+# if you don't specify this field, the wizard will use the working directory (pwd)
+# here you'll have to change the username and set the correct path to your project
 project_path: $GOPATH/src/
+
+# the module_name is used to create the imports
 module_name: github.com/edteamlat/go-wizzard
 
 # Use for the name of the structs of the different layers
@@ -18,6 +22,7 @@ time_type: time.Time
 id_type: uint
 
 # a list of objects where you specify the name, type and if it allows nulls
+# by default the fields' id, created_at and updated_at will be created
 fields:
   - name: user_id
     type: uint
@@ -25,13 +30,14 @@ fields:
   - name: description
     type: string
     is_null: true
+    field_size: 100 # only for string type, if not specified, it'll be 255, if you put -1, it'll be of type TEXT instead of VARCHAR
   - name: created_at
     type: time.Time
     is_null: false
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it
-layers: # by default the fields id, created_at and updated_at will be created
+layers:
   - domain
   - handler_echo # we only support the echo framework for now
   - storage_postgres # we don't support other db system for now
