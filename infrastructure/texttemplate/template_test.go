@@ -1281,7 +1281,7 @@ var constraints = postgres.Constraints{
 var (
 	psqlInsert                  = postgres.BuildSQLInsertWithID(table, fields)
 	psqlUpdate                  = postgres.BuildSQLUpdateByID(table, fields)
-	psqlDelete                  = "DELETE FROM " + table + " WHERE id = $1"
+	psqlDelete 					= postgres.BuildSQLDelete(table)
 	psqlGetAll                  = postgres.BuildSQLSelect(table, fields)
 )
 
@@ -1355,10 +1355,7 @@ func (%[4]s %[3]s) Delete(ID uuid.UUID) error {
 
 // GetWhere gets an ordered model.%[3]s with filters
 func (%[4]s %[3]s) GetWhere(specification models.FieldsSpecification) (model.%[3]s, error) {
-	conditions, args := postgres.BuildSQLWhere(specification.Filters)
-	query := psqlGetAll + " " + conditions
-
-	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
+	query, args := postgres.BuildQueryArgsAndPagination(psqlGetAll, specification.Filters, specification.Sorts, specification.Pagination)
 
 	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
@@ -1371,11 +1368,7 @@ func (%[4]s %[3]s) GetWhere(specification models.FieldsSpecification) (model.%[3
 
 // GetAllWhere gets all model.%[3]ss with Fields
 func (%[4]s %[3]s) GetAllWhere(specification models.FieldsSpecification) (model.Specialities, error) {
-	conditions, args := postgres.BuildSQLWhere(specification.Filters)
-	query := psqlGetAll + " " + conditions
-
-	query += " " + postgres.BuildSQLOrderBy(specification.Sorts)
-	query += " " + postgres.BuildSQLPagination(specification.Pagination)
+	query, args := postgres.BuildQueryArgsAndPagination(psqlGetAll, specification.Filters, specification.Sorts, specification.Pagination)
 
 	stmt, err := %[4]s.db.Prepare(query)
 	if err != nil {
