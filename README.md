@@ -1,5 +1,6 @@
 # 🧙 Go Wizard
->This README.md is also available in [Spanish](README_ES.md).
+
+> This README.md is also available in [Spanish](README_ES.md).
 
 Is a command line interface that provides you with useful commands to help you build your application with the Hexagonal
 Architecture. It allows you to generate the initial structure of a project and to generate every layer of a new package.
@@ -74,25 +75,29 @@ it'll automatically init git and the go modules.
     ├── README.md
     └── wizard-config.yaml
 ```
+
 Once the installation is done, you can open your project folder:
+
 ```bash
 cd my-app
 ```
 
-Inside the created project, you must run the next command to install the dependencies:
-```bash
-go mod tidy
-```
+After we init the project the `go mod tidy` command will be executed to download the dependencies.
 
 If you want to get more information about this command, run:
+
 ```bash
 go-wizard help init
 ```
 
 ### `add package` command
-With this command you can create the CRUD on the available layers that will read from a config yaml file that is generated when you run the init command:
+
+With this command you can create the CRUD on the available layers that will read from a config yaml file that is
+generated when you run the init command:
+
 ```yaml
 # if you don't specify this field, the wizard will automatically use the path of working directory (pwd)
+# here you'll have to change the username and set the correct path to your project
 project_path: /home/username/Documents/code/
 
 # the module_name is used to create the imports
@@ -124,6 +129,7 @@ fields:
   - name: description
     type: string
     is_null: true
+    field_size: 255 # only for string type, if not specified, it'll be 255, if you put -1, it'll be of type TEXT instead of VARCHAR
   - name: is_active
     type: bool
     is_null: false
@@ -141,14 +147,16 @@ layers:
   - sqlmigration_postgres # here we'll save the sql files to modify our db, it only supports postgres syntax for now
 ```
 
-This config file is added on the root of your project  with the name `wizard-config.yaml` when you exec the init command.
+This config file is added on the root of your project with the name `wizard-config.yaml` when you exec the init command.
 
 To create a new package just fill the config file and exec the next command:
+
 ```bash
 go-wizard add package
 ```
 
 With the config file of above this command will generate the following:
+
 ```bash
 ├── cmd
 ├── domain
@@ -173,8 +181,40 @@ With the config file of above this command will generate the following:
 
 Now you can enter into every file that was generated to see what's inside.
 
+You can also pass the flag `-c` to indicate the path of the config file:
+
+```bash
+go-wizard add package -c /home/username/Documents/code/my-app/wizard-config.yaml
+```
 
 If you want to get more information about this command, run:
+
 ```bash
 go-wizard help add
 ```
+
+## 🏷 Available types
+
+| Go Type         | Postgres type                  |
+|-----------------|--------------------------------|
+| string          | VARCHAR(SIZE) and TEXT         |
+| int             | INTEGER                        |
+| int8            | INTEGER                        |
+| int16           | INTEGER                        |
+| int32           | INTEGER                        |
+| int64           | INTEGER                        |
+| uint            | INTEGER                        |
+| uint8           | INTEGER                        |
+| uint16          | INTEGER                        |
+| uint32          | INTEGER                        |
+| uint64          | INTEGER                        |
+| float32         | NUMERIC()                      |
+| float64         | NUMERIC()                      |
+| bool            | BOOLEAN                        |
+| time.Time       | TIMESTAMP and INTEGER for unix |
+| uuid.UUID       | UUID                           |
+| json.RawMessage | JSON                           |
+
+If other types are used, the wizard will return set INVALID_TYPE as the type of the field, so if you want to use other
+types, you'll have to open an issue or make a PR.
+

@@ -27,9 +27,6 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 	if err := yaml.Unmarshal(fileBytes, &conf); err != nil {
 		return conf, fmt.Errorf("config: could not unmarshal file, %w", err)
 	}
-	if !conf.IsProjectPathEmpty() {
-		return conf, nil
-	}
 
 	if !conf.HasValidTimeType() {
 		conf.TimeType = model.Timestamp
@@ -37,6 +34,10 @@ func readConfig(filename string, action runner.Action) (model.Config, error) {
 
 	if !conf.HasValidIDType() {
 		conf.IDType = model.IDUint
+	}
+
+	if !conf.IsProjectPathEmpty() {
+		return conf, nil
 	}
 
 	dir, err := os.Getwd()
