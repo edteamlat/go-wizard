@@ -27,6 +27,10 @@ type Layer struct {
 
 	TimeType TimeEnum `yaml:"time_type"`
 	IDType   IDEnum   `yaml:"id_type"`
+
+	// IsStorageLayerGenerated we need this to know if we'll pass this dependency to the domain
+	// in the routes layer
+	IsStorageLayerGenerated bool `yaml:"is_storage_layer_generated"`
 }
 
 // NewLayer returns a new Layer with module and table Field initialized
@@ -49,14 +53,15 @@ func NewLayer(conf Config) Layer {
 	}}...)
 
 	return Layer{
-		ProjectPath:  conf.ProjectPath,
-		ModuleName:   conf.ModuleName,
-		Model:        conf.Model,
-		Table:        conf.Table,
-		TableComment: conf.TableComment,
-		Fields:       fields,
-		TimeType:     conf.TimeType,
-		IDType:       conf.IDType,
+		ProjectPath:             conf.ProjectPath,
+		ModuleName:              conf.ModuleName,
+		Model:                   conf.Model,
+		Table:                   conf.Table,
+		TableComment:            conf.TableComment,
+		Fields:                  fields,
+		TimeType:                conf.TimeType,
+		IDType:                  conf.IDType,
+		IsStorageLayerGenerated: conf.IsStorageLayerRequired(),
 	}
 }
 

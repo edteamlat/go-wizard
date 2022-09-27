@@ -80,27 +80,37 @@ func parseIdToID(v string) string {
 	return strings.ReplaceAll(v, "Id", "ID")
 }
 
-func parseToSqlType(v string, size int) string {
-	switch v {
+func parseToSqlType(m model.Field) string {
+	switch m.Type {
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
 		return "INTEGER"
 	case "float64", "float32":
-		return "NUMERIC(SIZE)"
+		if m.NumericPrecision == 0 {
+			m.NumericPrecision = 10
+		}
+
+		if m.NumericScale == 0 {
+			return fmt.Sprintf("NUMERIC(%d)", m.NumericPrecision)
+		}
+
+		return fmt.Sprintf("NUMERIC(%d, %d)", m.NumericPrecision, m.NumericScale)
 	case "string":
-		if size < 0 {
+		if m.FieldSize < 0 {
 			return "TEXT"
 		}
-		if size == 0 {
+		if m.FieldSize == 0 {
 			return "VARCHAR(255)"
 		}
 
-		return fmt.Sprintf("VARCHAR(%d)", size)
+		return fmt.Sprintf("VARCHAR(%d)", m.FieldSize)
 	case "bool":
 		return "BOOLEAN"
 	case "time.Time":
 		return "TIMESTAMP"
 	case "json.RawMessage":
 		return "JSON"
+	case "uuid.UUID":
+		return "UUID"
 	default:
 		return "UNKNOWN-TYPE"
 	}
@@ -231,7 +241,7 @@ func printMigrationFieldsWithoutDefaults(fields model.Fields) string {
 			continue
 		}
 
-		msg.WriteString(fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field.Type, field.FieldSize), parseNull(field.IsNull)))
+		msg.WriteString(fmt.Sprintf("%s %s%s,\n\t", field.Name, parseToSqlType(field), parseNull(field.IsNull)))
 	}
 
 	return strings.TrimSpace(msg.String())
