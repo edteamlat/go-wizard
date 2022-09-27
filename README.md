@@ -136,6 +136,10 @@ fields:
   - name: begins_at
     type: time.Time
     is_null: false
+  - name: priority
+    type: float64
+    numeric_precision: 10 # only for float type, if not specify, it'll be 10, must be a positive number
+    numeric_scale: 2 # only for float type, if not specified, it'll be 2, can be either positive or negative
 
 # The available layers that we can generate
 # if you don't want to use one, just remove it

@@ -302,8 +302,7 @@ func (u User) Create(m *model.User) error {
 		return fmt.Errorf("user: %w", err)
 	}
 
-	err := u.storage.Create(m)
-	if err != nil {
+	if err := u.storage.Create(m); err != nil {
 		return handleStorageErr(err)
 	}
 
@@ -381,11 +380,11 @@ func (u User) GetAllWhere(specification models.FieldsSpecification) (model.Users
 // handleStorageErr handles errors from storage layer
 func handleStorageErr(err error) error {
 	e := model.NewError()
-	e.SetError(err)
+	e.SetError(fmt.Errorf("user: %w", err))
 
 	switch err {
 	default:
-		return err
+		return e
 	}
 }
 `,
@@ -628,14 +627,17 @@ INSERT INTO modules (name) VALUES ('COURSE');
 							IsNull: false,
 						},
 						{
-							Name:   "price",
-							Type:   "float32",
-							IsNull: false,
+							Name:             "price",
+							Type:             "float32",
+							IsNull:           false,
+							NumericPrecision: 10,
 						},
 						{
-							Name:   "base_price",
-							Type:   "float64",
-							IsNull: true,
+							Name:             "base_price",
+							Type:             "float64",
+							IsNull:           true,
+							NumericPrecision: 10,
+							NumericScale:     2,
 						},
 						{
 							Name:   "is_active",
@@ -660,8 +662,8 @@ INSERT INTO modules (name) VALUES ('COURSE');
 			wantWr: `CREATE TABLE course_prices (
 	id SERIAL NOT NULL,
 	course_id INTEGER NOT NULL,
-	price NUMERIC(SIZE) NOT NULL,
-	base_price NUMERIC(SIZE),
+	price NUMERIC(10) NOT NULL,
+	base_price NUMERIC(10, 2),
 	is_active BOOLEAN NOT NULL,
 	begins_at TIMESTAMP NOT NULL,
 	ends_at TIMESTAMP,
@@ -693,9 +695,10 @@ func getHandlerRouteLayerTests() testTables {
 			args: args{
 				templateName: "route.gotpl",
 				data: model.Layer{
-					Model:      "Invoice",
-					Table:      "invoices",
-					ModuleName: moduleName,
+					Model:                   "Invoice",
+					Table:                   "invoices",
+					ModuleName:              moduleName,
+					IsStorageLayerGenerated: true,
 				},
 			},
 			wantWr: fmt.Sprintf(`package invoice
@@ -729,7 +732,7 @@ func buildHandler(specification model.RouterSpecification) handler {
 
 // adminRoutes handle the routes that requires a token and permissions to certain users
 func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
-	route := api.Group("api/v1/admin/invoices", middlewares...)
+	route := api.Group("/api/v1/admin/invoices", middlewares...)
 
 	route.POST("", h.Create)
 	route.PUT("/:id", h.Update)
@@ -769,9 +772,10 @@ func publicRoutes(api *echo.Echo, h handler) {
 			args: args{
 				templateName: "route.gotpl",
 				data: model.Layer{
-					Model:      "InvoiceItem",
-					Table:      "invoice_items",
-					ModuleName: moduleName,
+					Model:                   "InvoiceItem",
+					Table:                   "invoice_items",
+					ModuleName:              moduleName,
+					IsStorageLayerGenerated: true,
 				},
 			},
 			wantWr: fmt.Sprintf(`package invoiceitem
@@ -805,7 +809,7 @@ func buildHandler(specification model.RouterSpecification) handler {
 
 // adminRoutes handle the routes that requires a token and permissions to certain users
 func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
-	route := api.Group("api/v1/admin/invoice-items", middlewares...)
+	route := api.Group("/api/v1/admin/invoice-items", middlewares...)
 
 	route.POST("", h.Create)
 	route.PUT("/:id", h.Update)

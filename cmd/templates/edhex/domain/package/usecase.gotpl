@@ -37,9 +37,14 @@ func ({{ $reciverName }} {{ $reciverType }}) Create(m *model.{{ .Model }}) error
 	if err := m.Validate(); err != nil {
 		return fmt.Errorf("{{ $packageName }}: %w", err)
 	}
-
-	err := {{ $reciverName }}.storage.Create(m)
+{{if eq .IDType "uuid.UUID"}}
+	ID, err := uuid.NewUUID()
 	if err != nil {
+		return fmt.Errorf("{{$packageName}}.%s %w", "uuid.NewUUID()", err)
+	}
+	m.ID = ID
+{{end}}
+	if err := {{ $reciverName }}.storage.Create(m); err != nil {
 		return handleStorageErr(err)
 	}
 
@@ -117,10 +122,10 @@ func ({{ $reciverName }} {{ .Model }}) GetAllWhere(specification models.FieldsSp
 // handleStorageErr handles errors from storage layer
 func handleStorageErr(err error) error {
 	e := model.NewError()
-	e.SetError(err)
+	e.SetError(fmt.Errorf("{{$packageName}}: %w", err))
 
 	switch err {
 	default:
-		return err
+		return e
 	}
 }

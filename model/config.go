@@ -3,6 +3,7 @@ package model
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type TimeEnum string
@@ -75,4 +76,14 @@ func (c *Config) AddDefaultInitLayers() {
 
 func (c Config) IsProjectPathEmpty() bool {
 	return c.ProjectPath == ""
+}
+
+func (c Config) IsStorageLayerRequired() bool {
+	for _, layer := range c.Layers {
+		if strings.HasPrefix(layer, "storage") {
+			return true
+		}
+	}
+
+	return false
 }

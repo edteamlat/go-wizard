@@ -7,7 +7,7 @@ import (
 	"{{ .ModuleName }}/model"
 	"{{ .ModuleName }}/infrastructure/handler/response"
 	"{{ .ModuleName }}/domain/{{ $package }}"
-	{{ $package }}Storage "{{ .ModuleName }}/infrastructure/postgres/{{ $package }}"
+	{{if eq .IsStorageLayerGenerated true}}{{ $package }}Storage "{{ .ModuleName }}/infrastructure/postgres/{{ $package }}"{{end}}
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,13 +26,13 @@ func NewRouter(specification model.RouterSpecification) {
 func buildHandler(specification model.RouterSpecification) handler {
 	responser := response.New(specification.Logger)
 
-	useCase := {{ $package }}.New({{$package}}Storage.New(specification.DB))
+	useCase := {{ $package }}.New({{if eq .IsStorageLayerGenerated true}}{{$package}}Storage.New(specification.DB){{else}}nil{{end}})
 	return newHandler(useCase, responser)
 }
 
 // adminRoutes handle the routes that requires a token and permissions to certain users
 func adminRoutes(api *echo.Echo, h handler, middlewares ...echo.MiddlewareFunc) {
-	route := api.Group("api/v1/admin/{{ $routeResource }}", middlewares...)
+	route := api.Group("/api/v1/admin/{{ $routeResource }}", middlewares...)
 
 	route.POST("", h.Create)
 	route.PUT("/:id", h.Update)
