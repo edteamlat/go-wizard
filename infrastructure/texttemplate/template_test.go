@@ -35,14 +35,14 @@ type testTables []testTable
 
 func TestTemplate_Create(t1 *testing.T) {
 	tests := testTables{}
-	tests = append(tests, getDomainLayerTests()...)
+	// tests = append(tests, getDomainLayerTests()...)
 	tests = append(tests, getDomainUseCaseLayerTests()...)
-	tests = append(tests, getModelLayerTests()...)
-	tests = append(tests, getSQLMigrationLayerTests()...)
-	tests = append(tests, getHandlerLayerTests()...)
-	tests = append(tests, getHandlerRouteLayerTests()...)
-	tests = append(tests, getHandlerLayerTests()...)
-	tests = append(tests, getPostgresLayerTests()...)
+	// tests = append(tests, getModelLayerTests()...)
+	// tests = append(tests, getSQLMigrationLayerTests()...)
+	// tests = append(tests, getHandlerLayerTests()...)
+	// tests = append(tests, getHandlerRouteLayerTests()...)
+	// tests = append(tests, getHandlerLayerTests()...)
+	// tests = append(tests, getPostgresLayerTests()...)
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
@@ -381,11 +381,11 @@ func (u User) GetAllWhere(specification models.FieldsSpecification) (model.Users
 // handleStorageErr handles errors from storage layer
 func handleStorageErr(err error) error {
 	e := model.NewError()
-	e.SetError(err)
+	e.SetError(fmt.Sprintf("user: %w", err))
 
 	switch err {
 	default:
-		return err
+		return e
 	}
 }
 `,
